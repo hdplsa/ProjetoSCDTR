@@ -1,5 +1,6 @@
 #include "LightSensor.h"
 #include "LedPWM.h"
+#include "LumItensity.h"
 
 LightSensor *ls;
 LedPWM *Ledp;
