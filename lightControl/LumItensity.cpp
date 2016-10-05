@@ -11,19 +11,14 @@ const double a = log(25000);
 // and receives a lightsensor variable,
 // from where we can get the LDR's resistance.
 LumItensity::LumItensity(LightSensor *ls){
-  this->Rs = 10000;
   this->lumIt = 0;
   this->ls = ls;
 }
 
-void LumItensity::setSensorResistance(double Rs){
-  this->Rs = Rs;
-}
-
 double LumItensity::getLuminousItensity(){
   double R,light;
-  
-  R = ls->getSensorResistance();
+  //Calcula intensidade luminosa pelos dados do sensor
+  R = this->ls->getSensorResistance();
   light = log(R/a)/log(k);
   return light;
 }
