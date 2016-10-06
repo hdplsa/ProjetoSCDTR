@@ -1,9 +1,12 @@
 #include "LedPWM.h"
 
 LedPWM::LedPWM(int LedPin,double PLed){
+  //Pino de saída onde está o LED
   this->LedPin = LedPin;
+  //Potência do LED (W)
   this->PLed = PLed;
-  this->TPWM = 1/490;
+  //Periodo de onda PWM (s)
+  this->TPWM = 1.0/490.0;
 }
 
 double LedPWM::getTPWM(){

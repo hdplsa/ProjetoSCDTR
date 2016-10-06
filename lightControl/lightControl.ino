@@ -15,7 +15,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   ls = new LightSensor(sensorPin);
-  Ledp = new LedPWM(ledPin,1);
+  Ledp = new LedPWM(ledPin,0.085);
   luminten = new LumItensity(ls);
 }
 

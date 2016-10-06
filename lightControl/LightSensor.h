@@ -8,7 +8,7 @@ class LightSensor{
   int PinInput;
   int RPin;
   //Resistance
-  int R;
+  double R;
   
   public:
     LightSensor(int PinInput);
