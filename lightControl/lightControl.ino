@@ -15,7 +15,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   ls = new LightSensor(sensorPin);
-  Ledp = new LedPWM(ledPin);
+  Ledp = new LedPWM(ledPin,1);
   luminten = new LumItensity(ls);
 }
 
@@ -58,6 +58,9 @@ void loop() {
   //Serial.print("\n");
   Serial.print("lux = ");
   Serial.print(lux);
+  Serial.print("\n");
+  Serial.print("Energia = ");
+  Serial.print(Ledp->calculateLedEnergyCycle());
   Serial.print("\n");
 
   delay(50);
