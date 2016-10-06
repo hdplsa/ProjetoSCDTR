@@ -4,9 +4,6 @@
 // R = a*lux^k, where 'k' and 'a' are constants
 // obtained form the datasheet.
 
-//const double k = 0.5294;
-//const double a = 25000;
-
 const double k = -0.2882;
 const double a = 22000;
 
