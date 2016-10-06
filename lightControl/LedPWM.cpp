@@ -18,15 +18,14 @@ void LedPWM::setLedPWM(int value){
 }
 
 double LedPWM::calculateLedEnergyCycle(){
-  double E, d;
-  E = PLed*(this->dutCycle/255)*this->TPWM;
-  return E;
+  double DtC;
+  DtC = this->dutCycle;
+  return PLed*(DtC/255.0)*this->TPWM;
 }
 
 LedPWM::~LedPWM(){
   
 }
-
 
 void LedPWM::setPWMOutput(int pin, int dutCycle){
   this->dutCycle = dutCycle;
