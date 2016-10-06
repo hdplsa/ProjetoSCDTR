@@ -4,8 +4,15 @@
 // R = a*lux^k, where 'k' and 'a' are constants
 // obtained form the datasheet.
 
-const double k = 0.5294;
-const double a = log(25000);
+//const double k = 0.5294;
+//const double a = 25000;
+
+const double k = -0.2882;
+const double a = 22000;
+
+//const double k = -1.0328;
+//const double a = 70000;
+
 
 // Constructor, has the default value of Rs, 
 // and receives a lightsensor variable,
@@ -19,7 +26,7 @@ double LumItensity::getLuminousItensity(){
   double R,light;
   //Calcula intensidade luminosa pelos dados do sensor
   R = this->ls->getSensorResistance();
-  light = log(R/a)/log(k);
+  light = pow(R/a,1/k);
   return light;
 }
 

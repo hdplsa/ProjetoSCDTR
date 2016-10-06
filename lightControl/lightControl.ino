@@ -26,9 +26,9 @@ void loop() {
   R = ls->getSensorResistance();
   lux = luminten->getLuminousItensity();
 
-//  Serial.print("R = ");
-//  Serial.print(R);
-//  Serial.print("\n");
+  Serial.print("R = ");
+  Serial.print(R);
+  Serial.print("\n");
   Serial.print("lux = ");
   Serial.print(lux);
   Serial.print("\n");
