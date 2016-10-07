@@ -19,6 +19,23 @@ void setup() {
   luminten = new LumItensity(ls);
 }
 
+//Inicialização - Calibração
+void nome_qualquer(){
+  double y[10];
+  double u[10];
+  int n;
+  //Recolha de dados para regressão linear
+  for(n=0;n<=10;n=n+1){
+    u[n] = 0.5*n;
+    Ledp->setLedPWMVoltage(u[n]);
+    delay(1000);
+    y[n] = ls->getSensorVoltage();
+    Serial.print("y[n] = ");
+    Serial.print(y[n]);
+    Serial.print("\n");
+  }
+}
+
 void reset_board_serial(void (*f())){
 
   int incoming;
@@ -62,6 +79,7 @@ void loop() {
   Serial.print("Energia = ");
   Serial.print(Ledp->calculateLedEnergyCycle());
   Serial.print("\n");
+  nome_qualquer();
 
   delay(50);
 

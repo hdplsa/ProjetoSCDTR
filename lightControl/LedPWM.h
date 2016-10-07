@@ -15,7 +15,8 @@ class LedPWM{
   public:
     LedPWM(int LedPin,double PLed);
     double getTPWM();
-    void setLedPWM(int value);
+    void setLedPWM(int dutCycle);
+    void setLedPWMVoltage(int value);
     double calculateLedEnergyCycle();
     ~LedPWM();
     
