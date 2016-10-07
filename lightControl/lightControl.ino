@@ -21,11 +21,19 @@ void setup() {
 
 //Inicialização - Calibração
 void nome_qualquer(){
-  double y[10];
-  double u[10];
+  //Variáveis experimentais
+  int N = 10;
+  double y[N];
+  double u[N];
+  double us[N];
+  //Variáveis Regressão
   int n;
+  double sum = 0;
+  double sumy = 0;
+  double sums = 0;
+  double sumyu = 0;
   //Recolha de dados para regressão linear
-  for(n=0;n<=10;n=n+1){
+  for(n=0;n<=N;n=n+1){
     u[n] = 0.5*n;
     Ledp->setLedPWMVoltage(u[n]);
     delay(1000);
@@ -34,6 +42,23 @@ void nome_qualquer(){
     Serial.print(y[n]);
     Serial.print("\n");
   }
+  //Regressão Linear (u - entrada, y - saída)
+  for(n=0;n<=N;n=n+1){
+    sum+=u[n];
+    us[n]=u[n]*u[n];
+    sums+=us[n];
+    sumy+=y[n];
+    sumyu+=u[n]*y[n];
+  }
+  double det = 1/(N*sums - sum*sum);
+  double k = det*(N*sumyu - sum*sumy);
+  double teta = det*(-sum*sumyu + sums*sumy);
+  Serial.print("k = ");
+  Serial.print(k);
+  Serial.print("\n");
+  Serial.print("theta = ");
+  Serial.print(teta);
+  Serial.print("\n");
 }
 
 void reset_board_serial(void (*f())){
