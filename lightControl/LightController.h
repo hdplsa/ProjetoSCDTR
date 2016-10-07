@@ -3,6 +3,11 @@
 
 class LightController{
 
+  public:
+    LightController();
+    ~LightController();
+  
+  private:
   
 };
 
