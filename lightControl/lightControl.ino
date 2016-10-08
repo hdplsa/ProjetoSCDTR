@@ -21,8 +21,9 @@ void setup() {
 
 //Inicialização - Calibração
 void nome_qualquer(){
-  //Variáveis experimentais
+  //Número de testes
   int N = 10;
+  //Variáveis experimentais
   double y[N];
   double u[N];
   double us[N];
@@ -32,15 +33,16 @@ void nome_qualquer(){
   double sumy = 0;
   double sums = 0;
   double sumyu = 0;
+  double det, k, teta;
   //Recolha de dados para regressão linear
   for(n=0;n<=N;n=n+1){
     u[n] = 0.5*n;
     Ledp->setLedPWMVoltage(u[n]);
     delay(1000);
-    y[n] = ls->getSensorVoltage();
-    Serial.print("y[n] = ");
+    y[n] = luminten->getLuminousItensity();
+    /*Serial.print("y[n] = ");
     Serial.print(y[n]);
-    Serial.print("\n");
+    Serial.print("\n");*/
   }
   //Regressão Linear (u - entrada, y - saída)
   for(n=0;n<=N;n=n+1){
@@ -50,9 +52,10 @@ void nome_qualquer(){
     sumy+=y[n];
     sumyu+=u[n]*y[n];
   }
-  double det = 1/(N*sums - sum*sum);
-  double k = det*(N*sumyu - sum*sumy);
-  double teta = det*(-sum*sumyu + sums*sumy);
+  det = 1/(N*sums - sum*sum);
+  k = det*(N*sumyu - sum*sumy);
+  teta = det*(-sum*sumyu + sums*sumy);
+
   Serial.print("k = ");
   Serial.print(k);
   Serial.print("\n");
@@ -102,7 +105,7 @@ void loop() {
   Serial.print(lux);
   Serial.print("\n");
   Serial.print("Energia = ");
-  Serial.print(Ledp->calculateLedEnergyCycle());
+  Serial.print(Ledp->calculateLedEnergyCycle(),4);
   Serial.print("\n");
   nome_qualquer();
 

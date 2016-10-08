@@ -23,9 +23,11 @@ void LedPWM::setLedPWMVoltage(int value){
 }
 
 double LedPWM::calculateLedEnergyCycle(){
-  double DtC;
+  double DtC,E;
   DtC = this->dutCycle;
-  return PLed*(DtC/255.0)*this->TPWM;
+  //Calcula energia num ciclo (mJ)
+  E = 1000*PLed*(DtC/255.0)*this->TPWM;
+  return E;
 }
 
 LedPWM::~LedPWM(){
