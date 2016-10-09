@@ -15,4 +15,6 @@ function y = getData(channel,baudrate,string,n)
         end
         y(i) = tmp;
     end
+    
+    fclose(arduino);
 end
