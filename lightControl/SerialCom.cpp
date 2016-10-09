@@ -23,7 +23,7 @@ void SerialCom::receive_message(){
 
   char in;
 
-  if(Serial.available() > 0){
+  while(Serial.available() > 0){
     in = Serial.read();
     // Cada mensagem enviada pelo pc tem que ser terminada por '\n'
     if(in != '\n'){
@@ -42,9 +42,9 @@ void SerialCom::receive_message(){
       this->process_request(this->incoming);
       
     }
-  } else {
-    return;
   }
+
+  return;
 
 }
 
@@ -56,8 +56,16 @@ void SerialCom::process_request(char *message){
   sscanf(message,"%i %i",&tipo, &valor);
 
   switch(tipo){
-    // Caso em que queremos mudar a referência
+    // Muda o valor do LED PWM
     case 0:
+      
+      break;
+    // Envia os valores do LDR em lux
+    case 1:
+      
+      break;
+    // Caso em que queremos mudar a referência local
+    case 2:
       //luminten->setLedLuminousItensity( (double) valor);
       break;
     // Caso o tipo de comando seja desconhecido

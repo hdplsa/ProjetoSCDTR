@@ -23,7 +23,7 @@ class LightController{
   double k, teta;
   
   public:
-    LightController(double Kp,double Ti,double Td);
+    LightController(int ledPin, int sensorPin, double Kp,double Ti,double Td);
     ~LightController();
   
   private:

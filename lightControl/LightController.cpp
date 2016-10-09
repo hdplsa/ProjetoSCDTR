@@ -1,13 +1,13 @@
 #include "LightController.h"
 
-LightController::LightController(double Kp,double Ti,double Td){
+LightController::LightController(int ledPin, int sensorPin, double Kp,double Ti,double Td){
   //Parâmetros do controlador
   this->Kp = Kp;
   this->Ti = Ti;
   this->Td = Td;
   //Depêndencias do feedback
-  this->ls = new LightSensor(9,5);
-  this->ledp = new LedPWM(9);
+  this->ls = new LightSensor(sensorPin,5);
+  this->ledp = new LedPWM(ledPin);
   //Variáveis do modelo
   this->k = 0;
   this->teta = 0;
