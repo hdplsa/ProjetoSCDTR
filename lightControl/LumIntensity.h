@@ -10,9 +10,7 @@ class LumIntensity{
   const double a = 22000;
   //Intensidade luminosa
   double lumIt;
-  double k, teta;
   LightSensor *ls;
-  LedPWM *ledp;
 
   public:
     LumIntensity(int ledPin, int sensorPin);
@@ -23,7 +21,6 @@ class LumIntensity{
     ~LumIntensity();
     
   private:
-    void calibrateLumVoltage();
     
 };
 
