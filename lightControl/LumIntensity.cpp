@@ -1,4 +1,4 @@
-#include "LumItensity.h"
+#include "LumIntensity.h"
 
 // The model for the conversion of R to lux is:
 // R = a*lux^k, where 'k' and 'a' are constants
@@ -7,7 +7,7 @@
 // Constructor, has the default value of Rs, 
 // and receives a lightsensor variable,
 // from where we can get the LDR's resistance.
-LumItensity::LumItensity(int ledPin, int sensorPin){
+LumIntensity::LumIntensity(int ledPin, int sensorPin){
   this->lumIt = 0;
   this->ls = new LightSensor(sensorPin, 5.0);
   this->ledp = new LedPWM(ledPin);
@@ -17,7 +17,7 @@ LumItensity::LumItensity(int ledPin, int sensorPin){
   this->calibrateLumVoltage();
 }
 
-double LumItensity::getLuminousItensity(){
+double LumIntensity::getLuminousItensity(){
   double R,light;
   //Calcula intensidade luminosa pelos dados do sensor
   R = this->ls->getSensorResistance();
@@ -25,19 +25,19 @@ double LumItensity::getLuminousItensity(){
   return light;
 }
 
-void LumItensity::setLedLuminousItensity(double l){
+void LumIntensity::setLedLuminousItensity(double l){
   double u;
   //Modelo matemático l = k*u+teta
   u = (l-this->teta)/this->k;
   this->ledp->setLedPWMVoltage(u);
 }
 
-LumItensity::~LumItensity(){
+LumIntensity::~LumIntensity(){
   
 }
 
 //Inicialização - Calibração
-void LumItensity::calibrateLumVoltage(){
+void LumIntensity::calibrateLumVoltage(){
   //Número de testes
   int N = 10;
   //Variáveis experimentais
@@ -50,7 +50,7 @@ void LumItensity::calibrateLumVoltage(){
   double sumy = 0;
   double sums = 0;
   double sumyu = 0;
-  double det, k, teta;
+  double det;
   //Recolha de dados para regressão linear
   for(n=0;n<=N;n=n+1){
     u[n] = 0.5*n;

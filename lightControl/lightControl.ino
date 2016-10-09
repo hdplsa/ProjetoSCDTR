@@ -1,10 +1,10 @@
 #include "LightSensor.h"
 #include "LedPWM.h"
-#include "LumItensity.h"
+#include "LumIntensity.h"
 
 LightSensor *ls;
 LedPWM *Ledp;
-LumItensity *luminten;
+LumIntensity *luminten;
 
 const int ledPin = 9;
 const int sensorPin = 5;
@@ -12,7 +12,7 @@ const int sensorPin = 5;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  luminten = new LumItensity(ledPin, sensorPin);
+  luminten = new LumIntensity(ledPin, sensorPin);
 }
 
 // funções auxiliares

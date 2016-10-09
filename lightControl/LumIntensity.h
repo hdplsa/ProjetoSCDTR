@@ -4,7 +4,7 @@
 #include "LightSensor.h"
 #include "LedPWM.h"
 
-class LumItensity{
+class LumIntensity{
   //Constantes Calibração
   const double K = -0.2882;
   const double a = 22000;
@@ -15,12 +15,12 @@ class LumItensity{
   LedPWM *ledp;
 
   public:
-    LumItensity(int ledPin, int sensorPin);
+    LumIntensity(int ledPin, int sensorPin);
     double getLuminousItensity();
     void setK(double K);
     void seta(double a);
     void setLedLuminousItensity(double u);
-    ~LumItensity();
+    ~LumIntensity();
     
   private:
     void calibrateLumVoltage();
