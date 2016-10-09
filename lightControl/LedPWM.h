@@ -9,11 +9,11 @@ class LedPWM{
   int LedPin;
   //Energia do LED
   int dutCycle;
-  double PLed;
+  const double PLed = 0.085; //Potência do LED
   double TPWM;
   
   public:
-    LedPWM(int LedPin,double PLed);
+    LedPWM(int LedPin);
     double getTPWM();
     void setLedPWM(int dutCycle);
     void setLedPWMVoltage(int value);

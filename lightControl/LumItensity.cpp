@@ -10,7 +10,7 @@
 LumItensity::LumItensity(int ledPin, int sensorPin){
   this->lumIt = 0;
   this->ls = new LightSensor(sensorPin, 5.0);
-  this->ledp = new LedPWM(ledPin,0);
+  this->ledp = new LedPWM(ledPin);
   //Calibrações - inicializações
   this->k = 0;
   this->teta = 0;
