@@ -1,8 +1,8 @@
 #ifndef LIGHTCONTROLLER_H_INCLUDED
 #define LIGHTCONTROLLER_H_INCLUDED
 
-#include "LumIntensity.h"
 #include "LedPWM.h"
+#include "LightSensor.h"
 
 /* class que pretende implementar um controlador PID
  * Como input do controlador está o erro de luminosidade medido
@@ -17,7 +17,7 @@ class LightController{
   double Ti;
   double Td;
   //Depêndencias do feedback
-  LumIntensity *lit;
+  LightSensor *ls;
   LedPWM *ledp;
   //Variáveis do modelo
   double k, teta;

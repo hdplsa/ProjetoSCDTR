@@ -11,11 +11,15 @@ class LightSensor{
   double AREF;
   //Resistance
   const double R = 10000.0;
+  //Constantes Calibração
+  const double K = -0.2882;
+  const double a = 22000;
   
   public:
     LightSensor(int PinInput, int AREF);
     double getSensorVoltage();
     double getSensorResistance();
+    double getLuminousItensity();
     ~LightSensor();
     
   private:

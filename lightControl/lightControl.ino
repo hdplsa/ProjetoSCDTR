@@ -1,9 +1,7 @@
 #include "LightSensor.h"
 #include "LedPWM.h"
-#include "LumIntensity.h"
 #include "SerialCom.h"
 
-LumIntensity *luminten;
 SerialCom *serialcom;
 
 const int ledPin = 9;
@@ -12,8 +10,7 @@ const int sensorPin = 5;
 void setup() {
   // put your setup code here, to run once:
   
-  luminten = new LumIntensity(ledPin, sensorPin);
-  serialcom = new SerialCom(9600, luminten);
+  serialcom = new SerialCom(9600);
   serialcom->send_message((char*)"Ready");
 }
 
@@ -45,7 +42,6 @@ void loop() {
   
   //Ledp->setLedPWM(100);
   //R = ls->getSensorResistance();
-  //lux = luminten->getLuminousItensity();
 
   //Serial.print("R = ");
   //Serial.print(R);

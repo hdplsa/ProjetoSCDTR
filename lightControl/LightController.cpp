@@ -6,7 +6,7 @@ LightController::LightController(double Kp,double Ti,double Td){
   this->Ti = Ti;
   this->Td = Td;
   //Depêndencias do feedback
-  this->lit = new LumIntensity(9,5);
+  this->ls = new LightSensor(9,5);
   this->ledp = new LedPWM(9);
   //Variáveis do modelo
   this->k = 0;
@@ -15,7 +15,7 @@ LightController::LightController(double Kp,double Ti,double Td){
 }
 
 LightController::~LightController(){
-  delete this->lit;
+  delete this->ls;
   delete this->ledp;
 }
 
@@ -39,7 +39,7 @@ void LightController::calibrateLumVoltage(){
     u[n] = 0.5*n;
     this->ledp->setLedPWMVoltage(u[n]);
     delay(1000);
-    y[n] = this->lit->getLuminousItensity();
+    y[n] = this->ls->getLuminousItensity();
     /*Serial.print("y[n] = ");
     Serial.print(y[n]);
     Serial.print("\n");*/

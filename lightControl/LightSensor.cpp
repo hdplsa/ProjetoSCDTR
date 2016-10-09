@@ -20,6 +20,21 @@ double LightSensor::getSensorResistance(){
   return R;
 }
 
+// The model for the conversion of R to lux is:
+// R = a*lux^k, where 'k' and 'a' are constants
+// obtained form the datasheet.
+
+// Constructor, has the default value of Rs, 
+// and receives a lightsensor variable,
+// from where we can get the LDR's resistance.
+double LightSensor::getLuminousItensity(){
+  double R,light;
+  //Calcula intensidade luminosa pelos dados do sensor
+  R = this->getSensorResistance();
+  light = pow(R/this->a,1/this->K);
+  return light;
+}
+
 LightSensor::~LightSensor(){
   
 }

@@ -4,10 +4,9 @@
 // serial, controla os envios por serial, as receções, e o proces-
 // samento das receções.
 
-SerialCom::SerialCom(int Baudrate, LumIntensity *luminten){
+SerialCom::SerialCom(int Baudrate){
 
   Serial.begin(Baudrate);
-  this->luminten = luminten;
   this->current_char = 0;
   
 }
@@ -59,7 +58,7 @@ void SerialCom::process_request(char *message){
   switch(tipo){
     // Caso em que queremos mudar a referência
     case 0:
-      luminten->setLedLuminousItensity( (double) valor);
+      //luminten->setLedLuminousItensity( (double) valor);
       break;
     // Caso o tipo de comando seja desconhecido
     default:
