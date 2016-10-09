@@ -14,6 +14,7 @@ void setup() {
   
   luminten = new LumIntensity(ledPin, sensorPin);
   serialcom = new SerialCom(9600, luminten);
+  serialcom->send_message((char*)"Ready");
 }
 
 // funções auxiliares
@@ -36,20 +37,11 @@ void reset_board_serial(void (f())){
   }
 }
 
-//void reset_led(){
-//
-//  Ledp->setLedPWM(0); 
-//
-//  delay(1000);
-//
-//}
-
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  double R, lux;
-  char buffer[20];
+  //double R, lux;
   
   //Ledp->setLedPWM(100);
   //R = ls->getSensorResistance();
@@ -58,8 +50,8 @@ void loop() {
   //Serial.print("R = ");
   //Serial.print(R);
   //Serial.print("\n");
-  sprintf(buffer,"lux = %i \n",16);
-  serialcom->send_message(buffer);
+  //sprintf(buffer,"lux = %i \n",16);
+  //serialcom->send_message(buffer);
   //Serial.print(lux);
   //Serial.print("\n");
   //Serial.print("Energia = ");
@@ -68,6 +60,6 @@ void loop() {
 
   delay(50);
 
-  //reset_board_serial(reset_led);
+  serialcom->receive_message();
 
   }

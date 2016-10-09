@@ -7,11 +7,15 @@
 class SerialCom{
 
   LumIntensity *luminten;
+  int current_char;
+  char incoming[10];
   
   public:
     SerialCom(int Baudrate, LumIntensity *luminten);
     void send_message(char* message);
-    char* receive_message();
+    void receive_message();
+
+  private:
     void process_request(char *message);
     
     
