@@ -6,8 +6,8 @@
 
 class LumItensity{
   //Constantes Calibração
-  double K;
-  double a;
+  const double K = -0.2882;
+  const double a = 22000;
   //Intensidade luminosa
   double lumIt;
   double k, teta;
@@ -15,7 +15,7 @@ class LumItensity{
   LedPWM *ledp;
 
   public:
-    LumItensity(LightSensor *ls);
+    LumItensity(int ledPin, int sensorPin);
     double getLuminousItensity();
     void setK(double K);
     void seta(double a);

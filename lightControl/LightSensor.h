@@ -7,11 +7,13 @@ class LightSensor{
   //Pin para leitura do sensor de luz
   int PinInput;
   int RPin;
+  // Referência para o A/D da placa
+  double AREF;
   //Resistance
-  double R;
+  const double R = 10000.0;
   
   public:
-    LightSensor(int PinInput);
+    LightSensor(int PinInput, int AREF);
     double getSensorVoltage();
     double getSensorResistance();
     ~LightSensor();
