@@ -1,6 +1,6 @@
 #include "SerialCom.h"
 
-SerialCom::SerialCom(int Baudrate, LumItensity *luminten){
+SerialCom::SerialCom(int Baudrate, LumIntensity *luminten){
 
   Serial.begin(Baudrate);
   this->luminten = luminten;

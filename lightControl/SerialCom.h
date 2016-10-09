@@ -2,14 +2,14 @@
 #define SERIALCOM_H_INCLUDED
 
 #include "Arduino.h"
-#include "LumItensity.h"
+#include "LumIntensity.h"
 
 class SerialCom{
 
-  LumItensity *luminten;
+  LumIntensity *luminten;
   
   public:
-    SerialCom(int Baudrate, LumItensity *luminten);
+    SerialCom(int Baudrate, LumIntensity *luminten);
     void send_message(char* message);
     char* receive_message();
     void process_request(char *message);
