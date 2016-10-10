@@ -52,27 +52,47 @@ void SerialCom::receive_message(){
 void SerialCom::process_request(char *message){
 
   int tipo, valor;
+  char text[10];
   
   sscanf(message,"%i %i",&tipo, &valor);
 
   switch(tipo){
     // Muda o valor do LED PWM
     case 0:
-      
+      this->valorLed = valor;
       break;
     // Envia os valores do LDR em lux
     case 1:
-      
+      sprintf(text, "%i", currentLux);
+      this->send_message(text);
       break;
     // Caso em que queremos mudar a referência local
     case 2:
-      //luminten->setLedLuminousItensity( (double) valor);
+      this->ref = valor;
       break;
     // Caso o tipo de comando seja desconhecido
     default:
       this->send_message((char*)"Wrong Commang");
     break;
   }
+  
+}
+
+int SerialCom::get_valorLed(){
+
+  return this->valorLed;
+  
+}
+
+void SerialCom::set_currentLux(int currentLux){
+
+  this->currentLux = currentLux;
+  
+}
+
+int SerialCom::get_ref(){
+
+  return this->ref;
   
 }
 
