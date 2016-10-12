@@ -9,9 +9,9 @@ class SerialCom{
   int current_char;
   char incoming[10];
 
-  // Variáveis usadas no na execução dos pedidos das mensagens
+  // Variáveis usadas na execução dos pedidos das mensagens
   int valorLed;
-  int currentLux;
+  int currentLux = 0;
   int ref;
   
   public:

@@ -72,7 +72,7 @@ void SerialCom::process_request(char *message){
       break;
     // Caso o tipo de comando seja desconhecido
     default:
-      this->send_message((char*)"Wrong Commang");
+      this->send_message((char*)"Wrong Command");
     break;
   }
   
