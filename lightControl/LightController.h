@@ -14,8 +14,8 @@
 class LightController{
   //Parâmetros do controlador
   double Kp;
-  double Ti;
-  double Td;
+  double Ki;
+  double Kd;
   //Depêndencias do feedback
   LightSensor *ls;
   LedPWM *ledp;
@@ -23,12 +23,15 @@ class LightController{
   double k, teta;
   
   public:
-    LightController(int ledPin, int sensorPin, double Kp,double Ti,double Td);
+    LightController(int ledPin, int sensorPin, double Kp,double Ki,double Kd);
     ~LightController();
     void calibrateLumVoltage();
     void lightoff();
+    void lighton();
+    double getK();
+    double getTeta();
   
-  private:
+  private: // tirar se não tiver nada
     
   
 };

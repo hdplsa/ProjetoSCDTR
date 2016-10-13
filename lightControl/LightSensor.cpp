@@ -36,7 +36,6 @@ double LightSensor::getLuminousItensity(){
 }
 
 LightSensor::~LightSensor(){
-  
 }
 
 // Lê a tensão do pin que está no range [0,1024[, e converte para volts.

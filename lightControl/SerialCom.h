@@ -7,7 +7,7 @@ class SerialCom{
 
   // Variáveis usadas na receção de mensagens serial
   int current_char;
-  char incoming[10];
+  char incoming[10]; //mensagens com 10 caractéres máximo, pode mudar.
 
   // Variáveis usadas na execução dos pedidos das mensagens
   int valorLed;

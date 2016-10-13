@@ -13,29 +13,26 @@ const int sensorPin = 5;
 void setup() {
   // put your setup code here, to run once:
 
-  controller = new LightController(ledPin, sensorPin,0,0,0);
-  
   serialcom = new SerialCom(9600);
   serialcom->send_message((char*)"Ready");
+
+  controller = new LightController(ledPin, sensorPin,0,0,0);
+  
+  Serial.print(controller->getK());
+  Serial.print('\n');
+  Serial.print(controller->getTeta());
+  Serial.print("\n\n");
 }
 
 // funções auxiliares
 
 void reset_board_serial(void (f())){
-
   int incoming;
-  
   // Se ele tiver uma ligação serial, e receber 42,
   // Executa a função.
   if(Serial.available() > 0){
-
     incoming = Serial.read();
-
-    if(incoming == 42){
-
-      f();
-      
-    }  
+    if(incoming == 42) f();
   }
 }
 
@@ -43,7 +40,7 @@ void reset_board_serial(void (f())){
 void loop() {
   // put your main code here, to run repeatedly:
 
-  double lux;
+  // double lux;
   
   //Ledp->setLedPWM(100);
   //R = ls->getSensorResistance();
@@ -65,9 +62,9 @@ void loop() {
 
   //Serial.println(lux,1);
 
-  controller->calibrateLumVoltage();
+  //controller->calibrateLumVoltage();
 
-  controller->lightoff();
+  //controller->lightoff();
 
   delay(2000);
 
