@@ -16,15 +16,10 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   delay(100);
 }
 
-LightController::~LightController(){
-  delete this->ls;
-  delete this->ledp;
-}
-
 //Inicialização - Calibração
 void LightController::calibrateLumVoltage(){
   //Número de testes
-  const int N = 5;
+  const int N = 10;
   //Variáveis experimentais
   double y[N];
   double u[N];
@@ -38,11 +33,11 @@ void LightController::calibrateLumVoltage(){
   double det;
   //Recolha de dados para regressão linear
   for(int n=0;n<N;n++){
-    u[n] = (5.0/N)*n;
+    u[n] = (5.0/(double)N)*(double)n;
     this->lightoff();
-    delay(2000);
+    delay(100);
     this->ledp->setLedPWMVoltage(u[n]);
-    delay(2000);
+    delay(100);
     for(int j=0;j<=10;j++){cumsum += this->ls->getLuminousItensity();}
     y[n] = cumsum/10;
     cumsum = 0;
@@ -76,4 +71,38 @@ void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
 void LightController::lighton(){this->ledp->setLedPWMVoltage(5);}
 double LightController::getK(){return this->k;}
 double LightController::getTeta(){return this->teta;}
+
+double LightController::getControlVariable(){
+  return this->u;
+}
+
+void LightController::LEDInputControlVariable(){
+  this->ledp->setLedPWMVoltage(this->u);
+}
+
+LightController::~LightController(){
+  delete this->ls;
+  delete this->ledp;
+}
+
+double LightController::calcPController(){
+  return this->Kp*this->e;
+}
+
+double LightController::calcPIController(){
+  double Ki;
+
+  return Ki;
+}
+
+double LightController::calcPDController(){
+  double Kd;
+
+  return Kd;
+}
+
+double LightController::calcController(){
+  this->u = this->calcPController()+this->calcPIController()+this->calcPDController();
+  return this->u;
+}
 
