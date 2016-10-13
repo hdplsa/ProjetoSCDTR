@@ -70,6 +70,10 @@ void SerialCom::process_request(char *message){
     case 2:
       this->ref = valor;
       break;
+    // Significado da vida, a board fica tão à toa que faz reboot
+    case 42:
+      // faz reset
+      break;
     // Caso o tipo de comando seja desconhecido
     default:
       this->send_message((char*)"Wrong Command");

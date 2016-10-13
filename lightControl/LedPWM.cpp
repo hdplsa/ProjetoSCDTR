@@ -19,10 +19,6 @@ void LedPWM::setLedPWM(int dutCycle){
 void LedPWM::setLedPWMVoltage(double voltage){
   //Passagem de tensão para dutyCycle correspondente no PWM
   this->setPWMOutput(this->LedPin,(int)(voltage*(255.0/5.0)));
-  Serial.print("voltage = ");
-  Serial.println(voltage,5);
-  Serial.print("PWM = ");
-  Serial.println((int)(voltage*(255.0/5.0)));
 }
 
 double LedPWM::calculateLedEnergyCycle(){
