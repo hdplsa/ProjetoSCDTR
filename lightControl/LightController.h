@@ -25,9 +25,11 @@ class LightController{
   public:
     LightController(int ledPin, int sensorPin, double Kp,double Ti,double Td);
     ~LightController();
+    void calibrateLumVoltage();
+    void lightoff();
   
   private:
-    void calibrateLumVoltage();
+    
   
 };
 

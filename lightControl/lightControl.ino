@@ -1,9 +1,11 @@
 #include "LightSensor.h"
 #include "LedPWM.h"
 #include "SerialCom.h"
+#include "LightController.h"
 
 LightSensor *sensor;
 SerialCom *serialcom;
+LightController * controller;
 
 const int ledPin = 9;
 const int sensorPin = 5;
@@ -11,7 +13,7 @@ const int sensorPin = 5;
 void setup() {
   // put your setup code here, to run once:
 
-  sensor = new LightSensor(sensorPin, 5);
+  controller = new LightController(ledPin, sensorPin,0,0,0);
   
   serialcom = new SerialCom(9600);
   serialcom->send_message((char*)"Ready");
@@ -41,7 +43,7 @@ void reset_board_serial(void (f())){
 void loop() {
   // put your main code here, to run repeatedly:
 
-  double R; char buffer2[10];
+  double lux;
   
   //Ledp->setLedPWM(100);
   //R = ls->getSensorResistance();
@@ -59,11 +61,15 @@ void loop() {
 
   //delay(50);
 
-  R = sensor->getSensorResistance();
+  //lux = sensor->getLuminousItensity();
 
-  Serial.println(R,1);
+  //Serial.println(lux,1);
 
-  delay(500);
+  controller->calibrateLumVoltage();
+
+  controller->lightoff();
+
+  delay(2000);
 
   //serialcom->receive_message();
 

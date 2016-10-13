@@ -12,8 +12,8 @@ class LightSensor{
   //Resistance
   const double R = 10000.0;
   //Constantes Calibração
-  const double K = -0.2882;
-  const double a = 22000;
+  const double K = -0.6227;
+  const double a = 94082.4;
   
   public:
     LightSensor(int PinInput, int AREF);
