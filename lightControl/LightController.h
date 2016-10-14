@@ -27,6 +27,7 @@ class LightController{
   double e[3];
   double y;
   double u[2];
+  double satU;
   
   public:
     LightController(int ledPin, int sensorPin, double Kp,double Ki,double Kd);
@@ -37,18 +38,21 @@ class LightController{
     void setY(double y);
     void setRef(double ref);
     void setU(double u);
+    void setSaturation(double satU);
     double getK();
     double getTeta();
     double getControlVariable();
+    double calcController();  
     void LEDInputControlVariable();
     ~LightController();
   
   private:
+    double getSensorY();
     double calcErro();
     double calcPController();
     double calcPIController();
     double calcPDController(); 
-    double calcController();   
+    //double calcController();   
   
 };
 

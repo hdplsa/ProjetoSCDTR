@@ -23,6 +23,7 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   this->y = 0;
   this->u[0] = 0;
   this->u[1] = 0;
+  this->satU = 1000;
 }
 
 //Inicialização - Calibração
@@ -95,10 +96,30 @@ void LightController::setU(double u){
   this->u[1] = u;
 }
 
+void LightController::setSaturation(double satU){
+  this->satU = satU;
+}
+
 double LightController::getK(){return this->k;}
 double LightController::getTeta(){return this->teta;}
 
 double LightController::getControlVariable(){
+  return this->u[1];
+}
+
+double LightController::calcController(){
+  //Avanço do tempo
+  this->y = this->getSensorY();
+  this->u[0] = this->u[1];
+  this->e[0] = this->e[1];
+  this->e[1] = this->e[2];
+  //Cálculo do sinal de comando neste ciclo
+  this->e[1] = this->calcErro();
+  this->u[1] = this->calcPController()+this->calcPIController()+this->calcPDController();
+  //Saturação na variável de controlo
+  if (this->u[1] > this->satU){
+    this->u[1] = this->satU;
+  }
   return this->u[1];
 }
 
@@ -109,6 +130,10 @@ void LightController::LEDInputControlVariable(){
 LightController::~LightController(){
   delete this->ls;
   delete this->ledp;
+}
+
+double LightController::getSensorY(){
+  this->y = ls->getLuminousItensity();
 }
 
 double LightController::calcErro(){
@@ -133,16 +158,6 @@ double LightController::calcPDController(){
   double u;
   //Controlo proporcional diferencial
   u = this->Kd*((this->e[2]-this->e[1])/this->T);
-  return u;
-}
-
-double LightController::calcController(){
-  //Avanço do tempo
-  this->u[0] = this->u[1];
-  this->e[0] = this->e[1];
-  this->e[1] = this->e[2];
-  //Cálculo do sinal de comando neste ciclo
-  this->u[1] = this->calcPController()+this->calcPIController()+this->calcPDController();
-  return this->u[1];
+  return 0;
 }
 
