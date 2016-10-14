@@ -14,6 +14,15 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   this->calibrateLumVoltage();
   this->lightoff();
   delay(100);
+  //Variaveis input/output
+  this->T = 0;
+  this->ref = 0;
+  this->e[0] = 0;
+  this->e[1] = 0;
+  this->e[2] = 0;
+  this->y = 0;
+  this->u[0] = 0;
+  this->u[1] = 0;
 }
 
 //Inicialização - Calibração
@@ -69,15 +78,32 @@ void LightController::calibrateLumVoltage(){
 
 void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
 void LightController::lighton(){this->ledp->setLedPWMVoltage(5);}
+
+void LightController::setT(double T){
+  this->T = T;
+}
+
+void LightController::setY(double y){
+  this->y = y;
+}
+
+void LightController::setRef(double ref){
+  this->ref = ref;  
+}
+
+void LightController::setU(double u){
+  this->u[1] = u;
+}
+
 double LightController::getK(){return this->k;}
 double LightController::getTeta(){return this->teta;}
 
 double LightController::getControlVariable(){
-  return this->u;
+  return this->u[1];
 }
 
 void LightController::LEDInputControlVariable(){
-  this->ledp->setLedPWMVoltage(this->u);
+  this->ledp->setLedPWMVoltage(this->u[1]);
 }
 
 LightController::~LightController(){
@@ -85,24 +111,38 @@ LightController::~LightController(){
   delete this->ledp;
 }
 
+double LightController::calcErro(){
+  //Cálcula erro de entrada no Controlador
+  this->e[1] = this->ref-this->y;
+  return this->e[1];
+}
+
 double LightController::calcPController(){
-  return this->Kp*this->e;
+  //Retorno do controlo proporcional
+  return this->Kp*this->e[1];
 }
 
 double LightController::calcPIController(){
-  double Ki;
-
-  return Ki;
+  double u;
+  //Controlo proporcional integral
+  u = this->u[0]+e[1]*this->Ki*this->T;
+  return u;
 }
 
 double LightController::calcPDController(){
-  double Kd;
-
-  return Kd;
+  double u;
+  //Controlo proporcional diferencial
+  u = this->Kd*((this->e[2]-this->e[1])/this->T);
+  return u;
 }
 
 double LightController::calcController(){
-  this->u = this->calcPController()+this->calcPIController()+this->calcPDController();
-  return this->u;
+  //Avanço do tempo
+  this->u[0] = this->u[1];
+  this->e[0] = this->e[1];
+  this->e[1] = this->e[2];
+  //Cálculo do sinal de comando neste ciclo
+  this->u[1] = this->calcPController()+this->calcPIController()+this->calcPDController();
+  return this->u[1];
 }
 

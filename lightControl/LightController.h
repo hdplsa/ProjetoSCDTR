@@ -22,23 +22,29 @@ class LightController{
   //Variáveis do modelo
   double k, teta;
   //Input/Output
+  double T;
   double ref;
-  double e;
+  double e[3];
   double y;
-  double u;
+  double u[2];
   
   public:
     LightController(int ledPin, int sensorPin, double Kp,double Ki,double Kd);
     void calibrateLumVoltage();
     void lightoff();
     void lighton();
+    void setT(double T);
+    void setY(double y);
+    void setRef(double ref);
+    void setU(double u);
     double getK();
     double getTeta();
     double getControlVariable();
     void LEDInputControlVariable();
     ~LightController();
   
-  private: // tirar se não tiver nada
+  private:
+    double calcErro();
     double calcPController();
     double calcPIController();
     double calcPDController(); 
