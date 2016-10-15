@@ -41,6 +41,7 @@ class LightController{
     void setSaturation(double satU);
     double getK();
     double getTeta();
+    double getT();
     double getControlVariable();
     double calcController();  
     void LEDInputControlVariable();
@@ -51,8 +52,7 @@ class LightController{
     double calcErro();
     double calcPController();
     double calcPIController();
-    double calcPDController(); 
-    //double calcController();   
+    double calcPDController();   
   
 };
 

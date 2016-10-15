@@ -13,7 +13,7 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   this->teta = 0;
   this->calibrateLumVoltage();
   this->lightoff();
-  delay(100);
+  delay(10);
   //Variaveis input/output
   this->T = 0;
   this->ref = 0;
@@ -71,12 +71,12 @@ void LightController::calibrateLumVoltage(){
   this->teta = det*(-sum*sumyu + sumsquare*sumy);
 
   //Debug Stuff. descomentar quando necessário
-  Serial.print("K = ");
+  /*Serial.print("K = ");
   Serial.print(this->k);
   Serial.print('\n');
   Serial.print("theta = ");
   Serial.print(this->teta);
-  Serial.print("\n\n");
+  Serial.print("\n\n");*/
 }
 
 void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
@@ -105,6 +105,10 @@ void LightController::setSaturation(double satU){
 double LightController::getK(){return this->k;}
 double LightController::getTeta(){return this->teta;}
 
+double LightController::getT(){
+  return this->T;  
+}
+
 double LightController::getControlVariable(){
   return this->u[1];
 }
@@ -125,6 +129,13 @@ double LightController::calcController(){
   if (this->u[1] > this->satU){
     this->u[1] = this->satU;
   }
+  //debug serial
+  Serial.print("y = ");
+  Serial.println(this->y,4);
+  Serial.print("e = ");
+  Serial.println(e[1],4);
+  Serial.print("u = ");
+  Serial.println(u[1],4);
   return this->u[1];
 }
 
