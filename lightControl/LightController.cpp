@@ -45,7 +45,7 @@ void LightController::calibrateLumVoltage(){
   for(int n=0;n<N;n++){
     u[n] = (5.0/(double)N)*(double)n;
     this->lightoff();
-    delay(100);
+    delay(10);
     this->ledp->setLedPWMVoltage(u[n]);
     delay(100);
     for(int j=0;j<=10;j++){cumsum += this->ls->getLuminousItensity();}
@@ -71,10 +71,12 @@ void LightController::calibrateLumVoltage(){
   this->teta = det*(-sum*sumyu + sumsquare*sumy);
 
   //Debug Stuff. descomentar quando necessário
-  /*Serial.print(this->k);
+  Serial.print("K = ");
+  Serial.print(this->k);
   Serial.print('\n');
+  Serial.print("theta = ");
   Serial.print(this->teta);
-  Serial.print("\n\n");*/
+  Serial.print("\n\n");
 }
 
 void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
@@ -114,9 +116,12 @@ double LightController::calcController(){
   this->e[0] = this->e[1];
   this->e[1] = this->e[2];
   //Cálculo do sinal de comando neste ciclo
-  this->e[1] = this->calcErro();
+  this->e[2] = this->calcErro();
   this->u[1] = this->calcPController()+this->calcPIController()+this->calcPDController();
   //Saturação na variável de controlo
+  if (this->u[1] < 0){
+    this->u[1] = 0;
+  }
   if (this->u[1] > this->satU){
     this->u[1] = this->satU;
   }
@@ -158,6 +163,6 @@ double LightController::calcPDController(){
   double u;
   //Controlo proporcional diferencial
   u = this->Kd*((this->e[2]-this->e[1])/this->T);
-  return 0;
+  return u;
 }
 
