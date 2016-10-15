@@ -6,7 +6,6 @@
 class LightSensor{
   //Pin para leitura do sensor de luz
   int PinInput;
-  // int RPin; /* what is this shit? */
   // Referência para o A/D da placa
   double AREF;
   //Resistance
