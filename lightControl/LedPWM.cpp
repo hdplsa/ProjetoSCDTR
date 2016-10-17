@@ -30,6 +30,7 @@ double LedPWM::calculateLedEnergyCycle(){
 }
 
 LedPWM::~LedPWM(){
+  
 }
 
 void LedPWM::setPWMOutput(int pin, int dutCycle){
