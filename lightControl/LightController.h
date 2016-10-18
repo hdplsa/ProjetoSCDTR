@@ -26,7 +26,7 @@ class LightController{
   double ref;
   double e[3];
   double y;
-  double u[2];
+  double u[3];
   double satU;
   
   public:
