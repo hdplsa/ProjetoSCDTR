@@ -114,24 +114,46 @@ double LightController::getControlVariable(){
   return this->u[2];
 }
 
+/* Legenda dos sinais:
+    e[1] -> sinal de erro no ciclo atual
+    e[0] -> sinal de erro no ciclo -1
+
+    u[1] -> sinal de controlo no ciclo atual
+    u[0] -> sinal de controlo no ciclo -1
+   
+    ui_ant -> sinal de controlo do controlador integral do ciclo passado
+    ud_ant -> sinal de controlo do controlador diferencial do ciclo anterior
+
+*/
+
 double LightController::calcController(){
-  //Avanço do tempo
+
+  double up, ui, ud;
+  
+  // Avanço do tempo das samples dos sinais
   this->y = this->getSensorY();
   this->u[0] = this->u[1];
-  this->u[1] = this->u[2];
   this->e[0] = this->e[1];
-  this->e[1] = this->e[2];
-  //Cálculo do sinal de comando neste ciclo
-  this->e[2] = this->calcErro();
-  this->u[2] = this->calcPController()+this->calcPIController()+this->calcPDController();
-  //Saturação na variável de controlo
-  if (this->u[2] < 0){
-    this->u[2] = 0;
+  
+  // Cálculo do sinal de erro
+  this->e[1] = this->calcErro();
+
+  // Cálculo do sinal de controlo  
+  up = this->calcPController();
+  ui = this->calcPIController();
+  ud = this->calcPDController();
+  
+  this->u[1] = up + ui + ud;
+  
+  // Saturação na variável de controlo
+  if (this->u[1] < 0){
+    this->u[1] = 0;
   }
-  if (this->u[2] > this->satU){
-    this->u[2] = this->satU;
+  if (this->u[1] > this->satU){
+    this->u[1] = this->satU;
   }
-  //debug serial
+  
+  // debug serial
   Serial.print("y = ");
   Serial.println(this->y,4);
   Serial.print("e = ");
@@ -151,7 +173,9 @@ LightController::~LightController(){
 }
 
 double LightController::getSensorY(){
-  this->y = ls->getLuminousItensity();
+  double y;
+  y = ls->getLuminousItensity();
+  return y;
 }
 
 double LightController::calcErro(){
@@ -168,14 +192,14 @@ double LightController::calcPController(){
 double LightController::calcPIController(){
   double u;
   //Controlo proporcional integral
-  u = this->Ki*((this->T*0.5)*(this->e[2]-this->e[1])) + this->u[1];
+  u = this->Ki*((this->T*0.5)*(this->e[1]+this->e[0])) + this->ui_ant;
   return u;
 }
 
 double LightController::calcPDController(){
   double u;
   //Controlo proporcional diferencial
-  u = this->Kd*((2/this->T)*(this->e[2]-this->e[1])) - this->u[1];
+  u = this->Kd*((2/this->T)*(this->e[1]-this->e[0])) - this->ud_ant;
   return u;
 }
 

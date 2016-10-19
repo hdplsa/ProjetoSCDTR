@@ -24,10 +24,13 @@ class LightController{
   //Input/Output
   double T;
   double ref;
-  double e[3];
+  double e[2];
   double y;
-  double u[3];
+  double u[2];
   double satU;
+
+  double ui_ant = 0;
+  double ud_ant = 0;
   
   public:
     LightController(int ledPin, int sensorPin, double Kp,double Ki,double Kd);
