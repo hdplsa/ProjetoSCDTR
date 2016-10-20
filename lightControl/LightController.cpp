@@ -43,14 +43,10 @@ void LightController::calibrateLumVoltage(){
   //Recolha de dados para regressão linear
   for(int n=0;n<N;n++){
     u[n] = (5.0/(double)N)*(double)n;
-    /*this->lightoff();
-    delay(50);*/
     this->ledp->setLedPWMVoltage(u[n]);
     delay(100);
-    /*for(int j=0;j<=10;j++){cumsum += this->ls->getLuminousItensity();}
-    y[n] = cumsum/10;
-    cumsum = 0;*/
     y[n] = this->ls->getAverageLuminousIntensity(10);
+    //Prints de debug
     Serial.print(n);
     Serial.print(' ');
     Serial.print(y[n]);
