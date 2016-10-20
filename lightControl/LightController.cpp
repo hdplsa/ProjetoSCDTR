@@ -8,7 +8,7 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   //Depêndencias do feedback
   this->ls = new LightSensor(sensorPin,5);
   this->ledp = new LedPWM(ledPin);
-  //Variáveis do modelo
+  //Variáveis do modelo tensão/lux
   this->k = 0;
   this->teta = 0;
   this->calibrateLumVoltage();
@@ -19,11 +19,11 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   this->ref = 0;
   this->e[0] = 0;
   this->e[1] = 0;
-  this->e[2] = 0;
   this->y = 0;
   this->u[0] = 0;
   this->u[1] = 0;
-  this->u[2] = 0;
+  this->ui_ant = 0;
+  this->ud_ant = 0;
   this->satU = 1000;
 }
 

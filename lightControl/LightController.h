@@ -27,10 +27,9 @@ class LightController{
   double e[2];
   double y;
   double u[2];
-  double satU;
-
-  double ui_ant = 0;
-  double ud_ant = 0;
+  double ui_ant;
+  double ud_ant;
+  double satU; 
   
   public:
     LightController(int ledPin, int sensorPin, double Kp,double Ki,double Kd);
