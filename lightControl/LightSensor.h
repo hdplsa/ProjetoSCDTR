@@ -18,7 +18,8 @@ class LightSensor{
     LightSensor(int PinInput, int AREF);
     double getSensorVoltage();
     double getSensorResistance();
-    double getLuminousItensity();
+    double getLuminousIntensity();
+    double getAverageLuminousIntensity(int N);
     ~LightSensor(); // No Fim, se não usado, retirar
     
   private:

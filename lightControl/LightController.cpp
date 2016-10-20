@@ -12,8 +12,6 @@ LightController::LightController(int ledPin, int sensorPin, double Kp,double Ki,
   this->k = 0;
   this->teta = 0;
   this->calibrateLumVoltage();
-  this->lightoff();
-  delay(10);
   //Variaveis input/output
   this->T = 0;
   this->ref = 0;
@@ -45,13 +43,14 @@ void LightController::calibrateLumVoltage(){
   //Recolha de dados para regressão linear
   for(int n=0;n<N;n++){
     u[n] = (5.0/(double)N)*(double)n;
-    this->lightoff();
-    delay(10);
+    /*this->lightoff();
+    delay(50);*/
     this->ledp->setLedPWMVoltage(u[n]);
     delay(100);
-    for(int j=0;j<=10;j++){cumsum += this->ls->getLuminousItensity();}
+    /*for(int j=0;j<=10;j++){cumsum += this->ls->getLuminousItensity();}
     y[n] = cumsum/10;
-    cumsum = 0;
+    cumsum = 0;*/
+    y[n] = this->ls->getAverageLuminousIntensity(10);
     Serial.print(n);
     Serial.print(' ');
     Serial.print(y[n]);
@@ -70,6 +69,9 @@ void LightController::calibrateLumVoltage(){
   det = 1/(N*sumsquare - sum*sum);
   this->k = det*(N*sumyu - sum*sumy);
   this->teta = det*(-sum*sumyu + sumsquare*sumy);
+
+  //Desligar a luz no fim
+  this->lightoff();
 
   //Debug Stuff. descomentar quando necessário
   /*Serial.print("K = ");
@@ -174,7 +176,7 @@ LightController::~LightController(){
 
 double LightController::getSensorY(){
   double y;
-  y = ls->getLuminousItensity();
+  y = ls->getLuminousIntensity();
   return y;
 }
 

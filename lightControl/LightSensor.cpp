@@ -27,12 +27,21 @@ double LightSensor::getSensorResistance(){
 // Constructor, has the default value of Rs, 
 // and receives a lightsensor variable,
 // from where we can get the LDR's resistance.
-double LightSensor::getLuminousItensity(){
+double LightSensor::getLuminousIntensity(){
   double R,light;
   //Calcula intensidade luminosa pelos dados do sensor
   R = this->getSensorResistance();
   light = pow(R/this->a,1/this->K);
   return light;
+}
+
+//Retorna média de N amostras do sensor
+double LightSensor::getAverageLuminousIntensity(int N){
+  double av, i;
+  for(i=1,av=0;i<=N;i++){
+    av += this->getLuminousIntensity();
+  }
+  return av;
 }
 
 LightSensor::~LightSensor(){
