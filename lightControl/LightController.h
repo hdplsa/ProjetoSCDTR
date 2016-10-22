@@ -46,7 +46,7 @@ class LightController{
     double getTeta();
     double getT();
     double getControlVariable();
-    double calcController();  
+    double calcController(); 
     void LEDInputControlVariable();
     ~LightController();
   

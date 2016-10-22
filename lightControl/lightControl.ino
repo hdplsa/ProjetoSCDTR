@@ -6,7 +6,7 @@
 SerialCom *serialcom;
 LightController * controller;
 
-const int ledPin = 9;
+const int ledPin = 11;
 const int sensorPin = 5;
 
 void initTimer(){
@@ -29,10 +29,10 @@ void setup() {
   
   serialcom = new SerialCom(9600);
 
-  //controller = new LightController(ledPin, sensorPin);
-  //controller->setT(0.2);
-  //controller->setRef(50);
-  //controller->setSaturation(5);
+  controller = new LightController(ledPin, sensorPin);
+  controller->setT(0.2);
+  controller->setRef(50);
+  controller->setSaturation(5);
   
   serialcom->send_message((char*)"Ready");
 
@@ -45,18 +45,17 @@ long unsigned int times1;
 long unsigned int times2;
 
 ISR(TIMER1_COMPA_vect){
-//...
-//put here control operations
-//
-flag = 1; //notify main loop
+  //...
+  //put here control operations
+  //
+  flag = 1; //notify main loop
 
-
+  controller->calcController();
+  controller->LEDInputControlVariable();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //controller->calcController();
-  //controller->LEDInputControlVariable();
   
   if(flag){
 
