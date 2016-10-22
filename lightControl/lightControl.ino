@@ -1,7 +1,7 @@
-#include "SerialCom.h"
-#include "LightController.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "SerialCom.h"
+#include "LightController.h"
 
 SerialCom *serialcom;
 LightController * controller;
@@ -9,7 +9,7 @@ LightController * controller;
 const int ledPin = 11;
 const int sensorPin = 5;
 
-void initTimer(){
+void initTimer1(){
   cli();
   TCCR1A = 0;// clear register
   TCCR1B = 0;// clear register
@@ -37,7 +37,7 @@ void setup() {
   serialcom->send_message((char*)"Ready");
 
    //Init interrupções
-   initTimer();
+   initTimer1();
 }
 
 volatile bool flag;
@@ -49,9 +49,7 @@ ISR(TIMER1_COMPA_vect){
   //put here control operations
   //
   flag = 1; //notify main loop
-
-  controller->calcController();
-  controller->LEDInputControlVariable();
+ 
 }
 
 void loop() {
@@ -59,12 +57,13 @@ void loop() {
   
   if(flag){
 
-    times1 = times2;
+    /*times1 = times2;
     times2 = millis();
     
-    Serial.println(times2 - times1);
+    Serial.println(times2 - times1);*/
+    controller->calcController();
+    controller->LEDInputControlVariable();
 
     flag = 0;
   }
-  //delay(controller->getT()*1000);
 }

@@ -1,7 +1,6 @@
 #ifndef LIGHTCONTROLLER_H_INCLUDED
 #define LIGHTCONTROLLER_H_INCLUDED
 
-#include <avr/interrupt.h>
 #include "LedPWM.h"
 #include "LightSensor.h"
 
