@@ -1,17 +1,21 @@
 #include "LightController.h"
 
 LightController::LightController(int ledPin, int sensorPin){
+  
   //Parâmetros do controlador
-  this->Kp = 0.0022;
-  this->Ki = 0.0108;
-  this->Kd = 0.0001;
+  this->Kp = 0.03;
+  this->Ki = 0.01;
+  this->Kd = 0.000001;
+  
   //Depêndencias do feedback
   this->ls = new LightSensor(sensorPin,5);
   this->ledp = new LedPWM(ledPin);
-  //Variáveis do modelo tensão/lux
+  
+  //Variáveis do modelo tensão/lux (vão ser mudadas do 0)
   this->k = 0;
   this->teta = 0;
   this->calibrateLumVoltage();
+  
   //Variaveis input/output
   this->T = 0;
   this->ref = 0;
@@ -70,12 +74,12 @@ void LightController::calibrateLumVoltage(){
   this->lightoff();
 
   //Debug Stuff. descomentar quando necessário
-  /*Serial.print("K = ");
+  Serial.print("K = ");
   Serial.print(this->k);
   Serial.print('\n');
   Serial.print("theta = ");
   Serial.print(this->teta);
-  Serial.print("\n\n");*/
+  Serial.print("\n\n");
 }
 
 void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
@@ -94,7 +98,7 @@ void LightController::setRef(double ref){
 }
 
 void LightController::setU(double u){
-  this->u[2] = u;
+  this->u[1] = u;
 }
 
 void LightController::setSaturation(double satU){
@@ -109,7 +113,7 @@ double LightController::getT(){
 }
 
 double LightController::getControlVariable(){
-  return this->u[2];
+  return this->u[1];
 }
 
 /* Legenda dos sinais:
@@ -140,6 +144,9 @@ double LightController::calcController(){
   up = this->calcPController();
   ui = this->calcPIController();
   ud = this->calcPDController();
+
+  this->ui_ant = ui;
+  this->ud_ant = ud;
   
   this->u[1] = up + ui + ud;
   
@@ -152,12 +159,19 @@ double LightController::calcController(){
   }
   
   // debug serial
-  Serial.print("y = ");
+  /*Serial.print("y = ");
   Serial.println(this->y,4);
   Serial.print("e = ");
-  Serial.println(e[2],4);
+  Serial.println(e[1],4);
   Serial.print("u = ");
-  Serial.println(u[2],4);
+  Serial.println(u[1],4);*/
+  Serial.print(this->y,4);
+  Serial.print(';');
+  Serial.print(e[1],4);
+  Serial.print(';');
+  Serial.print(u[1],4);
+  Serial.print(';');
+  Serial.print('\n');
   return this->u[1];
 }
 
@@ -178,13 +192,14 @@ double LightController::getSensorY(){
 
 double LightController::calcErro(){
   //Cálcula erro de entrada no Controlador
-  this->e[2] = this->ref-this->y;
-  return this->e[2];
+  double error;
+  error = this->ref-this->y;
+  return error;
 }
 
 double LightController::calcPController(){
   //Retorno do controlo proporcional
-  return this->Kp*this->e[2];
+  return this->Kp*this->e[1];
 }
 
 double LightController::calcPIController(){
