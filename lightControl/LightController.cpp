@@ -2,11 +2,11 @@
 
 LightController::LightController(int ledPin, int sensorPin){
   //Parâmetros do controlador
-  this->Kp = 0.0022;
-  this->Ki = 0.0108;
-  this->Kd = 0.0001;
+  this->Kp = 0.03;
+  this->Ki = 0.01;
+  this->Kd = 0.000001;
   //Depêndencias do feedback
-  this->ls = new LightSensor(sensorPin,5);
+  this->ls = new LightSensor(sensorPin,5.0);
   this->ledp = new LedPWM(ledPin);
   //Variáveis do modelo tensão/lux
   this->k = 0;
@@ -22,7 +22,7 @@ LightController::LightController(int ledPin, int sensorPin){
   this->u[1] = 0;
   this->ui_ant = 0;
   this->ud_ant = 0;
-  this->sat_up = 5;
+  this->sat_up = 5.0;
   this->sat_down = 0;
 }
 
@@ -46,6 +46,7 @@ void LightController::calibrateLumVoltage(){
     u[n] = (Vcc/(double)N)*(double)n;
     this->ledp->setLedPWMVoltage(u[n]);
     delay(100);
+    //Média de 10 observações
     y[n] = this->ls->getAverageLuminousIntensity(10);
     //Prints de debug
     Serial.print(n);
@@ -86,6 +87,7 @@ void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
 void LightController::lighton(){this->ledp->setLedPWMVoltage(5);}
 
 void LightController::setT(double T){
+  //Periodo de chamada da ação do controlador
   this->T = T;
 }
 
@@ -113,7 +115,7 @@ double LightController::getT(){
 }
 
 double LightController::getControlVariable(){
-  return this->u[2];
+  return this->u[1];
 }
 
 /* Legenda dos sinais:
@@ -129,7 +131,6 @@ double LightController::getControlVariable(){
 */
 
 double LightController::calcController(){
-
   double up, ui, ud;
   
   // Avanço do tempo das samples dos sinais
@@ -144,7 +145,8 @@ double LightController::calcController(){
   up = this->calcPController();
   ui = this->calcPIController();
   ud = this->calcPDController();
-  
+  this->ui_ant = ui;
+  this->ud_ant = ud;
   this->u[1] = up + ui + ud;
   
   // Saturação na variável de controlo
@@ -161,17 +163,19 @@ double LightController::calcController(){
   /*Serial.print("y = ");
   Serial.println(this->y,4);
   Serial.print("e = ");
-  Serial.println(e[2],4);
+  Serial.println(e[1],4);
   Serial.print("u = ");
-  Serial.println(u[2],4);
+  Serial.println(u[1],4);
   return this->u[1];*/
 }
 
 void LightController::LEDInputControlVariable(){
+  //Impõe sinal de comando calculado no LED
   this->ledp->setLedPWMVoltage(this->u[1]);
 }
 
 LightController::~LightController(){
+  //Free à memória
   delete this->ls;
   delete this->ledp;
 }
@@ -184,13 +188,13 @@ double LightController::getSensorY(){
 
 double LightController::calcErro(){
   //Cálcula erro de entrada no Controlador
-  this->e[2] = this->ref-this->y;
-  return this->e[2];
+  this->e[1] = this->ref-this->y;
+  return this->e[1];
 }
 
 double LightController::calcPController(){
   //Retorno do controlo proporcional
-  return this->Kp*this->e[2];
+  return this->Kp*this->e[1];
 }
 
 double LightController::calcPIController(){
