@@ -4,6 +4,8 @@
 #include "LedPWM.h"
 #include "LightSensor.h"
 
+const double Vcc = 5.0;
+
 /* class que pretende implementar um controlador PID
  * Como input do controlador está o erro de luminosidade medido
  * pela diferença entre a referência pretendida e o feedback
@@ -29,7 +31,7 @@ class LightController{
   double u[2];
   double ui_ant;
   double ud_ant;
-  double satU; 
+  double sat_up, sat_down; 
   
   public:
     LightController(int ledPin, int sensorPin);
@@ -40,7 +42,7 @@ class LightController{
     void setY(double y);
     void setRef(double ref);
     void setU(double u);
-    void setSaturation(double satU);
+    void setSaturation(double sat_up);
     double getK();
     double getTeta();
     double getT();

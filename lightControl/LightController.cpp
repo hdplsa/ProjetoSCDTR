@@ -22,7 +22,8 @@ LightController::LightController(int ledPin, int sensorPin){
   this->u[1] = 0;
   this->ui_ant = 0;
   this->ud_ant = 0;
-  this->satU = 1000;
+  this->sat_up = 5;
+  this->sat_down = 0;
 }
 
 //Inicialização - Calibração
@@ -42,7 +43,7 @@ void LightController::calibrateLumVoltage(){
   double det;
   //Recolha de dados para regressão linear
   for(int n=0;n<N;n++){
-    u[n] = (5.0/(double)N)*(double)n;
+    u[n] = (Vcc/(double)N)*(double)n;
     this->ledp->setLedPWMVoltage(u[n]);
     delay(100);
     y[n] = this->ls->getAverageLuminousIntensity(10);
@@ -69,13 +70,16 @@ void LightController::calibrateLumVoltage(){
   //Desligar a luz no fim
   this->lightoff();
 
+  //Saturação inferior (limite do modelo)
+  this->sat_down = -this->teta/this->k;
+
   //Debug Stuff. descomentar quando necessário
-  /*Serial.print("K = ");
+  Serial.print("K = ");
   Serial.print(this->k);
   Serial.print('\n');
   Serial.print("theta = ");
   Serial.print(this->teta);
-  Serial.print("\n\n");*/
+  Serial.print("\n\n");
 }
 
 void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
@@ -94,11 +98,11 @@ void LightController::setRef(double ref){
 }
 
 void LightController::setU(double u){
-  this->u[2] = u;
+  this->u[1] = u;
 }
 
-void LightController::setSaturation(double satU){
-  this->satU = satU;
+void LightController::setSaturation(double sat_up){
+  this->sat_up = sat_up;
 }
 
 double LightController::getK(){return this->k;}
@@ -144,21 +148,23 @@ double LightController::calcController(){
   this->u[1] = up + ui + ud;
   
   // Saturação na variável de controlo
-  if (this->u[1] < 0){
-    this->u[1] = 0;
-  }
-  if (this->u[1] > this->satU){
-    this->u[1] = this->satU;
+  if (this->sat_up >= this->sat_down){
+    if (this->u[1] < this->sat_down){
+      this->u[1] = this->sat_down;
+    }
+    if (this->u[1] > this->sat_up){
+      this->u[1] = this->sat_up;
+    }
   }
   
   // debug serial
-  Serial.print("y = ");
+  /*Serial.print("y = ");
   Serial.println(this->y,4);
   Serial.print("e = ");
   Serial.println(e[2],4);
   Serial.print("u = ");
   Serial.println(u[2],4);
-  return this->u[1];
+  return this->u[1];*/
 }
 
 void LightController::LEDInputControlVariable(){
