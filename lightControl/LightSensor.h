@@ -7,17 +7,19 @@ class LightSensor{
   //Pin para leitura do sensor de luz
   int PinInput;
   // Referência para o A/D da placa
+  const double Vcc = 5.0;
   double AREF;
   //Resistance
-  const double R = 10000.0;
+  double R;
   //Constantes Calibração
-  const double K = -0.6227; // Experimental. regressão logarítmica usando 2 pontos.
-  const double a = 94082.4; // Experimental. regressão logarítmica usando 2 pontos.
+  double K; //log10(300/800)/log10(100/20); // Experimental. regressão logarítmica usando 2 pontos.
+  double a; //pow(10,log10(800e3) - K*log10(20)); // Experimental. regressão logarítmica usando 2 pontos.
   
   public:
     LightSensor(int PinInput, int AREF);
     double getSensorVoltage();
     double getSensorResistance();
+    double getAverageSensorResistance(int N);
     double getLuminousIntensity();
     double getAverageLuminousIntensity(int N);
     ~LightSensor(); // No Fim, se não usado, retirar

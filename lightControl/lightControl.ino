@@ -31,7 +31,7 @@ void setup() {
 
   controller = new LightController(ledPin, sensorPin);
   controller->setT(0.2);
-  controller->setRef(50);
+  controller->setRef(0);
   controller->setSaturation(5);
   
   serialcom->send_message((char*)"Ready");

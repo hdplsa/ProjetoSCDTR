@@ -4,6 +4,9 @@
 LightSensor::LightSensor(int PinInput, int AREF){
   this->PinInput = PinInput;
   this->AREF = AREF;
+  this->R = 10000.0;
+  this->K = -0.6094;
+  this->a = 4.9656e06;
 }
 
 double LightSensor::getSensorVoltage(){
@@ -16,8 +19,17 @@ double LightSensor::getSensorResistance(){
   double U, I, R;
   U = getSensorVoltage();
   I = U/this->R;
-  R = (5.0-U)/I;
+  R = (this->Vcc-U)/I;
   return R;
+}
+
+double LightSensor::getAverageSensorResistance(int N){
+  double n,av;
+  for(n=1,av=0;n<=N;n++){
+    av += this->getSensorResistance();
+  }
+  av = av/N;
+  return av;
 }
 
 // The model for the conversion of R to lux is:
@@ -31,7 +43,7 @@ double LightSensor::getLuminousIntensity(){
   double R,light;
   //Calcula intensidade luminosa pelos dados do sensor
   R = this->getSensorResistance();
-  light = pow(R/this->a,1/this->K);
+  light = pow((double)(R/this->a),(double)(1.0/this->K));
   return light;
 }
 
@@ -41,6 +53,7 @@ double LightSensor::getAverageLuminousIntensity(int N){
   for(i=1,av=0;i<=N;i++){
     av += this->getLuminousIntensity();
   }
+  av = av/N;
   return av;
 }
 
