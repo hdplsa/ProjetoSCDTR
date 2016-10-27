@@ -24,6 +24,11 @@ LightController::LightController(int ledPin, int sensorPin){
   this->ud_ant = 0;
   this->sat_up = 5.0;
   this->sat_down = 0;
+
+  // Windup
+  this->Kw = 10;
+  this->windup[0] = 0;
+  this->windup[1] = 0;
 }
 
 //Inicialização - Calibração
@@ -130,12 +135,13 @@ double LightController::getControlVariable(){
 */
 
 double LightController::calcController(){
-  double up, ui, ud;
+  double up, ui, ud, u_antes_sat;
   
   // Avanço do tempo das samples dos sinais
   this->y = this->getSensorY();
   this->u[0] = this->u[1];
   this->e[0] = this->e[1];
+  this->windup[0] = this->windup[1];
   
   // Cálculo do sinal de erro
   this->e[1] = this->calcErro();
@@ -147,6 +153,8 @@ double LightController::calcController(){
   this->ui_ant = ui;
   this->ud_ant = ud;
   this->u[1] = up + ui + ud;
+
+  u_antes_sat = this->u[1];
   
   // Saturação na variável de controlo
   if (this->sat_up >= this->sat_down){
@@ -157,6 +165,9 @@ double LightController::calcController(){
       this->u[1] = this->sat_up;
     }
   }
+
+  // Calcula o novo valor do windup
+  this->windup[1] = this->u[1] - u_antes_sat;
   
   // debug serial
   Serial.print("y = ");
@@ -199,7 +210,7 @@ double LightController::calcPController(){
 double LightController::calcPIController(){
   double u;
   //Controlo proporcional integral
-  u = this->Ki*((this->T*0.5)*(this->e[1]+this->e[0])) + this->ui_ant;
+  u = this->Ki*(this->T*0.5)*(this->e[1]+this->e[0]) + (this->T*0.5)*this->Kw*(this->windup[1]+this->windup[0]) + this->ui_ant;
   return u;
 }
 

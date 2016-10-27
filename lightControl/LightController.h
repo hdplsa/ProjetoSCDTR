@@ -32,6 +32,10 @@ class LightController{
   double ui_ant;
   double ud_ant;
   double sat_up, sat_down; 
+
+  // Windup
+  double Kw;
+  double windup[2];
   
   public:
     LightController(int ledPin, int sensorPin);
