@@ -2,9 +2,9 @@
 
 LightController::LightController(int ledPin, int sensorPin){
   //Parâmetros do controlador
-  this->Kp = 0.0003;
-  this->Ki = 0.00;
-  this->Kd = 0.00000;
+  this->Kp = 0.023;
+  this->Ki = 0.0006;
+  this->Kd = 0.000000;
   //Depêndencias do feedback
   this->ls = new LightSensor(sensorPin,5.0);
   this->ledp = new LedPWM(ledPin);
@@ -147,9 +147,6 @@ double LightController::calcController(){
   this->ui_ant = ui;
   this->ud_ant = ud;
   this->u[1] = up + ui + ud;
-  this->u[1] = 5;
-    Serial.print(this->ls->getAverageSensorResistance(10),2);
-  Serial.print('\n');
   
   // Saturação na variável de controlo
   if (this->sat_up >= this->sat_down){
