@@ -63,9 +63,9 @@ class LightController{
     ~LightController();
   
   private:
-    double calcFeedForward();
     double getSensorY();
     double calcErro();
+    double calcFeedForward();
     double calcDeadzone(double e);
     double calcPController();
     double calcPIController();

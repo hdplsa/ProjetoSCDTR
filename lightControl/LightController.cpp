@@ -133,16 +133,19 @@ double LightController::getControlVariable(){
     ui_ant -> sinal de controlo do controlador integral do ciclo passado
     ud_ant -> sinal de controlo do controlador diferencial do ciclo anterior
 
+    this->windup[1] -> corresponde ao sinal de anti-windup do ciclo atual
+    this->windup[0] -> corresponde ao sinal de anti-windup do ciclo -1, 
+      a ser utilizado no ciclo atual
+    u_antes_sat -> corresponde ao sinal de entrada antes da saturação, que 
+      é utilizado para calcular o anti-windup.
 */
 
 double LightController::calcController(){
-  double up, ui, ud, u_antes_sat;
+  double up, ui, ud, u_antes_sat, ff;
   
   // Avanço do tempo das samples dos sinais
   this->y = this->getSensorY();
 
-
-  
   this->u[0] = this->u[1];
   this->e[0] = this->e[1];
   this->windup[0] = this->windup[1];
@@ -150,13 +153,18 @@ double LightController::calcController(){
   // Cálculo do sinal de erro
   this->e[1] = this->calcDeadzone(this->calcErro());
 
-  // Cálculo do sinal de controlo  
+  // Cálcula o feedforward
+  ff = this->calcFeedForward();
+
+  // Cálculo dos sinais de controlo  
   up = this->calcPController();
   ui = this->calcPIController();
   ud = this->calcPDController();
   this->ui_ant = ui;
   this->ud_ant = ud;
-  this->u[1] = up + ui + ud;
+
+  // Gera o sinal de controlo
+  this->u[1] = up + ui + ud + ff;
 
   u_antes_sat = this->u[1];
   
@@ -207,6 +215,14 @@ double LightController::calcErro(){
   //Cálcula erro de entrada no Controlador
   this->e[1] = this->ref-this->y;
   return this->e[1];
+}
+
+double LightController::calcFeedForward(){
+  double feedforward;
+
+  feedforward = (this->ref - this->teta)/this->k;
+
+  return feedforward;
 }
 
 double LightController::calcDeadzone(double e){
