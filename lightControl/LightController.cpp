@@ -122,6 +122,21 @@ double LightController::getControlVariable(){
   return this->u[1];
 }
 
+/*
+ * Calcula o sinal de FeedForward, é basicamente uma função
+ * inversa do LED. Dá para cada Lux uma tensão a aplicar.
+ */
+
+double LightController::calcFeedForward(){
+  
+  double feedForward;
+
+  feedForward = this->ref/this->k - this->teta;
+
+  return feedForward;
+  
+}
+
 /* Legenda dos sinais:
     e[1] -> sinal de erro no ciclo atual
     e[0] -> sinal de erro no ciclo -1
@@ -132,10 +147,16 @@ double LightController::getControlVariable(){
     ui_ant -> sinal de controlo do controlador integral do ciclo passado
     ud_ant -> sinal de controlo do controlador diferencial do ciclo anterior
 
+    this->windup[1] -> corresponde ao sinal de anti-windup do ciclo atual
+    this->windup[0] -> corresponde ao sinal de anti-windup do ciclo -1, 
+      a ser utilizado no ciclo atual
+    u_antes_sat -> corresponde ao sinal de entrada antes da saturação, que 
+      é utilizado para calcular o anti-windup.
+
 */
 
 double LightController::calcController(){
-  double up, ui, ud, u_antes_sat;
+  double up, ui, ud, u_antes_sat, ff;
   
   // Avanço do tempo das samples dos sinais
   this->y = this->getSensorY();
@@ -152,7 +173,12 @@ double LightController::calcController(){
   ud = this->calcPDController();
   this->ui_ant = ui;
   this->ud_ant = ud;
-  this->u[1] = up + ui + ud;
+
+  // Calcula o FeedForward
+  ff = this->calcFeedForward();
+
+  // Calcula o sinal de controlo final
+  this->u[1] = up + ui + ud + ff;
 
   u_antes_sat = this->u[1];
   
