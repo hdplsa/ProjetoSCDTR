@@ -14,15 +14,19 @@ const double Vcc = 5.0;
  */
 
 class LightController{
+  
   //Parâmetros do controlador
   double Kp;
   double Ki;
   double Kd;
+  
   //Depêndencias do feedback
   LightSensor *ls;
   LedPWM *ledp;
+  
   //Variáveis do modelo
   double k, teta;
+  
   //Input/Output
   double T;
   double ref;
@@ -32,6 +36,9 @@ class LightController{
   double ui_ant;
   double ud_ant;
   double sat_up, sat_down; 
+
+  //deadzone
+  const double deadzone = 2;
 
   // Windup
   double Kw;
@@ -59,6 +66,7 @@ class LightController{
     double calcFeedForward();
     double getSensorY();
     double calcErro();
+    double calcDeadzone(double e);
     double calcPController();
     double calcPIController();
     double calcPDController();   
