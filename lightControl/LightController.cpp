@@ -2,9 +2,9 @@
 
 LightController::LightController(int ledPin, int sensorPin){
   //Parâmetros do controlador
-  this->Kp = 0.023;
-  this->Ki = 0.0006;
-  this->Kd = 0.000000;
+  this->Kp = 0.002;
+  this->Ki = 0.03;
+  this->Kd = 0.00000;
   //Depêndencias do feedback
   this->ls = new LightSensor(sensorPin,5.0);
   this->ledp = new LedPWM(ledPin);
@@ -57,6 +57,7 @@ void LightController::calibrateLumVoltage(){
     Serial.print(' ');
     Serial.print(y[n]);
     Serial.print('\n');
+    Serial.println("------------------------------------------");
   }
 
   //Regressão Linear (u - entrada, y - saída) mínimos quadrados
@@ -122,21 +123,6 @@ double LightController::getControlVariable(){
   return this->u[1];
 }
 
-/*
- * Calcula o sinal de FeedForward, é basicamente uma função
- * inversa do LED. Dá para cada Lux uma tensão a aplicar.
- */
-
-double LightController::calcFeedForward(){
-  
-  double feedForward;
-
-  feedForward = this->ref/this->k - this->teta;
-
-  return feedForward;
-  
-}
-
 /* Legenda dos sinais:
     e[1] -> sinal de erro no ciclo atual
     e[0] -> sinal de erro no ciclo -1
@@ -147,25 +133,22 @@ double LightController::calcFeedForward(){
     ui_ant -> sinal de controlo do controlador integral do ciclo passado
     ud_ant -> sinal de controlo do controlador diferencial do ciclo anterior
 
-    this->windup[1] -> corresponde ao sinal de anti-windup do ciclo atual
-    this->windup[0] -> corresponde ao sinal de anti-windup do ciclo -1, 
-      a ser utilizado no ciclo atual
-    u_antes_sat -> corresponde ao sinal de entrada antes da saturação, que 
-      é utilizado para calcular o anti-windup.
-
 */
 
 double LightController::calcController(){
-  double up, ui, ud, u_antes_sat, ff;
+  double up, ui, ud, u_antes_sat;
   
   // Avanço do tempo das samples dos sinais
   this->y = this->getSensorY();
+
+
+  
   this->u[0] = this->u[1];
   this->e[0] = this->e[1];
   this->windup[0] = this->windup[1];
   
   // Cálculo do sinal de erro
-  this->e[1] = this->calcErro();
+  this->e[1] = this->calcDeadzone(this->calcErro());
 
   // Cálculo do sinal de controlo  
   up = this->calcPController();
@@ -173,12 +156,7 @@ double LightController::calcController(){
   ud = this->calcPDController();
   this->ui_ant = ui;
   this->ud_ant = ud;
-
-  // Calcula o FeedForward
-  ff = this->calcFeedForward();
-
-  // Calcula o sinal de controlo final
-  this->u[1] = up + ui + ud + ff;
+  this->u[1] = up + ui + ud;
 
   u_antes_sat = this->u[1];
   
@@ -197,9 +175,11 @@ double LightController::calcController(){
   
   // debug serial
   Serial.print("y = ");
-  Serial.println(this->y,4);
+  Serial.print(this->y,4);
+  Serial.print(';');
   Serial.print("e = ");
-  Serial.println(e[1],4);
+  Serial.print(e[1],4);
+  Serial.print(';');
   Serial.print("u = ");
   Serial.println(u[1],4);
   return this->u[1];
@@ -209,6 +189,7 @@ void LightController::LEDInputControlVariable(){
   //Impõe sinal de comando calculado no LED
   this->ledp->setLedPWMVoltage(this->u[1]);
 }
+
 
 LightController::~LightController(){
   //Free à memória
@@ -226,6 +207,20 @@ double LightController::calcErro(){
   //Cálcula erro de entrada no Controlador
   this->e[1] = this->ref-this->y;
   return this->e[1];
+}
+
+double LightController::calcDeadzone(double e){
+
+  double error = e;
+
+  if(e > -this->deadzone && e < 0){
+    error = 0;
+  } else if(e < this->deadzone && e > 0) {
+    error = 0;
+  }
+
+  return error;
+  
 }
 
 double LightController::calcPController(){
