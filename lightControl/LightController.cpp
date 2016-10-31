@@ -11,7 +11,7 @@ LightController::LightController(int ledPin, int sensorPin){
   //Variáveis do modelo tensão/lux
   this->k = 0;
   this->teta = 0;
-  this->calibrateLumVoltage();
+  //this->calibrateLumVoltage();
   //Variaveis input/output
   this->T = 0;
   this->ref = 0;
@@ -57,7 +57,7 @@ void LightController::calibrateLumVoltage(){
     Serial.print(' ');
     Serial.print(y[n]);
     Serial.print('\n');
-    Serial.println("------------------------------------------");
+    //Serial.println("------------------------------------------");
   }
 
   //Regressão Linear (u - entrada, y - saída) mínimos quadrados
@@ -106,6 +106,10 @@ void LightController::setRef(double ref){
 
 void LightController::setU(double u){
   this->u[1] = u;
+}
+
+void LightController::setPWM(int PWM){
+  this->ledp->setLedPWM(PWM);
 }
 
 void LightController::setSaturation(double sat_up){
@@ -209,6 +213,16 @@ double LightController::getSensorY(){
   double y;
   y = ls->getLuminousIntensity();
   return y;
+}
+
+double LightController::getSensorV(){
+  double v;
+  v = ls->getSensorVoltage();
+  return v;
+}
+
+double LightController::getSensorRaw(){
+  return ls->getRaw();
 }
 
 double LightController::calcErro(){

@@ -4,7 +4,7 @@
 // serial, controla os envios por serial, as receções, e o proces-
 // samento das receções.
 
-SerialCom::SerialCom(int Baudrate){
+SerialCom::SerialCom(long int Baudrate){
 
   Serial.begin(Baudrate);
   this->current_char = 0;

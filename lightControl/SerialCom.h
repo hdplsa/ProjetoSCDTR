@@ -15,7 +15,7 @@ class SerialCom{
   int ref;
   
   public:
-    SerialCom(int Baudrate);
+    SerialCom(long int Baudrate);
     void send_message(char* message);
     void receive_message();
     int get_valorLed();

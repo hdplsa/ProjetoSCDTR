@@ -61,6 +61,9 @@ class LightController{
     double calcController(); 
     void LEDInputControlVariable();
     ~LightController();
+    double getSensorV();
+    void setPWM(int PWM);
+    double getSensorRaw();
   
   private:
     double getSensorY();

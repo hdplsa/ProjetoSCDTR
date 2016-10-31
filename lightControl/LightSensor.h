@@ -22,6 +22,7 @@ class LightSensor{
     double getAverageSensorResistance(int N);
     double getLuminousIntensity();
     double getAverageLuminousIntensity(int N);
+    double getRaw();
     ~LightSensor(); // No Fim, se não usado, retirar
     
   private:

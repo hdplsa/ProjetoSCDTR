@@ -14,7 +14,7 @@ void initTimer1(){
   TCCR1A = 0;// clear register
   TCCR1B = 0;// clear register
   TCNT1 = 0;//reset counter
-  OCR1A = 3124; //must be <65536
+  OCR1A = 3*1562; //must be <65536
   // = (16*10^6) / (1*1024) – 1
   TCCR1B |= (1 << WGM12); //CTC On
   // Set prescaler for 1024
@@ -26,44 +26,68 @@ void initTimer1(){
 
 void setup() {
   // put your setup code here, to run once:
-  
-  serialcom = new SerialCom(9600);
 
+  serialcom = new SerialCom(115200);
+  
   controller = new LightController(ledPin, sensorPin);
   controller->setT(0.2);
   controller->setRef(50);
   controller->setSaturation(5);
-  
-  serialcom->send_message((char*)"Ready");
+  controller->setPWM(0);
 
-   //Init interrupções
-   initTimer1();
+  controller->setPWM(255);
+  Serial.print((char*)"Ready\n");
+
+  //Init interrupções
+  //initTimer1();
 }
 
-volatile bool flag;
-long unsigned int times1;
-long unsigned int times2;
+const int N = 200;
+volatile bool send_flag = 1;
+int y[N];
+int cycle = 0;
+long unsigned int t[N];
 
 ISR(TIMER1_COMPA_vect){
   //...
   //put here control operations
   //
-  flag = 1; //notify main loop
- 
+  //flag = 0; //notify main loop
+  if(cycle <= 25){
+    //y = controller->getSensorRaw();
+    //u = cycle*10;
+
+    //Serial.print(y);
+    //Serial.print(';');
+    //Serial.print(u);
+    //Serial.print('\n');
+    
+    //controller->setPWM(cycle*10);
+    //cycle++;
+  } else {
+    //flag = 0;
+  }
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   
-  if(flag){
+  if(cycle < N){
 
-    /*times1 = times2;
-    times2 = millis();
-    
-    Serial.println(times2 - times1);*/
-    controller->calcController();
-    controller->LEDInputControlVariable();
+    y[cycle] = controller->getSensorRaw();
+    t[cycle] = micros();
 
-    flag = 0;
+  } else {
+    if(send_flag){
+      for(int i=0; i<N; i++){
+        Serial.print(y[i]);
+        Serial.print(';');
+        Serial.print(t[i]);
+        Serial.print('\n');
+      }
+      send_flag = 0;
+    }
   }
+
+  cycle++;  
 }

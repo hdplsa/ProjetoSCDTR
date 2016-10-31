@@ -47,6 +47,10 @@ double LightSensor::getLuminousIntensity(){
   return light;
 }
 
+double LightSensor::getRaw(){
+  return analogRead(this->PinInput);
+}
+
 //Retorna média de N amostras do sensor
 double LightSensor::getAverageLuminousIntensity(int N){
   double av, i;
