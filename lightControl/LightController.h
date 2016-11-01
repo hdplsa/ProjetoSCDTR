@@ -51,13 +51,15 @@ class LightController{
     void lighton();
     void setT(double T);
     void setY(double y);
-    void setRef(double ref);
+    void setRef(int ref);
     void setU(double u);
     void setSaturation(double sat_up);
     double getK();
     double getTeta();
     double getT();
     double getControlVariable();
+    double getY();
+    double getError();
     double calcController(); 
     void LEDInputControlVariable();
     ~LightController();

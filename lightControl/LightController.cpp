@@ -100,8 +100,8 @@ void LightController::setY(double y){
   this->y = y;
 }
 
-void LightController::setRef(double ref){
-  this->ref = ref;  
+void LightController::setRef(int ref){
+  this->ref = (double)ref;  
 }
 
 void LightController::setU(double u){
@@ -112,15 +112,34 @@ void LightController::setSaturation(double sat_up){
   this->sat_up = sat_up;
 }
 
-double LightController::getK(){return this->k;}
-double LightController::getTeta(){return this->teta;}
+// Retorna o parametro K da plant (LED)
+double LightController::getK(){
+  return this->k;
+}
 
+// Retorna o parâmetro Teta da plant (LED)
+double LightController::getTeta(){
+  return this->teta;
+}
+
+// Retorna o periodo
 double LightController::getT(){
   return this->T;  
 }
 
+// Retorna o sinal de controlo a ser aplicado ao LED
 double LightController::getControlVariable(){
   return this->u[1];
+}
+
+// Retorna o y guardado no objeto
+double LightController::getY(){
+  return this->y;
+}
+
+// Retorna o erro do ciclo "atual"
+double LightController::getError(){
+  return this->e[1];
 }
 
 /* Legenda dos sinais:
@@ -180,16 +199,10 @@ double LightController::calcController(){
 
   // Calcula o novo valor do windup
   this->windup[1] = this->u[1] - u_antes_sat;
+
+  // Coloca o sinal de comando no LED
+  LEDInputControlVariable();
   
-  // debug serial
-  Serial.print("y = ");
-  Serial.print(this->y,4);
-  Serial.print(';');
-  Serial.print("e = ");
-  Serial.print(e[1],4);
-  Serial.print(';');
-  Serial.print("u = ");
-  Serial.println(u[1],4);
   return this->u[1];
 }
 

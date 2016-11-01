@@ -4,17 +4,10 @@
 // serial, controla os envios por serial, as receções, e o proces-
 // samento das receções.
 
-SerialCom::SerialCom(int Baudrate){
+SerialCom::SerialCom(long int Baudrate){
 
   Serial.begin(Baudrate);
   this->current_char = 0;
-  
-}
-
-// Esta função recebe uma string que depois envia para o computador
-void SerialCom::send_message(char *message){
-
-  Serial.println(message);
   
 }
 
@@ -38,7 +31,7 @@ void SerialCom::receive_message(){
       // contador de caracteres
       this->incoming[current_char] = '\0';
       current_char = 0;
-      this->send_message(this->incoming);
+      Serial.println(this->incoming);
       this->process_request(this->incoming);
       
     }
@@ -64,7 +57,7 @@ void SerialCom::process_request(char *message){
     // Envia os valores do LDR em lux
     case 1:
       sprintf(text, "%i", currentLux);
-      this->send_message(text);
+      Serial.println(text);
       break;
     // Caso em que queremos mudar a referência local
     case 2:
@@ -76,7 +69,7 @@ void SerialCom::process_request(char *message){
       break;
     // Caso o tipo de comando seja desconhecido
     default:
-      this->send_message((char*)"Wrong Command");
+      Serial.println((char*)"Wrong Command");
     break;
   }
   
@@ -94,9 +87,11 @@ void SerialCom::set_currentLux(int currentLux){
   
 }
 
-int SerialCom::get_ref(){
+int SerialCom::getRef(){
 
-  return this->ref;
+  int ref = this->ref;
+  this->ref = -1;
   
+  return ref;
 }
 

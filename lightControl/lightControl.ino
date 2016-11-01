@@ -27,22 +27,21 @@ void initTimer1(){
 void setup() {
   // put your setup code here, to run once:
   
-  serialcom = new SerialCom(9600);
+  serialcom = new SerialCom(115200);
 
   controller = new LightController(ledPin, sensorPin);
   controller->setT(0.2);
   controller->setRef(50);
   controller->setSaturation(5);
-  
-  serialcom->send_message((char*)"Ready");
+
+  Serial.println((char*)"Ready");
 
    //Init interrupções
    initTimer1();
 }
 
 volatile bool flag;
-long unsigned int times1;
-long unsigned int times2;
+int new_ref;
 
 ISR(TIMER1_COMPA_vect){
   //...
@@ -57,12 +56,29 @@ void loop() {
   
   if(flag){
 
-    /*times1 = times2;
-    times2 = millis();
-    
-    Serial.println(times2 - times1);*/
+    // Calcula o sinal de controlo
     controller->calcController();
-    controller->LEDInputControlVariable();
+
+    // debug serial
+    Serial.print("y = ");
+    Serial.print(controller->getY(),4);
+    Serial.print(';');
+    Serial.print("e = ");
+    Serial.print(controller->getError(),4);
+    Serial.print(';');
+    Serial.print("u = ");
+    Serial.println(controller->getControlVariable(),4);
+
+    // Recebe mensagens 
+    serialcom->receive_message();
+
+    // Obtem a referência da mensagem. è -1 se não houver ref nova.
+    new_ref = serialcom->getRef();
+
+    if(new_ref != -1){
+      controller->setRef(new_ref);
+      Serial.println("Mudada Ref");
+    }
 
     flag = 0;
   }
