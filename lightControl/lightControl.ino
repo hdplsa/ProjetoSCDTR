@@ -67,7 +67,10 @@ void loop() {
     Serial.print(controller->getError(),4);
     Serial.print(';');
     Serial.print("u = ");
-    Serial.println(controller->getControlVariable(),4);
+    Serial.print(controller->getControlVariable(),4);
+    Serial.print(';');
+    Serial.print("t = ");
+    Serial.println(millis());
 
     // Recebe mensagens 
     serialcom->receive_message();
