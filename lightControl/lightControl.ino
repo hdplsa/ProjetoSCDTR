@@ -33,9 +33,8 @@ void setup() {
   controller->setT(0.2);
   controller->setRef(50);
   controller->setSaturation(5);
-  controller->setPWM(255);
-
-  controller->setPWM(255);
+  controller->setPWM(51);
+  
   Serial.print((char*)"Ready\n");
 
   //Init interrupções
@@ -90,5 +89,5 @@ void loop() {
   }
   
   cycle++;
-  delayMicroseconds(400);  
+  delayMicroseconds(1200);  
 }
