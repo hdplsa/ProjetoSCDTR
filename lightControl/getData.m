@@ -1,13 +1,23 @@
 function getData(obj, event,arduino, string_type, h)
     
-    global y e u t n;
+    global y e u t n bool_ready strings;
+    
     try
-        tmp = fscanf(arduino,string_type)
-    catch
+        str = fscanf(arduino)
+        strings{n} = str;
+        %     if strcmp(str,'Ready\n')
+        %        bool_ready = 1;
+        %     end
+        tmp = sscanf(str,string_type);
+    catch error
+        disp(error.message);
         return;
     end
     
-    if length(tmp)<3
+    
+    len = length(tmp)
+    
+    if len~=4
         return;
     end
     
@@ -18,10 +28,10 @@ function getData(obj, event,arduino, string_type, h)
     
     % update das figuras
     
-    set(h{1}, 'XData', t(1:n), 'YData', y(1:n)); 
+    set(h{1}, 'XData', t(1:n), 'YData', y(1:n));
     set(h{2}, 'XData', t(1:n), 'YData', e(1:n));
     set(h{3}, 'XData', t(1:n), 'YData', u(1:n));
     
-    n = n+1;
     
+    n = n+1;
 end

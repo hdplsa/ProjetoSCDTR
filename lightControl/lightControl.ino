@@ -34,10 +34,12 @@ void setup() {
   controller->setRef(50);
   controller->setSaturation(5);
 
+  delay(100);
+
   Serial.println((char*)"Ready");
 
-   //Init interrupções
-   initTimer1();
+  //Init interrupções
+  initTimer1();
 }
 
 volatile bool flag;

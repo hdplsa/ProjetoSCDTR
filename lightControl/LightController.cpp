@@ -53,11 +53,11 @@ void LightController::calibrateLumVoltage(){
     //Média de 10 observações
     y[n] = this->ls->getAverageLuminousIntensity(10);
     //Prints de debug
-    Serial.print(n);
+    /*Serial.print(n);
     Serial.print(' ');
     Serial.print(y[n]);
     Serial.print('\n');
-    Serial.println("------------------------------------------");
+    Serial.println("------------------------------------------");*/
   }
 
   //Regressão Linear (u - entrada, y - saída) mínimos quadrados

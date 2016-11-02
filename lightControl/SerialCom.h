@@ -12,7 +12,7 @@ class SerialCom{
   // Variáveis usadas na execução dos pedidos das mensagens
   int valorLed = 0;
   int currentLux = 0;
-  int ref = 0;
+  int ref = -1;
 
   // Booleanos que dizem se há valores novos
   volatile bool new_ref = 0;
