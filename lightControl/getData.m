@@ -3,7 +3,7 @@ function getData(obj, event,arduino, string_type, h)
     global y e u t n bool_ready strings;
     
     try
-        str = fscanf(arduino)
+        str = fscanf(arduino);
         strings{n} = str;
         %     if strcmp(str,'Ready\n')
         %        bool_ready = 1;
@@ -15,7 +15,7 @@ function getData(obj, event,arduino, string_type, h)
     end
     
     
-    len = length(tmp)
+    len = length(tmp);
     
     if len~=4
         return;

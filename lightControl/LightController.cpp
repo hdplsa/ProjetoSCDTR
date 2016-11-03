@@ -170,10 +170,10 @@ double LightController::calcController(){
   this->windup[0] = this->windup[1];
   
   // Cálculo do sinal de erro
-  this->e[1] = this->calcDeadzone(this->calcErro());
+  this->e[1] = this->calcDeadzone(this->y,this->calcErro());
 
   // Cálcula o feedforward
-  ff = this->calcFeedForward();
+  //ff = this->calcFeedForward();
 
   // Cálculo dos sinais de controlo  
   up = this->calcPController();
@@ -183,7 +183,7 @@ double LightController::calcController(){
   this->ud_ant = ud;
 
   // Gera o sinal de controlo
-  this->u[1] = up + ui + ud + ff;
+  this->u[1] = up + ui + ud;// + ff;
 
   u_antes_sat = this->u[1];
   
@@ -238,13 +238,16 @@ double LightController::calcFeedForward(){
   return feedforward;
 }
 
-double LightController::calcDeadzone(double e){
+double LightController::calcDeadzone(double y, double e){
 
   double error = e;
+  double deadzone;
+  
+  deadzone = 0.0355*this->ref - 0.5582;
 
-  if(e > -this->deadzone && e < 0){
+  if(e > -deadzone && e < 0){
     error = 0;
-  } else if(e < this->deadzone && e > 0) {
+  } else if(e < deadzone && e > 0) {
     error = 0;
   }
 

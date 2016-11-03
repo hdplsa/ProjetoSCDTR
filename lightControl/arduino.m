@@ -2,7 +2,7 @@ clear all; close all;
 
 global y e u t n bool_ready strings;
 
-serial_arduino = serial('COM3','BaudRate',115200,'DataBits',8,'StopBits',1,'Parity','none');
+serial_arduino = serial('COM6','BaudRate',115200,'DataBits',8,'StopBits',1,'Parity','none');
 
 fopen(serial_arduino);
 
@@ -26,11 +26,49 @@ arduino_timer = timer('ExecutionMode', 'fixedRate', 'Period', 0.2, ...
     'TimerFcn', {@getData,serial_arduino,string_type, h}, 'Name', 'Pioneer_timer');
 start(arduino_timer);
 
-pause(10);
+% pause(2);
+% 
+% n_ini = n-1;
+% 
+% pause(20);
+% 
+% n_last = n-1;
+% 
+% mmax = max(e(n_ini:n_last));
+% mmin = min(e(n_ini:n_last));
 
-fprintf(serial_arduino,'2 100\n');
+for i = 1:15
+    str = sprintf('2 %i\n',20*(i-1));
+    fprintf(serial_arduino,str);
+    
+    pause(2);
+    
+    n_ini = n-1;
+    
+    pause(10);
+    
+    n_last = n-1;
+    
+    mmax(i) = max(e(n_ini:n_last));
+    mmin(i) = min(e(n_ini:n_last));
+    
+end
 
-pause(10);
+% 
+% 
+% pause(10);
+% 
+% fprintf(serial_arduino,'2 150\n');
+% 
+% pause(10);
+% 
+% fprintf(serial_arduino,'2 200\n');
+% 
+% pause(10);
+% 
+% fprintf(serial_arduino,'2 250\n');
+% 
+% pause(10);
 
 stop(arduino_timer);
 delete(arduino_timer);
@@ -38,3 +76,5 @@ delete(arduino_timer);
 if size(instrfind) > 0
     fclose(instrfind); delete(instrfind);
 end
+
+max_error = max([mmax;-mmin]);
