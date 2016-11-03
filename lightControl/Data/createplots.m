@@ -1,13 +1,19 @@
+close all;
+
 % Cria os graficos do LDR
 
-figure;
-plot(TensaoLDR(:,1), TensaoLDR(:,2));
+f = figure;
+plot(TensaoLDR(:,1), TensaoLDR(:,2),'.');
 xlabel('Tempo [s]');
 ylabel('Tensão [V]');
-label('Tensão no LDR a cada instante');
+title('Tensão no LDR a cada instante');
+set(f,'renderer','painters')
+saveas(f,'TensaoLDR','epsc');
 
-figure;
-plot(luxLDR(:,1), luxLDR(:,2));
+f = figure;
+plot(luxLDR(:,1), luxLDR(:,2),'.');
 xlabel('Tempo [s]');
 ylabel('Iluminância [lx]');
-label('Iluminância medida pelo LDR');
+title('Iluminância medida pelo LDR');
+set(f,'renderer','painters')
+saveas(f,'IluminanciaLDR','epsc');

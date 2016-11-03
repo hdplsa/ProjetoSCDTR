@@ -33,7 +33,7 @@ void setup() {
   controller->setT(0.2);
   controller->setRef(50);
   controller->setSaturation(5);
-  controller->setPWM(51);
+  controller->setPWM(255);
   
   Serial.print((char*)"Ready\n");
 
@@ -89,5 +89,5 @@ void loop() {
   }
   
   cycle++;
-  delayMicroseconds(1200);  
+  delayMicroseconds(1500);  
 }
