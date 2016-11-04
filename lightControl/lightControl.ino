@@ -34,8 +34,6 @@ void setup() {
   controller->setRef(0);
   controller->setSaturation(5);
 
-  delay(100);
-
   Serial.println((char*)"Ready");
 
   //Init interrupções

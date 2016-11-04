@@ -49,7 +49,7 @@ void LightController::calibrateLumVoltage(){
   for(int n=0;n<N;n++){
     u[n] = (Vcc/(double)N)*(double)n;
     this->ledp->setLedPWMVoltage(u[n]);
-    delay(100);
+    delay(50);
     //Média de 10 observações
     y[n] = this->ls->getAverageLuminousIntensity(10);
     //Prints de debug
@@ -79,6 +79,9 @@ void LightController::calibrateLumVoltage(){
   //Saturação inferior (limite do modelo)
   this->sat_down = -this->teta/this->k;
 
+  //Esperar um pouco para estar ready
+  delay(10);
+  
   //Debug Stuff. descomentar quando necessário
   Serial.print("K = ");
   Serial.print(this->k);
