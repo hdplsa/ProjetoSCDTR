@@ -35,7 +35,8 @@ class LightController{
   double u[2];
   double ui_ant;
   double ud_ant;
-  double sat_up, sat_down; 
+  double sat_up, sat_down;
+  int ffflag; 
 
   //deadzone
   const double deadzone = 2;

@@ -3,7 +3,7 @@
 LightController::LightController(int ledPin, int sensorPin){
   //Parâmetros do controlador
   this->Kp = 0.008;
-  this->Ki = 0.08;
+  this->Ki = 0.1;
   this->Kd = 0.0000;
   //Depêndencias do feedback
   this->ls = new LightSensor(sensorPin,5.0);
@@ -24,6 +24,7 @@ LightController::LightController(int ledPin, int sensorPin){
   this->ud_ant = 0;
   this->sat_up = 5.0;
   this->sat_down = 0;
+  this->ffflag = 0;
 
   // Windup
   this->Kw = 10;
@@ -104,7 +105,8 @@ void LightController::setY(double y){
 }
 
 void LightController::setRef(int ref){
-  this->ref = (double)ref;  
+  this->ref = (double)ref;
+  this->ffflag = 1;  
 }
 
 void LightController::setU(double u){
@@ -164,48 +166,55 @@ double LightController::getError(){
 
 double LightController::calcController(){
   double up, ui, ud, u_antes_sat, ff;
+
+  if(this->ffflag == 1){
+    // Primeiro ciclo só com feedforward
+    this->u[1] = this->calcFeedForward();
+    // Liga o PID
+    this->ffflag = 0;
+  } else {
+    // Avanço do tempo das samples dos sinais
+    this->y = this->getSensorY();
   
-  // Avanço do tempo das samples dos sinais
-  this->y = this->getSensorY();
-
-  this->u[0] = this->u[1];
-  this->e[0] = this->e[1];
-  this->windup[0] = this->windup[1];
+    this->u[0] = this->u[1];
+    this->e[0] = this->e[1];
+    this->windup[0] = this->windup[1];
+    
+    // Cálculo do sinal de erro
+    this->e[1] = this->calcDeadzone(this->y,this->calcErro());
   
-  // Cálculo do sinal de erro
-  this->e[1] = this->calcDeadzone(this->y,this->calcErro());
-
-  // Cálcula o feedforward
-  //ff = this->calcFeedForward();
-
-  // Cálculo dos sinais de controlo  
-  up = this->calcPController();
-  ui = this->calcPIController();
-  ud = this->calcPDController();
-  this->ui_ant = ui;
-  this->ud_ant = ud;
-
-  // Gera o sinal de controlo
-  this->u[1] = up + ui + ud;// + ff;
-
-  u_antes_sat = this->u[1];
+    // Cálcula o feedforward
+    ff = this->calcFeedForward();
   
-  // Saturação na variável de controlo
-  if (this->sat_up >= this->sat_down){
-    if (this->u[1] < this->sat_down){
-      this->u[1] = this->sat_down;
+    // Cálculo dos sinais de controlo  
+    up = this->calcPController();
+    ui = this->calcPIController();
+    ud = this->calcPDController();
+    this->ui_ant = ui;
+    this->ud_ant = ud;
+  
+    // Gera o sinal de controlo
+    this->u[1] = up + ui + ud + ff;
+  
+    u_antes_sat = this->u[1];
+    
+    // Saturação na variável de controlo
+    if (this->sat_up >= this->sat_down){
+      if (this->u[1] < this->sat_down){
+        this->u[1] = this->sat_down;
+      }
+      if (this->u[1] > this->sat_up){
+        this->u[1] = this->sat_up;
+      }
     }
-    if (this->u[1] > this->sat_up){
-      this->u[1] = this->sat_up;
-    }
+  
+    // Calcula o novo valor do windup
+    this->windup[1] = this->u[1] - u_antes_sat;
+  
+    // Coloca o sinal de comando no LED
+    LEDInputControlVariable();
   }
-
-  // Calcula o novo valor do windup
-  this->windup[1] = this->u[1] - u_antes_sat;
-
-  // Coloca o sinal de comando no LED
-  LEDInputControlVariable();
-  
+    
   return this->u[1];
 }
 

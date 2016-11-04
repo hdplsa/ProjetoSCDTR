@@ -31,7 +31,7 @@ void setup() {
 
   controller = new LightController(ledPin, sensorPin);
   controller->setT(0.02);
-  controller->setRef(0);
+  controller->setRef(50);
   controller->setSaturation(5);
 
   Serial.println((char*)"Ready");
