@@ -14,7 +14,7 @@ void initTimer1(){
   TCCR1A = 0;// clear register
   TCCR1B = 0;// clear register
   TCNT1 = 0;//reset counter
-  OCR1A = 3124; //must be <65536
+  OCR1A = 313; //must be <65536
   // = (16*10^6) / (1*1024) – 1
   TCCR1B |= (1 << WGM12); //CTC On
   // Set prescaler for 1024
@@ -30,7 +30,7 @@ void setup() {
   serialcom = new SerialCom(115200);
 
   controller = new LightController(ledPin, sensorPin);
-  controller->setT(0.2);
+  controller->setT(0.02);
   controller->setRef(0);
   controller->setSaturation(5);
 
@@ -48,19 +48,20 @@ int new_ref;
 ISR(TIMER1_COMPA_vect){
   //...
   //put here control operations
-  //
+  
+  // Calcula o sinal de controlo
+  controller->calcController();
+  
   flag = 1; //notify main loop
  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  long int time2 = 0, time1 = 0;
   
   if(flag){
-
-    // Calcula o sinal de controlo
-    controller->calcController();
-
+    
     // debug serial
     Serial.print("y = ");
     Serial.print(controller->getY(),4);
@@ -72,7 +73,7 @@ void loop() {
     Serial.print(controller->getControlVariable(),4);
     Serial.print(';');
     Serial.print("t = ");
-    Serial.println(millis());
+    Serial.println(millis()); 
 
     // Recebe mensagens 
     serialcom->receive_message();
