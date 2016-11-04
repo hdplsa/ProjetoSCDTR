@@ -2,7 +2,7 @@
 
 LightController::LightController(int ledPin, int sensorPin){
   //Parâmetros do controlador
-  this->Kp = 0.004;
+  this->Kp = 0.008;
   this->Ki = 0.08;
   this->Kd = 0.0000;
   //Depêndencias do feedback
