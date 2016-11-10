@@ -16,9 +16,9 @@ const double Vcc = 5.0;
 class LightController{
   
   //Parâmetros do controlador
-  double Kp;
-  double Ki;
-  double Kd;
+  const double Kp = 0.008;
+  const double Ki = 0.1;
+  const double Kd = 0.000;
   
   //Depêndencias do feedback
   LightSensor *ls;
@@ -28,22 +28,23 @@ class LightController{
   double k, teta;
   
   //Input/Output
-  double T;
-  double ref;
-  double e[2];
-  double y;
-  double u[2];
-  double ui_ant;
-  double ud_ant;
-  double sat_up, sat_down;
-  int ffflag; 
+  double T = 0;
+  double ref = 0;
+  double e[2] = {0,0};
+  double y = 0;
+  double u[2] = {0,0};
+  double ui_ant = 0;
+  double ud_ant = 0;
+  double sat_up = 5.0;
+  double sat_down = 0;
+  volatile int ffflag = 0; 
 
   //deadzone
   const double deadzone = 2;
 
   // Windup
-  double Kw;
-  double windup[2];
+  const double Kw = 10;
+  double windup[2] = {0,0};
   
   public:
     LightController(int ledPin, int sensorPin);

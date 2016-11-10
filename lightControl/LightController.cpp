@@ -1,35 +1,16 @@
 #include "LightController.h"
 
 LightController::LightController(int ledPin, int sensorPin){
-  //Parâmetros do controlador
-  this->Kp = 0.008;
-  this->Ki = 0.1;
-  this->Kd = 0.0000;
+
   //Depêndencias do feedback
   this->ls = new LightSensor(sensorPin,5.0);
   this->ledp = new LedPWM(ledPin);
-  //Variáveis do modelo tensão/lux
+
+  //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
   this->k = 0;
   this->teta = 0;
   this->calibrateLumVoltage();
-  //Variaveis input/output
-  this->T = 0;
-  this->ref = 0;
-  this->e[0] = 0;
-  this->e[1] = 0;
-  this->y = 0;
-  this->u[0] = 0;
-  this->u[1] = 0;
-  this->ui_ant = 0;
-  this->ud_ant = 0;
-  this->sat_up = 5.0;
-  this->sat_down = 0;
-  this->ffflag = 0;
-
-  // Windup
-  this->Kw = 10;
-  this->windup[0] = 0;
-  this->windup[1] = 0;
+  
 }
 
 //Inicialização - Calibração

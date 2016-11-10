@@ -4,9 +4,6 @@
 LightSensor::LightSensor(int PinInput, int AREF){
   this->PinInput = PinInput;
   this->AREF = AREF;
-  this->R = 10000.0;
-  this->K = -0.6094;
-  this->a = 94082.4;
 }
 
 double LightSensor::getSensorVoltage(){

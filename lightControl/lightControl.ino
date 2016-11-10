@@ -6,8 +6,10 @@
 SerialCom *serialcom;
 LightController * controller;
 
-const int ledPin = 11;
-const int sensorPin = 5;
+constexpr int ledPin = 11;
+constexpr int sensorPin = 5;
+
+constexpr uint8_t deviceID = 2;
 
 void initTimer1(){
   cli();
@@ -22,6 +24,19 @@ void initTimer1(){
   // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
   sei(); //allow interrupts
+}
+
+/* Vai dizer ao arduino o seu endereço no I2C e 
+ * inicià-lo como slave receiver
+ */
+void initI2C(){
+
+  // Define o numero do dispositivo
+  TWAR = deviceID;
+
+  // Liga o TWIN e liga a deteção do address do arduino
+  TWCR |= 0b01000100;
+  
 }
 
 void setup() {
@@ -56,7 +71,6 @@ ISR(TIMER1_COMPA_vect){
 
 void loop() {
   // put your main code here, to run repeatedly:
-  long int time2 = 0, time1 = 0;
   
   if(flag){
     
