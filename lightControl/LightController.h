@@ -70,7 +70,7 @@ class LightController{
     double getSensorY();
     double calcErro();
     double calcFeedForward();
-    double calcDeadzone(double y,double e);
+    double calcDeadzone(double e);
     double calcPController();
     double calcPIController();
     double calcPDController();   
