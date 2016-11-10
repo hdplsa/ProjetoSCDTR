@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include "SerialCom.h"
 #include "LightController.h"
+#include "TWI.h"
 
 SerialCom *serialcom;
 LightController * controller;
@@ -35,7 +36,7 @@ void initI2C(){
   TWAR = deviceID;
 
   // Liga o TWIN e liga a deteção do address do arduino
-  TWCR |= 0b01000100;
+  TWCR |= (1<<TWEA)|(1<<TWEN);
   
 }
 
@@ -100,4 +101,18 @@ void loop() {
 
     flag = 0;
   }
+}
+
+// Função chamada quando se chama este arduino por I2C
+ISR(TWI_vect){
+
+  switch(TWISR){
+    case TWI_START:
+    break;
+
+    default:
+    break;
+
+  }
+
 }
