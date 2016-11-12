@@ -11,6 +11,10 @@ double LedPWM::getTPWM(){
   return this->TPWM;
 }
 
+double LedPWM::getLedPower(){
+  return this->PLed;
+}
+
 void LedPWM::setLedPWM(int dutCycle){
   //dutCycle representa o duty cycle do PWM (0-255)
   this->setPWMOutput(this->LedPin,dutCycle);
@@ -21,11 +25,10 @@ void LedPWM::setLedPWMVoltage(double voltage){
   this->setPWMOutput(this->LedPin,(int)(voltage*(255.0/5.0)));
 }
 
-double LedPWM::calculateLedEnergyCycle(){
-  double DtC,E;
-  DtC = this->dutCycle;
+double LedPWM::calculateLedEnergyPeriod(){
+  double E;
   //Calcula energia num ciclo (mJ)
-  E = 1000*PLed*(DtC/255.0)*this->TPWM;
+  E = 1000*PLed*(this->dutCycle/255.0)*this->TPWM;
   return E;
 }
 

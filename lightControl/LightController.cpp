@@ -10,6 +10,9 @@ LightController::LightController(int ledPin, int sensorPin){
   this->k = 0;
   this->teta = 0;
   this->calibrateLumVoltage();
+
+  //Metrics
+  this->E = 0;
   
 }
 
@@ -191,6 +194,9 @@ double LightController::calcController(){
   
     // Calcula o novo valor do windup
     this->windup[1] = this->u[1] - u_antes_sat;
+
+    //Metrics
+    this->E = calcEnergyCycle();
   
     // Coloca o sinal de comando no LED
     LEDInputControlVariable();
@@ -265,5 +271,10 @@ double LightController::calcPDController(){
   //Controlo proporcional diferencial
   u = this->Kd*((2/this->T)*(this->e[1]-this->e[0])) - this->ud_ant;
   return u;
+}
+
+double LightController::calcEnergyCycle(){
+  this->E = (this->T/this->ledp->getTPWM())*this->ledp->calculateLedEnergyPeriod();
+  return this->E;
 }
 

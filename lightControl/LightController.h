@@ -45,6 +45,9 @@ class LightController{
   // Windup
   const double Kw = 10;
   double windup[2] = {0,0};
+
+  //Metrics
+  double E;
   
   public:
     LightController(int ledPin, int sensorPin);
@@ -73,7 +76,8 @@ class LightController{
     double calcDeadzone(double e);
     double calcPController();
     double calcPIController();
-    double calcPDController();   
+    double calcPDController();
+    double calcEnergyCycle();   
   
 };
 
