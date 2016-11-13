@@ -1,8 +1,17 @@
-#include <stdio.h>
+#include <iostream>
+#include "Serial.h"
+using namespace std;
 
 int main(){
 
-    printf("Hello World\n");
+    string port = "";
+
+    Serial arduino = new Serial();
+    arduino.begin(port, 115200);
+
+    cout << arduino.read();
+
+    cout << "Hello World";
 
     return 0;
 

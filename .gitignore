@@ -6,3 +6,5 @@
 ### matlab ###
 *.slx.autosave
 *.m~
+
+*.out
