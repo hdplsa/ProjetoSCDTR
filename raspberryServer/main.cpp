@@ -4,14 +4,24 @@ using namespace std;
 
 int main(){
 
-    string port = "";
+    Serial *arduino = new Serial();
+    arduino->Begin(115200,"/dev/ttyACM0");
 
-    Serial arduino = new Serial();
-    arduino.begin(port, 115200);
+    cout << "Hello World" << std::endl;
 
-    cout << arduino.read();
+    for(int i = 0; i < 100; i++){
+        arduino->read_ln();
+    }
 
-    cout << "Hello World";
+    for(int i = 0; i < 5; i++){
+        arduino->Write("Whore");
+    }
+    
+    for(int i = 0; i < 100; i++){
+        arduino->read_ln();
+    }
+
+    arduino->Close();
 
     return 0;
 

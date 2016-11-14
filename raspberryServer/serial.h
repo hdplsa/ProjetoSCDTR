@@ -3,6 +3,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <cstring>
 #include <stdexcept>
 #include <termios.h>    // POSIX terminal control definitions
 
@@ -14,13 +18,15 @@ int arduino;
 
 public:
     Serial();
-    void Begin(long baudrate, const string port);
-    string read();
-    void write();
+    void Begin(long baudrate, const char* port);
+    string read_ln();
+    void Write(string in);
+    void Close();
+    ~Serial();
     
 private:
 
-}
+};
 
 
 #endif

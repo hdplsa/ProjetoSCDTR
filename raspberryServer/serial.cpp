@@ -1,4 +1,4 @@
-#include "serial.h"
+#include "Serial.h"
 
 Serial::Serial(){
 
@@ -6,20 +6,20 @@ Serial::Serial(){
 
 }
 
-void Serial::Begin(long baudrate, const string port){
+void Serial::Begin(long baudrate, const char* port){
 
-    arduino = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY );
+    arduino = open("/dev/ttyACM0", O_RDWR| O_NOCTTY );
 
     if(arduino == -1){
         throw std::runtime_error("Erro a criar a porta Serial.");
     }
 
     struct termios tty;
-    memset (&tty, 0, sizeof tty);
+    std::memset (&tty, 0, sizeof tty);
 
     /* Error Handling */
     if ( tcgetattr ( arduino, &tty ) != 0 ) {
-        std::cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
+        std::cout << "Error " << " from tcgetattr: " << std::endl;
     }
 
     /* Set Baud Rate */
@@ -41,15 +41,51 @@ void Serial::Begin(long baudrate, const string port){
     cfmakeraw(&tty);
 
     /* Flush Port, then applies attributes */
-    tcflush( USB, TCIFLUSH );
-    if ( tcsetattr ( USB, TCSANOW, &tty ) != 0) {
-        std::cout << "Error " << errno << " from tcsetattr" << std::endl;
+    tcflush( arduino, TCIFLUSH );
+    if ( tcsetattr ( arduino, TCSANOW, &tty ) != 0) {
+        std::cout << "Error" << " from tcsetattr" << std::endl;
     }
 
 }
 
-char Serial::read(){
+void Serial::Write(string str){
 
+    int n = 0;
+
+    if(str[str.length()-1] != '\n'){
+        str += '\n';
+        cout << str[str.length()];
+    }
+
+    for(int i = 0; i < str.length(); i++){
+        n = write(arduino, &str[i], 1);
+    }
+
+}
+
+string Serial::read_ln(){
+
+    int n = 0;
+    string str;
+    char buffer = '\0';
+    do {
+        n = read(arduino, &buffer, 1);
+        str += buffer;
+    } while(buffer != '\n' && n > 0 && n < 10);
+    
+    cout << str;
+
+    return str;
+
+}
+
+void Serial::Close(){
+
+    close(arduino);
+
+}
+
+Serial::~Serial(){
 
 
 }
