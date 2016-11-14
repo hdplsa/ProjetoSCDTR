@@ -106,13 +106,13 @@ void loop() {
 // Função chamada quando se chama este arduino por I2C
 ISR(TWI_vect){
 
-  switch(TWISR){
+  /*switch(TWISR){
     case TWI_START:
     break;
 
     default:
     break;
 
-  }
+  }*/
 
 }

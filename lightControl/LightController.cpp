@@ -225,8 +225,7 @@ double LightController::getSensorY(){
 
 double LightController::calcErro(){
   //Cálcula erro de entrada no Controlador
-  this->e[1] = this->ref-this->y;
-  return this->e[1];
+  return this->ref-this->y;
 }
 
 double LightController::calcFeedForward(){
