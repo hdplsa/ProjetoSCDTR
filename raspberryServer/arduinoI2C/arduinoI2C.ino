@@ -11,10 +11,19 @@ void setup() {
 
   char teste[] = "Teste";
 
-  twi_set_SLA((int)3);
-  twi_set_slaveR();
+  sei();
 
-  twi_send_msg(3, teste, 6);
+  twi_turn_pullUp();
+  twi_set_rate();
+
+  //twi_set_SLA((int)2);
+  //twi_set_slaveR();
+
+  SREG |= 0b10000000; // enable interrupts
+
+  //TWCR = (1 << TWEN) | (1 << TWIE);
+
+  twi_send_msg(2, teste, 6);
 
 }
 

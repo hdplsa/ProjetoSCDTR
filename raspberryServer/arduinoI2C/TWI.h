@@ -7,6 +7,8 @@
 
 /// Funções 
 
+void twi_turn_pullUp();
+void twi_set_rate();
 bool twi_busy();
 int twi_set_SLA(uint8_t SLA);
 void twi_set_slaveR();
