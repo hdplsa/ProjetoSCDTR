@@ -13,8 +13,8 @@ bool twi_busy();
 int twi_set_SLA(uint8_t SLA);
 void twi_set_slaveR();
 int twi_send_msg(uint8_t SLA, char *msg, unsigned int msg_length);
-char* twi_data_received();
-void interrupt();
+void twi_send_start();
+unsigned char* twi_data_received();
 
 /// Variáveis do TWI adicionadas
 #define TWI_BUFFER_SIZE 32

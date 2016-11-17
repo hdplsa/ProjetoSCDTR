@@ -1,6 +1,6 @@
 #include "TWI.h"
 
-static char twi_buf[TWI_BUFFER_SIZE];
+static unsigned char twi_buf[TWI_BUFFER_SIZE];
 volatile static unsigned int twi_msg_size = 0;
 static unsigned int twi_ptr = 0;
 
@@ -65,8 +65,8 @@ int twi_set_SLA(uint8_t SLA){
 void twi_set_slaveR(){
 
   TWCR = (1 << TWEA)  // Enable aknowledge
-        | (1 << TWEN)  // TWI enable
-        | (1 << TWIE); // Enable interrupção
+       | (1 << TWEN)  // TWI enable
+       | (1 << TWIE); // Enable interrupção
   
 }
 
@@ -86,31 +86,38 @@ int twi_send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
   twi_buf[0] = (SLA << 1) | 0b0;
   
   // Transfere a mensagem para o buffer
-  for(unsigned int i = 1; i < msg_length; i++){
+  for(unsigned int i = 1; i <= msg_length; i++){
     twi_buf[i] = msg[i-1];
   }
 
-  twi_msg_size = msg_length;
+  twi_msg_size = msg_length+1;
 
   twi_ptr = 0;
-  twi_status = 1;
 
-  // Envia o start
-
-  TWCR  = (1 << TWINT) // Flag a 1
-        | (1 << TWSTA) // Emvia o start
-        | (1 << TWEN)  // Enable
-        | (1 << TWIE); // Enable interrupções
-
-  Serial.print("TWISTA\n");
+  twi_send_start();
 
   return 0;
   
 }
 
-char* twi_data_received(){
+void twi_send_start(){
+    twi_status = 1;
+
+  // Envia o start
+
+  TWCR  = (1 << TWINT) // Flag a 1
+        | (1 << TWSTA) // Envia o start
+        | (1 << TWEN)  // Enable
+        | (1 << TWIE); // Enable interrupções
+
+  Serial.print("SETSTART\n");
+}
+
+unsigned char* twi_data_received(){
 
   // Tem que dizer que aconteceu algo
+
+  Serial.println((char*) twi_buf);
 
   return twi_buf;
   
@@ -121,6 +128,7 @@ ISR(TWI_vect){
 //  Serial.print(registo, HEX);
 //  Serial.print('\n');
   switch(registo){
+    
     // Foi enviado o start e tem que ser enviado o SLA+R/W
     case TWI_START:
     case TWI_REP_START:
@@ -145,10 +153,13 @@ ISR(TWI_vect){
     
     // Foi recebido um acknowledge do slave depois dum SLA+W
     case TWI_MTX_ADR_ACK:
-    Serial.print("ACK\n");
-    twi_ptr = 0;
+    
+      Serial.print("ACK\n");
+      twi_ptr = 0;
+    
     // Foi recebido um acknowledge do slave depois de mandar data
     case TWI_MTX_DATA_ACK:
+    
     Serial.print("DATA\n");
       // Se ainda não tivermos chegado ao fim dos dados
       if(twi_ptr < twi_msg_size){
@@ -169,21 +180,26 @@ ISR(TWI_vect){
       }
     break;
 
+    // O slave lançou um NACK
+    case TWI_MTX_ADR_NACK:
+      twi_send_start();
+    break;
+
     // Recebemos o SLA+W e enviàmos o ACK
     case TWI_SRX_ADR_ACK:
       twi_status = 3; // Estado de a receber
       twi_ptr = 0; // Começa-se a receber bytes no 0
 
-      TWDR = (1 << TWINT)
+      TWCR = (1 << TWINT)
             | (1 << TWEA)
+            | (1 << TWEN)
             | (1 << TWIE);
-      Serial.print("SLA+W\n");
+      Serial.print("Recebi SLA+W\n");
     break;
 
     // Recebemos dados
     case TWI_SRX_ADR_DATA_ACK:
-      Serial.print("ACK\n");
-      if(twi_ptr < TWI_BUFFER_SIZE - 1){
+      if(twi_ptr < (TWI_BUFFER_SIZE - 1)){
         // Coloca os dados no buffer
         twi_buf[twi_ptr] = TWDR;
 
@@ -191,24 +207,36 @@ ISR(TWI_vect){
         twi_ptr++;
 
         // Avisa que os dados foram processados
-        TWCR = (1<<TWINT) | ( 1 << TWEA) | (1<<TWIE);
+        TWCR = (1<<TWINT) 
+          | ( 1 << TWEA) 
+          | (1 << TWEN)
+          | (1 << TWIE);
       }
+      Serial.print("Recebi ");
+      Serial.print((char)TWDR, HEX); 
+      Serial.print('\n');
     break;
 
     // Indica que já estão os dados todos
     case TWI_SRX_STOP_RESTART:
-      Serial.print("STOP");  
+      Serial.print("STOP\n");  
       twi_buf[twi_ptr+1] = '\0';
       twi_ptr = 0;
-      TWCR |= (1 << TWEA)  // Enable aknowledge
-            | (1 << TWEN)  // TWI enable
-            | (1 << TWIE); // Enable interrupção
+      TWCR = (1 << TWINT) // Toma conhecimento do STOP
+           | (1 << TWEA)  // Enable aknowledge
+           | (1 << TWEN)  // TWI enable
+           | (1 << TWIE); // Enable interrupção
+      twi_data_received();
     break;
     
     default:
-    Serial.print("Recebi: "); Serial.print(TWSR, HEX); Serial.print('\n');
-    TWCR |= (1 << TWINT) | (1 << TWIE
-    );
+      Serial.print("Recebi: "); 
+      Serial.print(TWSR, HEX); 
+      Serial.print('\n');
+      TWCR = (1 << TWINT) 
+           | (1 << TWSTO) 
+           | (1 << TWEN)
+           | (1 << TWIE);
     break;
 
   }

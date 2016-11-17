@@ -5,7 +5,7 @@
 void setup() {
   // put your setup code here, to run once:
 
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // Faz setup do I2C
 
@@ -16,18 +16,21 @@ void setup() {
   twi_turn_pullUp();
   twi_set_rate();
 
-  //twi_set_SLA((int)2);
-  //twi_set_slaveR();
+  twi_set_SLA((int)2);
+  twi_set_slaveR();
 
   SREG |= 0b10000000; // enable interrupts
 
   //TWCR = (1 << TWEN) | (1 << TWIE);
 
-  twi_send_msg(2, teste, 6);
+  //twi_send_msg(2, teste, 6);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  delay(500);
+  Serial.println(TWSR,BIN);
 
 }
