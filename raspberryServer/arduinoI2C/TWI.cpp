@@ -124,10 +124,8 @@ unsigned char* twi_data_received(){
 }
 
 ISR(TWI_vect){
-  byte registo = TWSR;
-//  Serial.print(registo, HEX);
-//  Serial.print('\n');
-  switch(registo){
+
+  switch(TWSR){
     
     // Foi enviado o start e tem que ser enviado o SLA+R/W
     case TWI_START:
