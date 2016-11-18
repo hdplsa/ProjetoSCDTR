@@ -13,17 +13,19 @@ void setup() {
 
   sei();
 
-  twi_turn_pullUp();
-  twi_set_rate();
+  TWI::begin();
 
-  twi_set_SLA((int)2);
-  twi_set_slaveR();
+  TWI::turn_pullUp();
+  TWI::set_rate();
+
+  TWI::set_SLA((int)2);
+  TWI::set_slaveR();
 
   SREG |= 0b10000000; // enable interrupts
 
   //TWCR = (1 << TWEN) | (1 << TWIE);
 
-  //twi_send_msg(2, teste, 6);
+  //TWI::send_msg(2, teste, 6);
 
 }
 

@@ -5,19 +5,53 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-/// Funções 
-
-void twi_turn_pullUp();
-void twi_set_rate();
-bool twi_busy();
-int twi_set_SLA(uint8_t SLA);
-void twi_set_slaveR();
-int twi_send_msg(uint8_t SLA, char *msg, unsigned int msg_length);
-void twi_send_start();
-unsigned char* twi_data_received();
-
 /// Variáveis do TWI adicionadas
+
 #define TWI_BUFFER_SIZE 32
+#define TWI_BIT_RATE    152
+
+/// Classe de TWI 
+
+class TWI{
+
+  public:
+  
+    static void begin();
+    static void begin(uint8_t SLA);
+    static void turn_pullUp();
+    static void set_rate();
+    static bool busy();
+    static int set_SLA(uint8_t SLA);
+    static void set_globalRespond();
+    static void set_slaveR();
+    static int send_msg(uint8_t SLA, char *msg, unsigned int msg_length);
+    static void send_start();
+    static void data_received();
+    static void Interrupt_ISR();
+    
+  private:
+
+    // Variàveis a serem usadas durante a execução
+
+    static volatile unsigned char twi_buf[TWI_BUFFER_SIZE];
+    static volatile unsigned int twi_msg_size;
+    static volatile unsigned int twi_ptr;
+
+    /* Significados do twi_status
+     ** twi_status = 0 -> não contém informação, o TWI está à espera
+     *   de ação
+     ** twi_status = 1 -> há dados no buffer para enviar, foi emitido
+     *   um start mas ainda não foi enviado o SLA+W.
+     ** twi_status = 2 -> está-se a enviar dados 
+     ** twi_status = 3 -> está-se a receber dados
+     */
+ 
+    static volatile unsigned int twi_status; 
+
+    // Função de callback
+    static void (*on_receive)(void);
+  
+};
 
 /// TWI State codes
 

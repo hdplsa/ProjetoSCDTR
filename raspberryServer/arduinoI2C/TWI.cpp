@@ -1,32 +1,42 @@
 #include "TWI.h"
 
-static unsigned char twi_buf[TWI_BUFFER_SIZE];
-volatile static unsigned int twi_msg_size = 0;
-static unsigned int twi_ptr = 0;
+// É necessário definir as variàveis estáticas uma primeira vez FORA da classe
+volatile unsigned char TWI::twi_buf[TWI_BUFFER_SIZE];
+volatile unsigned int TWI::twi_msg_size = 0;
+volatile unsigned int TWI::twi_ptr = 0;
+volatile unsigned int TWI::twi_status = 0; 
 
-/* Significados do twi_status
- ** twi_status = 0 -> não contém informação, o TWI está à espera
- *   de ação
- ** twi_status = 1 -> há dados no buffer para enviar, foi emitido
- *   um start mas ainda não foi enviado o SLA+W.
- ** twi_status = 2 -> está-se a enviar dados 
- ** twi_status = 3 -> está-se a receber dados
- */
- 
-static unsigned int twi_status = 0; 
+// Função begin SEM o SLA
+// Coloca o Arduino em Slave Receiver
+void TWI::begin(){
+
+  turn_pullUp();
+  set_rate();
+  set_globalRespond();
+  
+}
+
+// Coloca o Arduino em Slave Receiver
+void TWI::begin(uint8_t SLA){
+
+  turn_pullUp();
+  set_rate();
+  set_SLA(SLA);
+  
+}
 
 /* Coloca os pull ups das portas 4 e 5 ON para não
  * precisar de pull ups externos                    */
-void twi_turn_pullUp(){
+void TWI::turn_pullUp(){
   PORTC |= (1 << 5) | (1 << 4); // Mete os pull up
 }
 
 /* A bit rate é dada pela equação 
  * f = CPU_freq / (16 + 2*TWBR*Prescaler) */
-void twi_set_rate(){
+void TWI::set_rate(){
 
   // Faz set do TWBR
-  TWBR = 152;
+  TWBR = TWI_BIT_RATE;
 
   // Faz set do Prescaler
   // TWPS | TWPS1 | TWPS0 | Prescaler
@@ -43,26 +53,38 @@ void twi_set_rate(){
 
 /* Esta função retorna 1 se o TWI estiver enabled, ou seja
  * se estiverem a ser processados outros requests           */
-bool twi_busy(){
+bool TWI::busy(){
 
-  return ( TWCR & (1 << TWIE) ); 
+  return ( TWCR & (1 << TWINT) ); 
   
 }
 
-int twi_set_SLA(uint8_t SLA){
+/* Faz set do registo que guarda o endereço do I2C
+ * Retornos possiveis:
+ * * -1 -> O endereço pedido é grande demais
+ * * 0  -> Tudo bem, endereço colocado com sucesso */
+int TWI::set_SLA(uint8_t SLA){
 
+  // Verifica o bit mais significativo. O TWAR só
+  // aceita 7 bits de endereço.
   if((SLA & 0b10000000) != 0){
     return -1;
   }
 
-  // Faz set do address e mete TWGCE a 1 (acknowledge address)
+  // Faz set do address e mete TWGCE a 1 (global call acknowledge address)
   TWAR = (SLA << 1) | (1 << TWGCE);
 
   return 0;
 }
 
+void TWI::set_globalRespond(){
+  // Faz set do TWGCE (global call acknowledge address)
+  TWAR |= (1 << TWGCE);
+
+}
+
 // Coloca o TWI à espera do seu slave address
-void twi_set_slaveR(){
+void TWI::set_slaveR(){
 
   TWCR = (1 << TWEA)  // Enable aknowledge
        | (1 << TWEN)  // TWI enable
@@ -70,7 +92,7 @@ void twi_set_slaveR(){
   
 }
 
-int twi_send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
+int TWI::send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
 
   // Não pode enviar mensagens maiores do que o buffer
   if(msg_length + 1 > TWI_BUFFER_SIZE) return -1;
@@ -82,10 +104,10 @@ int twi_send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
   //}
 
   // Este primeiro caracter corresponde ao SLA+W, por isso é que
-  // fazemos OR 0, o +W é o bit mais À direita.
+  // fazemos OR 0, o +W é o bit menos significativo
   twi_buf[0] = (SLA << 1) | 0b0;
   
-  // Transfere a mensagem para o buffer
+  // Copia a mensagem para o buffer
   for(unsigned int i = 1; i <= msg_length; i++){
     twi_buf[i] = msg[i-1];
   }
@@ -94,37 +116,42 @@ int twi_send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
 
   twi_ptr = 0;
 
-  twi_send_start();
+  send_start();
 
   return 0;
   
 }
 
-void twi_send_start(){
-    twi_status = 1;
+void TWI::send_start(){
+  // Coloca o estado do TWI como "start enviado"
+  TWI::twi_status = 1;
 
   // Envia o start
 
   TWCR  = (1 << TWINT) // Flag a 1
         | (1 << TWSTA) // Envia o start
-        | (1 << TWEN)  // Enable
+        | (1 << TWEN)  // Enable TWI
         | (1 << TWIE); // Enable interrupções
 
   Serial.print("SETSTART\n");
 }
 
-unsigned char* twi_data_received(){
+void TWI::data_received(){
 
-  // Tem que dizer que aconteceu algo
+  // CHAMAR O CALLBACK !!!!!!!!!!!!!!!!!
 
   Serial.println((char*) twi_buf);
-
-  return twi_buf;
   
 }
 
 ISR(TWI_vect){
 
+  TWI::Interrupt_ISR();
+
+}
+
+void TWI::Interrupt_ISR(){
+  
   switch(TWSR){
     
     // Foi enviado o start e tem que ser enviado o SLA+R/W
@@ -180,7 +207,7 @@ ISR(TWI_vect){
 
     // O slave lançou um NACK
     case TWI_MTX_ADR_NACK:
-      twi_send_start();
+      send_start();
     break;
 
     // Recebemos o SLA+W e enviàmos o ACK
@@ -224,7 +251,7 @@ ISR(TWI_vect){
            | (1 << TWEA)  // Enable aknowledge
            | (1 << TWEN)  // TWI enable
            | (1 << TWIE); // Enable interrupção
-      twi_data_received();
+      data_received();
     break;
     
     default:
@@ -238,6 +265,5 @@ ISR(TWI_vect){
     break;
 
   }
-
 }
 
