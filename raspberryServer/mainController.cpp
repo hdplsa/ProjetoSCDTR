@@ -31,6 +31,31 @@ void MainController::calcEnergy(int k){
 	}
 }
 
+/* Calculo do erro de comforto com a luminsidade*/
+void MainController::calcComfortError(int k){
+	if (k >= 0){
+		if (k == 0){
+			this->Cerror1[k] = 0;
+			this->Cerror2[k] = 0;
+		} else {
+			this->Cerror1[k] = ((k-1)/k)*getMax(this->ref1[k]-this->y1[k],0);
+			this->Cerror2[k] = ((k-1)/k)*getMax(this->ref2[k]-this->y2[k],0);
+		}
+	}
+}
+
 MainController::~MainController(){
 	
+}
+
+/* Retorna o valor máximo entre d1 e d2
+ * Caso d1 = d2, retorna 0 */
+double MainController::getMax(double d1, double d2){
+	if (d1 > d2){
+		return d1;
+	}
+	if (d2 > d1){
+		return d2;
+	}
+	return 0;
 }

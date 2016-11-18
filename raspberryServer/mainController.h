@@ -28,6 +28,9 @@ class MainController{
 	//Valores de consumo de energia
 	double E1[N];
 	double E2[N];
+	//Valores de erro de comforto
+	double Cerror1[N];
+	double Cerror2[N];
 	//Estado de ocupação
 	bool o1;
 	bool o2;
@@ -36,11 +39,14 @@ class MainController{
 	double theta1, theta2;
 	
 
-public:
+	public:
 		MainController();
 		void calibrate();
 		void calcError();
 		~MainController();
+		
+	private:
+		double getMax(double d1, double d2);
 		
 };
 
