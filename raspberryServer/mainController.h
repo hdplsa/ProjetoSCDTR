@@ -2,12 +2,14 @@
 #define MAINCONTROLLER_H_INCLUDED
 
 class MainController{
+	//Variável que guarda o instante actual
+	int k;
 	//Numero de pontos guardados
-	int N = 200;
+	int N = 10000;
 	//Periodo do ciclo de controlo
 	double T;
 	//Periodo de amostragem
-	double Ts;
+	double TPWM;
 	//Valores do sistema fisico
 	double ref1[N];
 	double ref2[N];
@@ -29,11 +31,16 @@ class MainController{
 	//Estado de ocupação
 	bool o1;
 	bool o2;
+	//Calibração minimos quadrados
+	double k11, k12, k21, k22;
+	double theta1, theta2;
 	
 
 public:
 		MainController();
+		void calibrate();
 		~MainController();
+		
 };
 
 #endif
