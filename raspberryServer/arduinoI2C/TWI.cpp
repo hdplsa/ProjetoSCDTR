@@ -5,6 +5,8 @@ volatile unsigned char TWI::twi_buf[TWI_BUFFER_SIZE];
 volatile unsigned int TWI::twi_msg_size = 0;
 volatile unsigned int TWI::twi_ptr = 0;
 volatile unsigned int TWI::twi_status = 0; 
+void (*TWI::user_onReceive)(char*);
+bool TWI::callback_on = 0;
 
 // Função begin SEM o SLA
 // Coloca o Arduino em Slave Receiver
@@ -13,6 +15,7 @@ void TWI::begin(){
   turn_pullUp();
   set_rate();
   set_globalRespond();
+  set_slaveR();
   
 }
 
@@ -22,7 +25,14 @@ void TWI::begin(uint8_t SLA){
   turn_pullUp();
   set_rate();
   set_SLA(SLA);
+  set_slaveR();
   
+}
+
+// Função que faz set da callback
+void TWI::onReceive(void (*function)(char*)){
+  user_onReceive = function;
+  callback_on = 1;
 }
 
 /* Coloca os pull ups das portas 4 e 5 ON para não
@@ -138,10 +148,10 @@ void TWI::send_start(){
 
 void TWI::data_received(){
 
-  // CHAMAR O CALLBACK !!!!!!!!!!!!!!!!!
-
-  Serial.println((char*) twi_buf);
-  
+  // Chama a callback
+  if(callback_on){
+    user_onReceive((char*) twi_buf);
+  }
 }
 
 ISR(TWI_vect){
@@ -202,6 +212,7 @@ void TWI::Interrupt_ISR(){
               | (1<<TWIE);   // Enable interrupção
         // Após uma escrita bem sucedida, ficamos em modo de espera
         twi_status = 0;
+        Serial.print("STOP\n");
       }
     break;
 
@@ -238,19 +249,24 @@ void TWI::Interrupt_ISR(){
           | (1 << TWIE);
       }
       Serial.print("Recebi ");
-      Serial.print((char)TWDR, HEX); 
+      Serial.print((char)TWDR); 
       Serial.print('\n');
     break;
 
     // Indica que já estão os dados todos
     case TWI_SRX_STOP_RESTART:
+    
       Serial.print("STOP\n");  
-      twi_buf[twi_ptr+1] = '\0';
+      twi_buf[twi_ptr] = '\0';
+      
+      // Reset do ponteiro para evitar error
       twi_ptr = 0;
+      
       TWCR = (1 << TWINT) // Toma conhecimento do STOP
            | (1 << TWEA)  // Enable aknowledge
            | (1 << TWEN)  // TWI enable
            | (1 << TWIE); // Enable interrupção
+           
       data_received();
     break;
     

@@ -18,6 +18,7 @@ class TWI{
   
     static void begin();
     static void begin(uint8_t SLA);
+    static void onReceive(void (*function)(char*));
     static void turn_pullUp();
     static void set_rate();
     static bool busy();
@@ -49,7 +50,8 @@ class TWI{
     static volatile unsigned int twi_status; 
 
     // Função de callback
-    static void (*on_receive)(void);
+    static bool callback_on;
+    static void (*user_onReceive)(char*);
   
 };
 

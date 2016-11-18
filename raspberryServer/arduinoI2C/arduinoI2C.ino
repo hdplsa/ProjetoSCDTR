@@ -2,6 +2,12 @@
 #include <avr/interrupt.h>
 #include "TWI.h"
 
+char teste[] = "Teste";
+
+void print_char(char* str){
+  Serial.println(str);
+}
+
 void setup() {
   // put your setup code here, to run once:
 
@@ -9,17 +15,10 @@ void setup() {
 
   // Faz setup do I2C
 
-  char teste[] = "Teste";
-
   sei();
 
-  TWI::begin();
-
-  TWI::turn_pullUp();
-  TWI::set_rate();
-
-  TWI::set_SLA((int)2);
-  TWI::set_slaveR();
+  TWI::begin(2);
+  TWI::onReceive(print_char);
 
   SREG |= 0b10000000; // enable interrupts
 
@@ -32,7 +31,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  delay(500);
-  Serial.println(TWSR,BIN);
+  delay(2000);
+  Serial.println(TWCR,BIN);
+  //TWI::send_msg(2, teste, 6);
 
 }
