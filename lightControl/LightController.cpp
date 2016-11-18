@@ -10,10 +10,6 @@ LightController::LightController(int ledPin, int sensorPin){
   this->k = 0;
   this->teta = 0;
   this->calibrateLumVoltage();
-
-  //Metrics
-  this->E = 0;
-  
 }
 
 //Inicialização - Calibração
@@ -194,9 +190,6 @@ double LightController::calcController(){
   
     // Calcula o novo valor do windup
     this->windup[1] = this->u[1] - u_antes_sat;
-
-    //Metrics
-    this->E = calcEnergyCycle();
   
     // Coloca o sinal de comando no LED
     LEDInputControlVariable();
@@ -216,6 +209,7 @@ LightController::~LightController(){
   delete this->ls;
   delete this->ledp;
 }
+
 
 double LightController::getSensorY(){
   double y;
@@ -272,8 +266,8 @@ double LightController::calcPDController(){
   return u;
 }
 
-double LightController::calcEnergyCycle(){
+/*double LightController::calcEnergyCycle(){
   this->E = (this->T/this->ledp->getTPWM())*this->ledp->calculateLedEnergyPeriod();
   return this->E;
-}
+}*/
 

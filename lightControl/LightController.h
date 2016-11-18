@@ -46,8 +46,6 @@ class LightController{
   const double Kw = 10;
   double windup[2] = {0,0};
 
-  //Metrics
-  double E;
   
   public:
     LightController(int ledPin, int sensorPin);
@@ -70,6 +68,7 @@ class LightController{
     ~LightController();
   
   private:
+    double getMax(double d1, double d2);
     double getSensorY();
     double calcErro();
     double calcFeedForward();
