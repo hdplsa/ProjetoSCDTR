@@ -4,6 +4,10 @@
 class MainController{
 	//Numero de pontos guardados
 	int N = 200;
+	//Periodo do ciclo de controlo
+	double T;
+	//Periodo de amostragem
+	double Ts;
 	//Valores do sistema fisico
 	double ref1[N];
 	double ref2[N];
