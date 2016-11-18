@@ -39,6 +39,7 @@ class MainController{
 public:
 		MainController();
 		void calibrate();
+		void calcError();
 		~MainController();
 		
 };
