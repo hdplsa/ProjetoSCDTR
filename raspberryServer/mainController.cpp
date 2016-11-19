@@ -19,7 +19,9 @@ MainController::MainController(){
 		this->E1[k] = 0;
 		this->E2[k] = 0;
 		this->Cerror1[k] = 0;
-		this->Cerror2[k] = 0;	
+		this->Cerror2[k] = 0;
+		this->Verror1[k] = 0;
+		this->Verror2[k] =	0;	
 	}
 	this->o1 = false;
 	this->o2 = false;
@@ -91,14 +93,20 @@ void MainController::calcComfortError(){
 
 /* Calculo da variancia de comforto */
 void MainController::calcComfortVariance(){
+	double sum1, sum2;
 	if ((k >= 0) && (k < this->N)){
-		
+		sum1 = this->getAbs(this->y1[this->k]-2*this->y1[this->getkPrevious(this->k)]+this->y1[this->getkPrevious(this->getkPrevious(this->k))]);
+		sum2 = this->getAbs(this->y2[this->k]-2*this->y2[this->getkPrevious(this->k)]+this->y2[this->getkPrevious(this->getkPrevious(this->k))]);
+		this->Verror1[this->k] = ((this->t-1)/this->t)*sum1/(this->T*this->T);
+		this->Verror2[this->k] = ((this->t-1)/this->t)*sum2/(this->T*this->T);
 	}
 }
 
 /* Função chamada ciclicamente para receber e guardar dados
  * vindos dos Arduinos */
 void MainController::receiveInformation(){
+	//Calcula erro
+	this->calcError();
 	
 	//Avança da o instante seguinte
 	this->k = this->getkNext(this->k);
@@ -119,4 +127,12 @@ double MainController::getMax(double d1, double d2){
 		return d2;
 	}
 	return 0;
+}
+
+double MainController::getAbs(double d){
+	if(d >= 0){
+		return d;
+	} else {
+		return -1*d;
+	}
 }

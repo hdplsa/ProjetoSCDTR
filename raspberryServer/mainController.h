@@ -33,6 +33,9 @@ class MainController{
 	//Valores de erro de comforto
 	double Cerror1[N];
 	double Cerror2[N];
+	//Valores de variância de comforto
+	double Verror1[N];
+	double Verror2[N];
 	//Estado de ocupação
 	bool o1;
 	bool o2;
@@ -54,6 +57,7 @@ class MainController{
 		
 	private:
 		double getMax(double d1, double d2);
+		double getAbs();
 		
 };
 
