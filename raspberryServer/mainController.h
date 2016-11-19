@@ -48,6 +48,7 @@ class MainController{
 		void calibrate();
 		void calcError();
 		void calcEnergy();
+		void calcComfortError();
 		void receiveInformation();
 		~MainController();
 		

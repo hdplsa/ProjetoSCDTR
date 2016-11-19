@@ -82,15 +82,17 @@ void MainController::calcEnergy(){
 }
 
 /* Calculo do erro de comforto com a luminsidade*/
-void MainController::calcComfortError(int k){
-	if (k >= 0){
-		if (k == 0){
-			this->Cerror1[k] = 0;
-			this->Cerror2[k] = 0;
-		} else {
-			this->Cerror1[k] = ((k-1)/k)*getMax(this->ref1[k]-this->y1[k],0);
-			this->Cerror2[k] = ((k-1)/k)*getMax(this->ref2[k]-this->y2[k],0);
-		}
+void MainController::calcComfortError(){
+	if ((k >= 0) && (k < this->N)){
+		this->Cerror1[this->k] = ((this->t-1)/this->t)*getMax(this->e1[this->k],0);
+		this->Cerror2[this->k] = ((this->t-1)/this->t)*getMax(this->e2[this->k],0);
+	}
+}
+
+/* Calculo da variancia de comforto */
+void MainController::calcComfortVariance(){
+	if ((k >= 0) && (k < this->N)){
+		
 	}
 }
 
