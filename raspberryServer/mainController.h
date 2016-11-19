@@ -3,6 +3,8 @@
 
 class MainController{
 	//Variável que guarda o instante actual
+	int t;
+	//Variável que guarda a posição actual nos vectores
 	int k;
 	//Numero de pontos guardados
 	int N = 10000;
@@ -41,10 +43,12 @@ class MainController{
 
 	public:
 		MainController();
-		int getkNext();
-		int getkPrecious();
+		int getkNext(int k);
+		int getkPrecious(int k);
 		void calibrate();
 		void calcError();
+		void calcEnergy();
+		void receiveInformation();
 		~MainController();
 		
 	private:

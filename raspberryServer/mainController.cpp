@@ -2,6 +2,7 @@
 
 MainController::MainController(){
 	int k;
+	this->t = 0;
 	this->k = 0;
 	//Inicialização de vectores
 	for(k=0; k < this->N;k++){
@@ -34,28 +35,28 @@ MainController::MainController(){
  * Assim, é necessário determinar os indices 
  * seguintes e anteriores dos extremos do vector */
 
-int MainController::getkNext(){
-	int k;
-	if(this->k >= 0){
-		if(this->k < this->N){
+int MainController::getkNext(int k){
+	if(k >= 0){
+		if(k < this->N){
 			k = 0;
 		} else {
-			k = this->k + 1;
+			k = k + 1;
 		}
+		return k;
 	}
-	return k;
+	return 0;
 }
 
-int MainController::getkPrevious(){
-	int k;
-	if(this->k >= 0){
-		if(this->k == 0){
+int MainController::getkPrevious(int k){
+	if(k >= 0){
+		if(k == 0){
 			k = this->N-1;
 		} else {
-			k = yhis->k - 1;
+			k = k - 1;
 		}
+		return k;
 	}
-	return k;
+	return 0;
 }
 
 /* Calculo dos valores das constantes no modelo 
@@ -66,22 +67,17 @@ void MainController::calibrate(){
 }
 
 /* Calculo do valor do erro no instante k */
-void MainController::calcError(int k){
-	if (k >= 0){
-		this->e[k] = this->y[k] - this->ref[k];
+void MainController::calcError(){
+	if ((k >= 0) && (k < this->N)){
+		this->e[this->k] = this->y[this->k] - this->ref[this->k];
 	}
 }
 
 /* Calculo da energia gasta nos LEDs */
-void MainController::calcEnergy(int k){
-	if (k >= 0){
-		if (k == 0){
-			this->E1[k] = 0;
-			this->E2[k] = 0;
-		} else {
-			this->E1[k] = this->E1[k-1] + this->d1[k-1]*this->T;
-			this->E2[k] = this->E2[k-1] + this->d2[k-1]*this->T;
-		}
+void MainController::calcEnergy(){
+	if ((k >= 0) && (k < this->N)){
+		this->E1[this->k] = this->E1[this->getkPrevious(this->k)] + this->d1[this->getkPrevious(this->k)]*this->T;
+		this->E2[this->k] = this->E2[this->getkPrevious(this->k)] + this->d2[this->getkPrevious(this->k)]*this->T;
 	}
 }
 
@@ -96,6 +92,15 @@ void MainController::calcComfortError(int k){
 			this->Cerror2[k] = ((k-1)/k)*getMax(this->ref2[k]-this->y2[k],0);
 		}
 	}
+}
+
+/* Função chamada ciclicamente para receber e guardar dados
+ * vindos dos Arduinos */
+void MainController::receiveInformation(){
+	
+	//Avança da o instante seguinte
+	this->k = this->getkNext(this->k);
+	this->t = this->t + 1;
 }
 
 MainController::~MainController(){
