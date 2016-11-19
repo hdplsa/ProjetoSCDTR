@@ -30,6 +30,34 @@ MainController::MainController(){
 	this->theta2 = 0;
 }
 
+/* Implementação dos indices do vector em anel
+ * Assim, é necessário determinar os indices 
+ * seguintes e anteriores dos extremos do vector */
+
+int MainController::getkNext(){
+	int k;
+	if(this->k >= 0){
+		if(this->k < this->N){
+			k = 0;
+		} else {
+			k = this->k + 1;
+		}
+	}
+	return k;
+}
+
+int MainController::getkPrevious(){
+	int k;
+	if(this->k >= 0){
+		if(this->k == 0){
+			k = this->N-1;
+		} else {
+			k = yhis->k - 1;
+		}
+	}
+	return k;
+}
+
 /* Calculo dos valores das constantes no modelo 
  * linear  entre tensão e luminosidade l = k u + theta
  * Método de minimos quadrados */

@@ -41,6 +41,8 @@ class MainController{
 
 	public:
 		MainController();
+		int getkNext();
+		int getkPrecious();
 		void calibrate();
 		void calcError();
 		~MainController();
