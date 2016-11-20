@@ -15,26 +15,46 @@ class Serial {
     public:
         Serial();
         int Begin(long baudrate, const char* port);
-        void start_read_ln();
+        void set_Readcallback(void (*function)(string));
+        void set_Writecallback(void (*function)(void));
+        void set_ReadErrorcallback(void (*function)(void));
+        void set_WriteErrorcallback(void (*function)(void));
+        void Read_ln();
         void Write(std::string send);
         void Close();
         ~Serial();
         
     private:
+        // Funções chamadas quando os processos assincronos finalizam
         void read_complete(const boost::system::error_code& e, std::size_t size);
         void write_complete(const boost::system::error_code& e, std::size_t size);
+
+        // Callbacks
+        void (*onRead)(string) = NULL;
+        void (*onWrite)(void) = NULL;
+
+        // Callbacks para o erro
+        void (*onReadError)(void) = NULL;
+        void (*onWriteError)(void) = NULL;
+
+        // Serviço que realiza as transações do serial
         boost::asio::io_service io;
+
+        // Objeto da porta serial (é um smart pointer)
         serial_port_ptr arduino;
+
+        // buffer para enviar e receber dados
         boost::asio::streambuf buf;
+
+        // objeto usado para obter os erros do boost
         boost::system::error_code error;
 
         // Thread para o serial ser relamente asincrono
         boost::thread t;
 
-        // Valor boleano que nos diz se a thread está a funcionar ou não        
+        // Valor boleano que nos diz se a thread está a ser usada ou não       
         bool working = false;
 
 };
-
 
 #endif
