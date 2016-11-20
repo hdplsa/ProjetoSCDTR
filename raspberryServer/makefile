@@ -1,10 +1,11 @@
 CC=g++
-CFLAGS=-c -Wall -std=c++11
+CFLAGS= -std=c++11 -c -Wall
+LFLAGS= -I /usr/include/boost/ -L /usr/include/boost/ –lboost_system
 
-all: app 
+all: main.o serial.o app
 
 app: main.o Serial.o
-	$(CC) main.o Serial.o -o app
+	$(CC) main.o Serial.o -o app $(LFLAGS)
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp

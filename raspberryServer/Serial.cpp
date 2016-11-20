@@ -2,86 +2,67 @@
 
 Serial::Serial(){
 
-
-
-}
-
-void Serial::Begin(long baudrate, const char* port){
-
-    arduino = open("/dev/ttyACM0", O_RDWR| O_NOCTTY );
-
-    if(arduino == -1){
-        throw std::runtime_error("Erro a criar a porta Serial.");
-    }
-
-    struct termios tty;
-    std::memset (&tty, 0, sizeof tty);
-
-    /* Error Handling */
-    if ( tcgetattr ( arduino, &tty ) != 0 ) {
-        std::cout << "Error " << " from tcgetattr: " << std::endl;
-    }
-
-    /* Set Baud Rate */
-    cfsetospeed (&tty, (speed_t)baudrate);
-    cfsetispeed (&tty, (speed_t)baudrate);
-
-    /* Setting other Port Stuff */
-    tty.c_cflag     &=  ~PARENB;            // Make 8n1
-    tty.c_cflag     &=  ~CSTOPB;
-    tty.c_cflag     &=  ~CSIZE;
-    tty.c_cflag     |=  CS8;
-
-    tty.c_cflag     &=  ~CRTSCTS;           // no flow control
-    tty.c_cc[VMIN]   =  1;                  // read doesn't block
-    tty.c_cc[VTIME]  =  5;                  // 0.5 seconds read timeout
-    tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
-
-    /* Make raw */
-    cfmakeraw(&tty);
-
-    /* Flush Port, then applies attributes */
-    tcflush( arduino, TCIFLUSH );
-    if ( tcsetattr ( arduino, TCSANOW, &tty ) != 0) {
-        std::cout << "Error" << " from tcsetattr" << std::endl;
-    }
+    arduino = serial_port_ptr(new boost::asio::serial_port(io));
 
 }
 
-void Serial::Write(string str){
+int Serial::Begin(long baudrate, const char* port){
 
-    int n = 0;
-
-    if(str[str.length()-1] != '\n'){
-        str += '\n';
-        cout << str[str.length()];
-    }
-
-    for(int i = 0; i < str.length(); i++){
-        n = write(arduino, &str[i], 1);
-    }
-
-}
-
-string Serial::read_ln(){
-
-    int n = 0;
-    string str;
-    char buffer = '\0';
-    do {
-        n = read(arduino, &buffer, 1);
-        str += buffer;
-    } while(buffer != '\n' && n > 0 && n < 10);
     
-    cout << str;
+    arduino->open(port, error); //connect to port
 
-    return str;
+    // Error handling
+    if(error){
+        cout << "Error";
+        return -1;
+    }
+
+    //set baud rate
+    arduino->set_option(boost::asio::serial_port_base::baud_rate(baudrate),error);
+    if(error){
+        cout <<	"Error";	
+        return -1;
+    }		
+
+    return 0;
+
+}
+
+void Serial::start_read_ln(){
+
+	if(arduino->is_open()){
+
+        async_read_until(*arduino, buf, '\n',
+            boost::bind(
+                &Serial::process_read,
+                this, boost::asio::placeholders::error,
+                boost::asio::placeholders::bytes_transferred
+        ));
+
+        io.run();   
+
+    } else {
+        cout << "close" << endl;
+    }					
+
+}
+
+void Serial::process_read(const boost::system::error_code& e, std::size_t size){
+
+    // Verifica se houve erro
+    if(!e){
+        istream is(&buf);
+        string data(size,'\0');
+        is.read(&data[0],size);
+
+        std::cout << "Received data:" << data;
+    }
 
 }
 
 void Serial::Close(){
 
-    close(arduino);
+    arduino->close();
 
 }
 
