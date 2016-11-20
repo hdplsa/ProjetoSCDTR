@@ -12,6 +12,8 @@ int main(){
 
     arduino->start_read_ln();
 
+    cout << "Comecei o sleep" << endl;
+
     usleep(5000*1000);
 
     arduino->Close();

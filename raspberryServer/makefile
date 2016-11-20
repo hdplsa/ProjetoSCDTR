@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS= -std=c++11 -c -Wall
-LFLAGS= -I /usr/include/boost/ -L /usr/include/boost/ –lboost_system
+CFLAGS=-std=c++11 -c -Wall
+LFLAGS=-lboost_system -lboost_thread
 
 all: main.o serial.o app
 

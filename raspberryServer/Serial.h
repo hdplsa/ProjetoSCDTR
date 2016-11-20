@@ -4,9 +4,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/asio/serial_port.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/thread.hpp>
 using namespace std;
 using namespace boost::asio;
 
@@ -18,16 +16,23 @@ class Serial {
         Serial();
         int Begin(long baudrate, const char* port);
         void start_read_ln();
+        void Write(std::string send);
         void Close();
         ~Serial();
         
     private:
-        void process_read(const boost::system::error_code& e, std::size_t size);
+        void read_complete(const boost::system::error_code& e, std::size_t size);
+        void write_complete(const boost::system::error_code& e, std::size_t size);
         boost::asio::io_service io;
         serial_port_ptr arduino;
         boost::asio::streambuf buf;
         boost::system::error_code error;
-        int count = 0;
+
+        // Thread para o serial ser relamente asincrono
+        boost::thread t;
+
+        // Valor boleano que nos diz se a thread está a funcionar ou não        
+        bool working = false;
 
 };
 
