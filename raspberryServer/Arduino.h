@@ -1,8 +1,9 @@
 #ifndef ARDUINO_H_INCLUDED
 #define ARDUINO_H_INCLUDED
 
-
 class Arduino{
+	//Variável que guarda a posição actual nos vectores
+	int k;
 	//Numero de pontos guardados
 	int N;
 	//Periodo do ciclo de controlo
@@ -28,6 +29,13 @@ class Arduino{
 	
 	public:
 		Arduino(int N);
+		int getkNext(int k);
+		int getkPrecious(int k);
+		void calibrate();
+		void calcError();
+		void calcEnergy();
+		void calcComfortError();
+		void receiveInformation();
 		~Arduino();
 	
 	private:
