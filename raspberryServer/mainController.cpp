@@ -1,32 +1,11 @@
 #include "mainController.h"
 
 MainController::MainController(){
-	int k;
 	this->t = 0;
 	this->k = 0;
-	//Inicialização de vectores
-	for(k=0; k < this->N;k++){
-		this->ref1[k] = 0;
-		this->ref2[k] = 0;
-		this->e1[k] = 0;
-		this->e2[k] = 0;
-		this->u1[k] = 0;
-		this->u2[k] = 0;
-		this->y1[k] = 0;
-		this->y2[k] = 0;
-		this->d1[k] = 0;
-		this->d2[k] = 0;
-		this->E1[k] = 0;
-		this->E2[k] = 0;
-		this->Cerror1[k] = 0;
-		this->Cerror2[k] = 0;
-		this->Verror1[k] = 0;
-		this->Verror2[k] =	0;	
-	}
-	this->o1 = false;
-	this->o2 = false;
+	//Modelo dos minimos quadrados
 	this->k11 = 0;
-	this-> k12 = 0;
+	this->k12 = 0;
 	this->k21 = 0;
 	this->k22 = 0;
 	this->theta1 = 0;
