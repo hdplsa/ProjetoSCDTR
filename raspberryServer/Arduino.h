@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include "Serial.h"
 using namespace std;
 
 class Arduino{
@@ -35,20 +36,27 @@ class Arduino{
 	int t;
 	
 	public:
-		Arduino(int N_);
+		Arduino(int N_, string port);
 		int getkNext(int k);
 		int getkPrevious(int k);
+		void send(string str);
+		void ledON(int pwm = 255);
+		void ledON(float V);
+		void ledOff();
 		void calibrate();
 		void calcError();
 		void calcEnergy();
 		void calcComfortError();
 		void calcComfortVariance();
-		void receiveInformation();
+		void receiveInformation(string info);
 		~Arduino();
 	
 	private:
 		double getMax(double d1, double d2);
 		double getAbs(double d);
+		Serial *serial = new Serial();
+
+		enum sendcodes { Ref = 0 };
 };
 
 #endif

@@ -1,6 +1,6 @@
 #include "Arduino.h"
 
-Arduino::Arduino(int N_) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
+Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
 	int k;
 	this->N = N;
 	this->k = 0;
@@ -16,6 +16,13 @@ Arduino::Arduino(int N_) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0),
 //		this->Verror[k] = 0;
 //	}
 	this->o = false; // Mudei de 'o1' para 'o' para compilar. Vê se é suposto ser 'o' --- Ass: Hugo
+
+	// Abre a porta serial
+	serial->Begin(115200, (const char*) port.c_str());
+
+	// Atribui os callbacks
+	serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
+
 }
 
 /* Implementação dos indices do vector em anel
@@ -43,6 +50,42 @@ int Arduino::getkPrevious(int k){
 		return k;
 	}
 	return 0;
+}
+
+void Arduino::send(string str){
+
+	serial->Write(str);
+
+}
+
+void Arduino::ledON(int pwm /* = 255 */){
+
+	string str;
+	sendcodes s = Ref;
+
+	str += std::to_string(s);
+	str += " ";
+	str += std::to_string(pwm);
+	str += '\n';
+
+	cout << "ledOn " << str << endl;
+
+	send(str);
+
+}
+
+void Arduino::ledON(float V){
+
+	int valor = (int)(V*255/5);
+
+	ledON(valor);
+
+}
+
+void Arduino::ledOff(){
+
+	ledON(0);
+
 }
 
 /* Calculo dos valores das constantes no modelo 
@@ -85,7 +128,7 @@ void Arduino::calcComfortVariance(){
 
 /* Função chamada ciclicamente para receber e guardar dados
  * vindos dos Arduinos */
-void Arduino::receiveInformation(){
+void Arduino::receiveInformation(string info){
 	//Calcula erro
 	this->calcError();
 	

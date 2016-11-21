@@ -11,7 +11,7 @@ int main(){
 
     Serial *arduino = new Serial();
     arduino->Begin(9600,"/dev/ttyUSB0");
-    arduino->set_Readcallback(print_received);
+    //arduino->set_Readcallback(print_received);
 
     cout << "Hello World" << std::endl;
 

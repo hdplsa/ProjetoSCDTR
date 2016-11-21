@@ -15,7 +15,7 @@ class Serial {
     public:
         Serial();
         int Begin(long baudrate, const char* port);
-        void set_Readcallback(void (*function)(string));
+        void set_Readcallback(std::function<void(string)>);
         void set_Writecallback(void (*function)(void));
         void set_ReadErrorcallback(void (*function)(void));
         void set_WriteErrorcallback(void (*function)(void));
@@ -30,7 +30,7 @@ class Serial {
         void write_complete(const boost::system::error_code& e, std::size_t size);
 
         // Callbacks
-        void (*onRead)(string) = NULL;
+        std::function<void(string)> onRead = NULL;
         void (*onWrite)(void) = NULL;
 
         // Callbacks para o erro

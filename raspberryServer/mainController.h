@@ -13,6 +13,9 @@ class MainController{
 	//Arduinos
 	Arduino *arduino1;
 	Arduino *arduino2;
+	// Portas dos arduinos
+	const string port1 = "/dev/ttyUSB0";
+	const string port2 = "/dev/ttyUSB1";
 	//Calibração minimos quadrados
 	double k11, k12, k21, k22;
 	double theta1, theta2;

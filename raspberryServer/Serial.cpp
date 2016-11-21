@@ -39,9 +39,9 @@ int Serial::Begin(long baudrate, const char* port){
 
 /* Faz set da função de callback de leitura
  */
-void Serial::set_Readcallback(void (*function)(string)){
+void Serial::set_Readcallback(std::function<void(string)> fcn){
 
-    this->onRead = function;
+    this->onRead = fcn;
 
 }
 

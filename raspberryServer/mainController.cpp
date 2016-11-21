@@ -4,8 +4,8 @@ MainController::MainController(){
 	this->t = 0;
 	this->k = 0;
 	//Inicialização dos arduinos
-	this->arduino1 = new Arduino(this->N);
-	this->arduino2 = new Arduino(this->N);
+	this->arduino1 = new Arduino(this->N, port1);
+	this->arduino2 = new Arduino(this->N, port2);
 	//Modelo dos minimos quadrados
 	this->k11 = 0;
 	this->k12 = 0;
