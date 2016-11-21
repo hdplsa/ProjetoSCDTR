@@ -6,3 +6,8 @@
 ### matlab ###
 *.slx.autosave
 *.m~
+
+### C++ ####
+app
+*.o
+*.out
