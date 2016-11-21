@@ -6,6 +6,8 @@
 class MainController{
 	//Variável que guarda o instante actual
 	int t;
+	// (?)
+	int k;
 	//Numero de pontos guardados
 	int N = 10000;
 	//Arduinos

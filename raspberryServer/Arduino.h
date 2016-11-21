@@ -1,6 +1,10 @@
 #ifndef ARDUINO_H_INCLUDED
 #define ARDUINO_H_INCLUDED
 
+#include <iostream>
+#include <vector>
+using namespace std;
+
 class Arduino{
 	//Variável que guarda a posição actual nos vectores
 	int k;
@@ -9,38 +13,42 @@ class Arduino{
 	//Periodo do ciclo de controlo
 	double T;
 	//Valores do sistema fisico
-	double ref[N];
+	vector<double> ref;
 	//Valores de erro do sistema
-	double e[N];
+	vector<double> e;
 	//Valores da variável de controlo
-	double u[N];
+	vector<double> u;
 	//Valores de saída do sistema
-	double y[N];
+	vector<double> y;
 	//Valores do duty cycle do sistema
-	double d[N];
+	vector<double> d;
 	//Valores de consumo de energia
-	double E[N];
+	vector<double> E;
 	//Valores de erro de comforto
-	double Cerror[N];
+	vector<double> Cerror;
 	//Valores de variância de comforto
-	double Verror[N];
+	vector<double> Verror;
 	//Estado de ocupação
 	bool o;
+
+	// (?) Parâmetro adicionado para compilar NÃO ESTÁ NO CONSTRUTOR
+	int t;
 	
 	public:
-		Arduino(int N);
+		Arduino(int N_);
 		int getkNext(int k);
-		int getkPrecious(int k);
+		int getkPrevious(int k);
 		void calibrate();
 		void calcError();
 		void calcEnergy();
 		void calcComfortError();
+		void calcComfortVariance();
 		void receiveInformation();
 		~Arduino();
 	
 	private:
 		double getMax(double d1, double d2);
-		double getAbs();
+		double getAbs(double d);
 };
 
 #endif
