@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include "Serial.h"
+#include "tcpServer.h"
 using namespace std;
 
 void print_received(string str){
