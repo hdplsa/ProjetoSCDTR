@@ -42,7 +42,7 @@ class Arduino{
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(float V);
-		void ledOff();
+		void ledOFF();
 		void calibrate();
 		void calcError();
 		void calcEnergy();

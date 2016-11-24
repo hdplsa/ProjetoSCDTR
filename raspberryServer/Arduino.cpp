@@ -82,7 +82,7 @@ void Arduino::ledON(float V){
 
 }
 
-void Arduino::ledOff(){
+void Arduino::ledOFF(){
 
 	ledON(0);
 
