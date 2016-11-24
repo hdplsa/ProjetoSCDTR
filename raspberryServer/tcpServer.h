@@ -10,6 +10,8 @@ using namespace boost::asio;
 
 typedef boost::shared_ptr<ip::tcp::acceptor> acceptor_ptr;
 typedef boost::shared_ptr<ip::tcp::resolver> resolver_ptr;
+typedef boost::shared_ptr<ip::tcp::socket>   socket_ptr;
+typedef boost::shared_ptr<deadline_timer>    deadline_ptr;
 
 class tcpServer {
 
@@ -29,7 +31,13 @@ class tcpServer {
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
-        void resolve_complete(const boost::system::error_code& e, ip::tcp::resolver::iterator endpoint_iterator);
+        void handle_resolve(const boost::system::error_code& e, ip::tcp::resolver::iterator endpoint_iterator);
+        void handle_connect(const boost::system::error_code& ec, ip::tcp::resolver::iterator endpoint_iter);
+        void start_read();
+        void handle_read(const boost::system::error_code &ec);
+        void start_write();
+        void handle_write(const boost::system::error_code &ec);
+        void check_deadline();
         void write_complete(const boost::system::error_code& e, std::size_t size);
 
         // Callbacks
@@ -48,6 +56,13 @@ class tcpServer {
 
         // Objeto de fazer tcp requests
         resolver_ptr resolver;
+
+        // Socket
+        ip::tcp::socket socket_;
+
+        // Timers para controlar os timeouts
+        deadline_ptr deadline;
+        deadline_ptr heartbeat_timer;
 
         // buffer para enviar e receber dados
         boost::asio::streambuf buf;
