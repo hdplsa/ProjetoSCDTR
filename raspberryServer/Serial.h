@@ -16,9 +16,9 @@ class Serial {
         Serial();
         int Begin(long baudrate, const char* port);
         void set_Readcallback(std::function<void(string)>);
-        void set_Writecallback(void (*function)(void));
-        void set_ReadErrorcallback(void (*function)(void));
-        void set_WriteErrorcallback(void (*function)(void));
+        void set_Writecallback(std::function<void(void)>);
+        void set_ReadErrorcallback(std::function<void(void)>);
+        void set_WriteErrorcallback(std::function<void(void)>);
         void Read_ln();
         void Write(std::string send);
         void Close();
@@ -31,11 +31,11 @@ class Serial {
 
         // Callbacks
         std::function<void(string)> onRead = NULL;
-        void (*onWrite)(void) = NULL;
+        std::function<void(void)> onWrite = NULL;
 
         // Callbacks para o erro
-        void (*onReadError)(void) = NULL;
-        void (*onWriteError)(void) = NULL;
+        std::function<void(void)> onReadError = NULL;
+        std::function<void(void)> onWriteError = NULL;
 
         // Serviço que realiza as transações do serial
         boost::asio::io_service io;

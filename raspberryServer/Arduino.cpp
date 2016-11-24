@@ -1,20 +1,10 @@
 #include "Arduino.h"
 
 Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
-	int k;
+
 	this->N = N;
 	this->k = 0;
-//	//Inicialização de vectores
-//	for(k=0; k < this->N;k++){
-//		this->ref[k] = 0;
-//		this->e[k] = 0;
-//		this->u[k] = 0;
-//		this->y[k] = 0;
-//		this->d[k] = 0;
-//		this->E[k] = 0;
-//		this->Cerror[k] = 0;
-//		this->Verror[k] = 0;
-//	}
+
 	this->o = false; // Mudei de 'o1' para 'o' para compilar. Vê se é suposto ser 'o' --- Ass: Hugo
 
 	// Abre a porta serial
@@ -22,6 +12,9 @@ Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_
 
 	// Atribui os callbacks
 	serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
+
+	// Começa a leitura do serial
+	serial->Read_ln();
 
 }
 
@@ -129,12 +122,30 @@ void Arduino::calcComfortVariance(){
 /* Função chamada ciclicamente para receber e guardar dados
  * vindos dos Arduinos */
 void Arduino::receiveInformation(string info){
+
+	float y;
+	float e;
+	float u;
+	long t;
+
+	// Estrai os dados da string
+	sscanf(info.c_str(), "y = %f;e = %f; u = %f; t = %ld\n", &y, &e, &u, &t);
+
+	// Guarda os dados no objeto
+	this->y[k] = y;
+	this->e[k] = e;
+	this->u[k] = u;
+		// Guardar o tempo tbm?
+
 	//Calcula erro
 	this->calcError();
 	
 	//Avança da o instante seguinte
 	this->k = this->getkNext(this->k);
 	this->t = this->t + 1;
+
+	// Manda ler a próxima linha
+	serial->Read_ln();
 }
 
 Arduino::~Arduino(){

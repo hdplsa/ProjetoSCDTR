@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdio>
 #include "Serial.h"
 using namespace std;
 
