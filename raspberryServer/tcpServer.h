@@ -23,10 +23,10 @@ class tcpServer {
         void stop();
         ~tcpServer();
 
-        void set_Readcallback(void (*function)(string));
-        void set_Writecallback(void (*function)(void));
-        void set_ReadErrorcallback(void (*function)(void));
-        void set_WriteErrorcallback(void (*function)(void));
+        void set_Readcallback(std::function<void(string)> fcn);
+        void set_Writecallback(std::function<void(void)> fcn);
+        void set_ReadErrorcallback(std::function<void(void)> fcn);
+        void set_WriteErrorcallback(std::function<void(void)> fcn);
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
@@ -37,12 +37,12 @@ class tcpServer {
         void check_deadline();
     
         // Callbacks
-        void (*onRead)(string) = NULL;
-        void (*onWrite)(void) = NULL;
+        std::function<void(string)> onRead = NULL;
+        std::function<void(void)> onWrite = NULL;
 
         // Callbacks para o erro
-        void (*onReadError)(void) = NULL;
-        void (*onWriteError)(void) = NULL;
+        std::function<void(void)> onReadError = NULL;
+        std::function<void(void)> onWriteError = NULL;
 
         // Serviço que realiza as transações do servidor
         boost::asio::io_service io;

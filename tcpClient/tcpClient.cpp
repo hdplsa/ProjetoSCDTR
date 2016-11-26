@@ -3,9 +3,6 @@
 tcpClient::tcpClient() : socket_(io), deadline(io)
 {
 
-  // Faz set do objeto que imprime no socket
-  acceptor = acceptor_ptr(new ip::tcp::acceptor(
-      io, ip::tcp::endpoint(ip::tcp::v4(), 10000)));
   // Faz set do objeto que recebe os IPs que damos ao socket
   resolver = resolver_ptr(new ip::tcp::resolver(io));
 
@@ -147,6 +144,7 @@ void tcpClient::handle_read(const boost::system::error_code &ec)
     if (!line.empty())
     {
       std::cout << "Received: " << line << "\n";
+      if(onRead != NULL) onRead(line);
     }
 
     start_read();
@@ -154,6 +152,8 @@ void tcpClient::handle_read(const boost::system::error_code &ec)
   else
   {
     std::cout << "Error on receive: " << ec.message() << "\n";
+
+    if(onReadError != NULL) onReadError();
 
     stop();
   }
@@ -210,9 +210,15 @@ void tcpClient::Write(std::string send){
 
 void tcpClient::handle_write(const boost::system::error_code &ec){
 
-  if(ec){
+  if(!ec){
 
-    cout << "Aconteceu um erro a enviar a mensagem, tente novamente." << endl;
+    if(onWrite != NULL) onWrite();
+
+  } else {
+
+    cout << "Erro a enviar mensagem: " << ec.message() << endl;
+
+    if(onWriteError != NULL) onWriteError();
 
   }
 
@@ -237,6 +243,30 @@ void tcpClient::check_deadline()
 
   // Put the actor back to sleep.
   deadline.async_wait(boost::bind(&tcpClient::check_deadline, this));
+}
+
+void tcpClient::set_Readcallback(std::function<void(string)> fcn){
+
+  onRead = fcn;
+
+}
+
+void tcpClient::set_Writecallback(std::function<void(void)> fcn){
+
+  onWrite = fcn;
+
+}
+
+void tcpClient::set_ReadErrorcallback(std::function<void(void)> fcn){
+
+  onReadError = fcn;
+
+}
+
+void tcpClient::set_WriteErrorcallback(std::function<void(void)> fcn){
+
+  onWriteError = fcn;
+
 }
 
 bool tcpClient::isWorking(){

@@ -9,7 +9,6 @@
 using namespace std;
 using namespace boost::asio;
 
-typedef boost::shared_ptr<ip::tcp::acceptor> acceptor_ptr;
 typedef boost::shared_ptr<ip::tcp::resolver> resolver_ptr;
 typedef boost::shared_ptr<ip::tcp::socket>   socket_ptr;
 typedef boost::shared_ptr<deadline_timer>    deadline_ptr;
@@ -24,10 +23,10 @@ class tcpClient {
         void stop();
         ~tcpClient();
 
-        void set_Readcallback(void (*function)(string));
-        void set_Writecallback(void (*function)(void));
-        void set_ReadErrorcallback(void (*function)(void));
-        void set_WriteErrorcallback(void (*function)(void));
+        void set_Readcallback(std::function<void(string)> fcn);
+        void set_Writecallback(std::function<void(void)> fcn);
+        void set_ReadErrorcallback(std::function<void(void)> fcn);
+        void set_WriteErrorcallback(std::function<void(void)> fcn);
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
@@ -39,21 +38,17 @@ class tcpClient {
         void handle_heartbeat(const boost::system::error_code &ec);
         void handle_write(const boost::system::error_code &ec);
         void check_deadline();
-        void write_complete(const boost::system::error_code& e, std::size_t size);
 
         // Callbacks
-        void (*onRead)(string) = NULL;
-        void (*onWrite)(void) = NULL;
+        std::function<void(string)> onRead = NULL;
+        std::function<void(void)> onWrite = NULL;
 
         // Callbacks para o erro
-        void (*onReadError)(void) = NULL;
-        void (*onWriteError)(void) = NULL;
+        std::function<void(void)> onReadError = NULL;
+        std::function<void(void)> onWriteError = NULL;
 
         // Serviço que realiza as transações do servidor
         boost::asio::io_service io;
-
-        // Objeto de receber tcp requests
-        acceptor_ptr acceptor;
 
         // Objeto de fazer tcp requests
         resolver_ptr resolver;

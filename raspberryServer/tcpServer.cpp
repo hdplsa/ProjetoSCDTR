@@ -70,11 +70,15 @@ void tcpServer::handle_read(const boost::system::error_code &ec)
       std::cout << "Received: " << line << "\n";
     }
 
+    if(onRead != NULL) onRead(line);
+
     start_read();
   }
   else
   {
     std::cout << "Error on receive: " << ec.message() << "\n";
+
+    if(onReadError != NULL) onReadError();
 
     stop();
   }
@@ -92,9 +96,15 @@ void tcpServer::Write(string send)
 void tcpServer::handle_write(const boost::system::error_code &ec)
 {
 
-  if (ec)
+  if (!ec)
   {
+    
+    if(onWrite != NULL) onWrite();
+
+  } else {
     cout << "Erro no envio" << endl;
+
+    if(onWriteError != NULL) onWriteError();
   }
 }
 
@@ -117,6 +127,30 @@ void tcpServer::check_deadline()
 
   // Put the actor back to sleep.
   deadline.async_wait(boost::bind(&tcpServer::check_deadline, this));
+}
+
+void tcpServer::set_Readcallback(std::function<void(string)> fcn){
+
+  onRead = fcn;
+
+}
+
+void tcpServer::set_Writecallback(std::function<void(void)> fcn){
+
+  onWrite = fcn;
+
+}
+
+void tcpServer::set_ReadErrorcallback(std::function<void(void)> fcn){
+
+  onReadError = fcn;
+
+}
+
+void tcpServer::set_WriteErrorcallback(std::function<void(void)> fcn){
+
+  onWriteError = fcn;
+
 }
 
 bool tcpServer::isWorking(){
