@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=c++11 -c -Wall
+CFLAGS=-std=c++11 -c -g -Wall
 LFLAGS=-lboost_system -lboost_thread -lpthread
 
 all: main.o serial.o tcpServer.o app

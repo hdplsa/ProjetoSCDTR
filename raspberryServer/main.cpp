@@ -29,15 +29,14 @@ void test_serial(){
 
 int main(){
 
-    tcpServer *server = new tcpServer();
-
     string host("127.0.0.1");
     string port("4444");
 
-    server->connect(host,port);
+    tcpServer *server = new tcpServer(host, port);
 
-    usleep(5000*1000);
+    server->accept();
 
+    while(server->isWorking()){}
 
     return 0;
 
