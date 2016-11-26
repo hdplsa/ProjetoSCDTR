@@ -12,6 +12,14 @@ Meta::Meta(int ledPin,int sensorPin){
     this->_lightcontroller->setSaturation(5);
 }
 
+/*String recebida assincronamente pelo protocolo I2C
+ * é copiada para dentro da class para processamento
+ * sempre que chamada receivedI2C
+ */
+void Meta::receivedI2C(char *str){
+  strcpy(this->rI2C, str);
+}
+
 void Meta::calibrateLumVoltageModel(){
     double theta11, theta12;
     double theta21, theta22;

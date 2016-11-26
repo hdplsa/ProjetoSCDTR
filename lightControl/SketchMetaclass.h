@@ -1,6 +1,7 @@
 #ifndef META_H_INCLUDED
 #define META_H_INCLUDED
 
+#include <string.h>
 #include "Arduino.h"
 #include "EEPROM.h"
 #include "LightController.h"
@@ -11,7 +12,7 @@
 
 class Meta{
   
-  //Parâmetros de calibra��o
+  //Parâmetros de calibracao
   double K11 = 0;
   double K12 = 0;
   double K21 = 0;
@@ -20,9 +21,12 @@ class Meta{
   double theta2 = 0;
   //Controlador PID
   LightController *_lightcontroller = 0;
+  //String de comunicação
+  char rI2C[50] = "";
 
   public:
     Meta(int ledPin,int sensorPin);
+    void receivedI2C(char *str);
     void calibrateLumVoltageModel();
     ~Meta();
   
