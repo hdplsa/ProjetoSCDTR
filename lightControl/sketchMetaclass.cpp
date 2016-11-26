@@ -1,4 +1,4 @@
-
+#include "SletchMetaclass.h"
 
 //PUBLIC FUNTIONS
 Meta::Meta(int ledPin,int sensorPin){
