@@ -22,7 +22,7 @@ class Meta{
   //Controlador PID
   LightController *_lightcontroller = 0;
   //String de comunicação
-  char rI2C[50] = "";
+  char rI2C[50];
 
   public:
     Meta(int ledPin,int sensorPin);

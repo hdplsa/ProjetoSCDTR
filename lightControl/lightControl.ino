@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include "SerialCom.h"
 #include "LightController.h"
+#include "SketchMetaClass.h"
 #include "EEPROM.h"
 #include "TWI.h"
 
@@ -27,6 +28,15 @@ void initTimer1(){
   // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
   sei(); //allow interrupts
+}
+
+/*Funcao callback, chamada sempre que
+ * e recebida uma string via I2C, e 
+ * que copia a string recebida para 
+ * a class Meta
+ */
+void metaI2CString(char *str){
+  Meta->receivedI2C(str);
 }
 
 void setup() {
