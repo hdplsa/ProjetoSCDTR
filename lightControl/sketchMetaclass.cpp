@@ -20,12 +20,18 @@ Meta::Meta(int ledPin,int sensorPin){
 }
 
 void Meta::calibrateLumVoltageModel(){
+    double theta11, theta12;
+    double theta21, theta22;
    /*Indica o master da comunicação, necessário
     * no protocolo de calibração utilizado
+    * 
+    * Por conveniencia, o Arduino Master na comunicação
+    * assume terá a Primeira linha das matrizes do modelo
+    * [L] = [K]*[U] + [O], e o Slave a segunda linha
     */
    switch(this->defineMaster()){
       case MASTER:
-      
+        
         break;
       case SLAVE:
       

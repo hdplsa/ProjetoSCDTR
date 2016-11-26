@@ -6,7 +6,7 @@
 #include "LightController.h"
 #include "TWI.h"
 
-// Meta class que encapsula os m�dulos (classes) necess�rios que cada arduino
+// Meta class que encapsula os modulos (classes) necessarios que cada arduino
 
 
 class Meta{
