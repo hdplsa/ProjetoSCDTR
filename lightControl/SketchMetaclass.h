@@ -18,16 +18,16 @@ class Meta{
   double K22;
   double theta1;
   double theta2;
-  
-  LightController *_lightcontroller;
+  //Controlador PID
+  LightController *_lightcontroller = 0;
 
   public:
     Meta(int ledPin,int sensorPin);
-    void calibrateLumVoltage();
+    void calibrateLumVoltageModel();
     ~Meta();
   
   private:
-    bool DefineMaster();
+    bool defineMaster();
 };
 
 #endif
