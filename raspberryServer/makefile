@@ -1,11 +1,11 @@
 CC=g++
 CFLAGS=-std=c++11 -c -Wall
-LFLAGS=-lboost_system -lboost_thread
+LFLAGS=-lboost_system -lboost_thread -lpthread
 
 all: main.o serial.o tcpServer.o app
 
 app: main.o Serial.o tcpServer.o
-	$(CC) main.o Serial.o -o app $(LFLAGS)
+	$(CC) main.o Serial.o tcpServer.o -o app $(LFLAGS)
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp

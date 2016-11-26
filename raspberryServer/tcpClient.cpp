@@ -1,6 +1,6 @@
-#include "tcpServer.h"
+#include "tcpClient.h"
 
-tcpServer::tcpServer() : socket_(io)
+tcpClient::tcpClient() : socket_(io)
 {
 
   // Faz set do objeto que imprime no socket
@@ -8,27 +8,25 @@ tcpServer::tcpServer() : socket_(io)
       io, ip::tcp::endpoint(ip::tcp::v4(), 10000)));
   // Faz set do objeto que recebe os IPs que damos ao socket
   resolver = resolver_ptr(new ip::tcp::resolver(io));
-  // Faz set ao socket
-  //socket = socket_ptr(new ip::tcp::socket(io));
 
   // Inicia o timer
   deadline = deadline_ptr(new deadline_timer(io));
   // Set do timer sem nenhum tempo definido (ainda)
-  deadline->async_wait(boost::bind(&tcpServer::check_deadline, this));
+  deadline->async_wait(boost::bind(&tcpClient::check_deadline, this));
 }
 
 /*  Esta função trata de usar o resolver para obter os endereços dos sites
  * fornecidos (pode ou não ser util no projeto)
  */
-void tcpServer::connect(string ip, string port)
+void tcpClient::connect(string ip, string port)
 {
 
-  ip::tcp::resolver::query query(ip, port);
+  ip::tcp::resolver::query query(ip.c_str(), port.c_str());
 
   // Cria a tarefa de vai ao ip ou site que fornecemos e
   // nos devolve os endereços desse site para o handle_resolve
   resolver->async_resolve(query,
-                          boost::bind(&tcpServer::handle_resolve, this,
+                          boost::bind(&tcpClient::handle_resolve, this,
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::iterator));
 
@@ -36,9 +34,9 @@ void tcpServer::connect(string ip, string port)
   t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
 }
 
-void tcpServer::handle_resolve(const boost::system::error_code &e, ip::tcp::resolver::iterator endpoint_iterator)
+void tcpClient::handle_resolve(const boost::system::error_code &e, ip::tcp::resolver::iterator endpoint_iterator)
 {
-
+  cout << "cheguei ao handle_resolve" << endl;
   if (endpoint_iterator != ip::tcp::resolver::iterator())
   {
 
@@ -49,12 +47,12 @@ void tcpServer::handle_resolve(const boost::system::error_code &e, ip::tcp::reso
 
     // Inicia a conexão ao host assincronamente
     socket_.async_connect(endpoint_iterator->endpoint(),
-                          boost::bind(&tcpServer::handle_connect,
+                          boost::bind(&tcpClient::handle_connect,
                                       this, _1, endpoint_iterator));
   }
 }
 
-void tcpServer::handle_connect(const boost::system::error_code &ec, ip::tcp::resolver::iterator endpoint_iterator)
+void tcpClient::handle_connect(const boost::system::error_code &ec, ip::tcp::resolver::iterator endpoint_iterator)
 {
 
   // The async_connect() function automatically opens the socket at the start
@@ -96,17 +94,17 @@ void tcpServer::handle_connect(const boost::system::error_code &ec, ip::tcp::res
   }
 }
 
-void tcpServer::start_read()
+void tcpClient::start_read()
 {
   // Set a deadline for the read operation.
   deadline->expires_from_now(boost::posix_time::seconds(30));
 
   // Start an asynchronous operation to read a newline-delimited message.
   boost::asio::async_read_until(socket_, buf, '\n',
-                                boost::bind(&tcpServer::handle_read, this, _1));
+                                boost::bind(&tcpClient::handle_read, this, _1));
 }
 
-void tcpServer::handle_read(const boost::system::error_code &ec)
+void tcpClient::handle_read(const boost::system::error_code &ec)
 {
 
   if (!ec)
@@ -132,22 +130,22 @@ void tcpServer::handle_read(const boost::system::error_code &ec)
   }
 }
 
-void tcpServer::start_write()
+void tcpClient::start_write()
 {
 
   // Start an asynchronous operation to send a heartbeat message.
   boost::asio::async_write(socket_, boost::asio::buffer("\n", 1),
-                           boost::bind(&tcpServer::handle_write, this, _1));
+                           boost::bind(&tcpClient::handle_write, this, _1));
 }
 
-void tcpServer::handle_write(const boost::system::error_code &ec)
+void tcpClient::handle_write(const boost::system::error_code &ec)
 {
 
   if (!ec)
   {
     // Wait 10 seconds before sending the next heartbeat.
     heartbeat_timer->expires_from_now(boost::posix_time::seconds(10));
-    heartbeat_timer->async_wait(boost::bind(&tcpServer::start_write, this));
+    heartbeat_timer->async_wait(boost::bind(&tcpClient::start_write, this));
   }
   else
   {
@@ -157,7 +155,7 @@ void tcpServer::handle_write(const boost::system::error_code &ec)
   }
 }
 
-void tcpServer::check_deadline()
+void tcpClient::check_deadline()
 {
 
   // Check whether the deadline has passed. We compare the deadline against
@@ -175,5 +173,5 @@ void tcpServer::check_deadline()
   }
 
   // Put the actor back to sleep.
-  deadline->async_wait(boost::bind(&tcpServer::check_deadline, this));
+  deadline->async_wait(boost::bind(&tcpClient::check_deadline, this));
 }

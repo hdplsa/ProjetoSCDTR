@@ -1,8 +1,3 @@
-Boost C++ Libraries
-...one of the most highly regarded and expertly designed C++ library projects in the world.
-— Herb Sutter and Andrei Alexandrescu, C++ Coding Standards
-This is an old version of boost. Click here for the latest version's documentation home page.
-doc/html/boost_asio/example/timeouts/async_tcp_client.cpp
 //
 // async_tcp_client.cpp
 // ~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +79,7 @@ using boost::asio::ip::tcp;
 // The heartbeat actor sends a heartbeat (a message that consists of a single
 // newline character) every 10 seconds. In this example, no deadline is applied
 // message sending.
-//'
+//
 class client
 {
 public:
@@ -308,10 +303,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-Revised $Date$
-Copyright Beman Dawes, David Abrahams, 1998-2005.
-Copyright Rene Rivera 2004-2008.
-Distributed under the Boost Software License, Version 1.0.
-XHTML 1.0
-CSS
-OSI Certified

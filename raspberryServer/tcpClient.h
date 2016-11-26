@@ -1,6 +1,7 @@
 #ifndef TECSERVER_H_INCLUDED
-#define TCPSERVER_H_INCLUDED
+#define tcpClient_H_INCLUDED
 
+#define	BOOST_ASIO_ENABLE_HANDLER_TRACKING
 #include <iostream>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -13,16 +14,16 @@ typedef boost::shared_ptr<ip::tcp::resolver> resolver_ptr;
 typedef boost::shared_ptr<ip::tcp::socket>   socket_ptr;
 typedef boost::shared_ptr<deadline_timer>    deadline_ptr;
 
-class tcpServer {
+class tcpClient {
 
     public:
-        tcpServer();
+        tcpClient();
         int Begin();
         void connect(string host, string ip);
         void Read_ln();
         void Write(std::string send);
         void Close();
-        ~tcpServer();
+        ~tcpClient();
 
         void set_Readcallback(void (*function)(string));
         void set_Writecallback(void (*function)(void));
