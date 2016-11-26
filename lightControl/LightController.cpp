@@ -9,7 +9,7 @@ LightController::LightController(int ledPin, int sensorPin){
   //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
   this->k = 0;
   this->teta = 0;
-  this->calibrateLumVoltage();
+  //this->calibrateLumVoltage();
 }
 
 //Inicialização - Calibração

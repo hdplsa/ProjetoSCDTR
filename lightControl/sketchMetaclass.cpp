@@ -1,4 +1,4 @@
-#include "SletchMetaclass.h"
+#include "SketchMetaclass.h"
 
 //PUBLIC FUNTIONS
 Meta::Meta(int ledPin,int sensorPin){
@@ -18,7 +18,7 @@ Meta::~Meta(){
 
 //PRIVATE FUNCTIONS 
 bool Meta::DefineMaster(){
-    if EEPROM.read(0) == 0
+    if (EEPROM.read(0) == 0)
         return true;
     else
         return false;

@@ -4,10 +4,19 @@
 // serial, controla os envios por serial, as receções, e o proces-
 // samento das receções.
 
-SerialCom::SerialCom(long int Baudrate){
+// Inicialização dos valores estáticos
+
+int SerialCom::current_char = 0;
+char SerialCom::incoming[10];
+int SerialCom::valorLed = 0;
+int SerialCom::currentLux = 0;
+int SerialCom::ref = -1;
+volatile bool SerialCom::new_ref = 0;
+
+void SerialCom::Begin(long int Baudrate){
 
   Serial.begin(Baudrate);
-  this->current_char = 0;
+  current_char = 0;
   
 }
 
@@ -22,17 +31,17 @@ void SerialCom::receive_message(){
     if(in != '\n'){
       
       // Se a mensagem ainda não tiver acabado, guarda o byte na string
-      this->incoming[current_char] = in;
+      incoming[current_char] = in;
       current_char++; //Próximo byte fica na próxima posição
       
     } else {
       
       // Quando chegarmos ao final da string, temos que recomeçar o
       // contador de caracteres
-      this->incoming[current_char] = '\0';
+      incoming[current_char] = '\0';
       current_char = 0;
-      Serial.println(this->incoming);
-      this->process_request(this->incoming);
+      Serial.println(incoming);
+      process_request(incoming);
       
     }
   }
@@ -52,7 +61,7 @@ void SerialCom::process_request(char *message){
   switch(tipo){
     // Muda o valor do LED PWM
     case 0:
-      this->valorLed = valor;
+      valorLed = valor;
       break;
     // Envia os valores do LDR em lux
     case 1:
@@ -61,7 +70,7 @@ void SerialCom::process_request(char *message){
       break;
     // Caso em que queremos mudar a referência local
     case 2:
-      this->ref = valor;
+      ref = valor;
       break;
     // Significado da vida, a board fica tão à toa que faz reboot
     case 42:
@@ -77,21 +86,21 @@ void SerialCom::process_request(char *message){
 
 int SerialCom::get_valorLed(){
 
-  return this->valorLed;
+  return valorLed;
   
 }
 
 void SerialCom::set_currentLux(int currentLux){
 
-  this->currentLux = currentLux;
+  currentLux = currentLux;
   
 }
 
 int SerialCom::getRef(){
 
-  int ref = this->ref;
-  this->ref = -1;
+  int ref2 = ref;
+  ref = -1;
   
-  return ref;
+  return ref2;
 }
 

@@ -6,14 +6,12 @@
 #include "LightController.h"
 #include "TWI.h"
 
-const double Vcc = 5.0;
-
-// Meta class que encapsula os módulos (classes) necessários que cada arduino
+// Meta class que encapsula os mï¿½dulos (classes) necessï¿½rios que cada arduino
 
 
 class Meta{
   
-  //ParÃ¢metros de calibração
+  //ParÃ¢metros de calibraï¿½ï¿½o
   double K11;
   double K12;
   double K21;
