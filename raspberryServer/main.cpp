@@ -4,8 +4,21 @@
 #include "Serial.h"
 #include "tcpServer.h"
 #include "Arduino.h"
+#include <signal.h>
 
 using namespace std;
+
+const string host("127.0.0.1");
+const string port("4444");
+
+tcpServer *server = new tcpServer(host, port);
+
+// Função chamada quando se dá CTRL + C 
+void close_all(int sig){
+
+    server->stop();
+
+}
 
 void print_received(string str)
 {
@@ -28,14 +41,14 @@ void test_serial(){
 
 int main(){
 
-    string host("127.0.0.1");
-    string port("4444");
-
-    tcpServer *server = new tcpServer(host, port);
+    // Diz o que deve acontecer quandp se carraga no CTRL+C
+    signal(SIGINT, close_all); 
 
     server->accept();
 
     while(server->isWorking()){}
+
+    delete server;
 
     return 0;
 

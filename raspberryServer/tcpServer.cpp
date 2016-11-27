@@ -167,5 +167,6 @@ void tcpServer::stop()
 
 tcpServer::~tcpServer(){
   stop();
+  io.stop();
 }
 
