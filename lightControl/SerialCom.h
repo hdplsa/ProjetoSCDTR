@@ -6,26 +6,26 @@
 class SerialCom{
 
   // Variáveis usadas na receção de mensagens serial
-  int current_char;
-  char incoming[10]; //mensagens com 10 caractéres máximo, pode mudar.
+  static int current_char;
+  static char incoming[10]; //mensagens com 10 caractéres máximo, pode mudar.
 
   // Variáveis usadas na execução dos pedidos das mensagens
-  int valorLed = 0;
-  int currentLux = 0;
-  int ref = -1;
+  static int valorLed;
+  static int currentLux;
+  static int ref;
 
   // Booleanos que dizem se há valores novos
-  volatile bool new_ref = 0;
+  static volatile bool new_ref;
   
   public:
-    SerialCom(long int Baudrate);
-    void receive_message();
-    int get_valorLed();
-    void set_currentLux(int currentLux);
-    int getRef();
+    static void Begin(long int Baudrate);
+    static void receive_message();
+    static int get_valorLed();
+    static void set_currentLux(int currentLux);
+    static int getRef();
 
   private:
-    void process_request(char *message);
+    static void process_request(char *message);
 
 };
 

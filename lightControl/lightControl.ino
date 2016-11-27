@@ -2,11 +2,15 @@
 #include <avr/interrupt.h>
 #include "SerialCom.h"
 #include "LightController.h"
+#include "SketchMetaClass.h"
+#include "EEPROM.h"
 #include "TWI.h"
 
-SerialCom *serialcom;
+// Objetos a serem utilizados
+Meta *meta;
 LightController * controller;
 
+// Numeros das portas usadas
 constexpr int ledPin = 11;
 constexpr int sensorPin = 5;
 
@@ -27,28 +31,24 @@ void initTimer1(){
   sei(); //allow interrupts
 }
 
-/* Vai dizer ao arduino o seu endereço no I2C e 
- * inicià-lo como slave receiver
+/*Funcao callback, chamada sempre que
+ * e recebida uma string via I2C, e 
+ * que copia a string recebida para 
+ * a class Meta
  */
-void initI2C(){
-
-  // Define o numero do dispositivo
-  TWAR = deviceID;
-
-  // Liga o TWIN e liga a deteção do address do arduino
-  TWCR |= (1<<TWEA)|(1<<TWEN);
-  
+void metaI2CString(char *str){
+  meta->receivedI2C(str);
 }
 
 void setup() {
   // put your setup code here, to run once:
   
-  serialcom = new SerialCom(115200);
+  SerialCom::Begin(115200);
 
-  controller = new LightController(ledPin, sensorPin);
-  controller->setT(0.02);
-  controller->setRef(50);
-  controller->setSaturation(5);
+  meta = new Meta(0.02,ledPin, sensorPin);
+  controller = meta->getController();
+
+  TWI::begin(EEPROM.read(0));
 
   Serial.println((char*)"Ready");
 
@@ -89,10 +89,10 @@ void loop() {
     Serial.println(millis()); 
 
     // Recebe mensagens 
-    serialcom->receive_message();
+    SerialCom::receive_message();
 
     // Obtem a referência da mensagem. è -1 se não houver ref nova.
-    new_ref = serialcom->getRef();
+    new_ref = SerialCom::getRef();
 
     if(new_ref != -1){
       controller->setRef(new_ref);
@@ -101,18 +101,4 @@ void loop() {
 
     flag = 0;
   }
-}
-
-// Função chamada quando se chama este arduino por I2C
-ISR(TWI_vect){
-
-  /*switch(TWISR){
-    case TWI_START:
-    break;
-
-    default:
-    break;
-
-  }*/
-
 }

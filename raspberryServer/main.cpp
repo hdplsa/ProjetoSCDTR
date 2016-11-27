@@ -3,27 +3,26 @@
 #include <string>
 #include "Serial.h"
 #include "tcpServer.h"
+#include "Arduino.h"
+
 using namespace std;
 
-void print_received(string str){
+void print_received(string str)
+{
     cout << str << endl;
 }
 
 void test_serial(){
 
-    Serial *arduino = new Serial();
-    arduino->Begin(9600,"/dev/ttyUSB0");
-    arduino->set_Readcallback(print_received);
+    Arduino *arduino = new Arduino(1000, "/dev/ttyACM0");
 
-    cout << "Hello World" << std::endl;
-
-    arduino->Read_ln();
-
-    cout << "Comecei o sleep" << endl;
+    arduino->ledON();
 
     usleep(5000*1000);
 
-    arduino->Close();
+    arduino->ledOFF();
+
+    usleep(1000*1000);
 
 }
 

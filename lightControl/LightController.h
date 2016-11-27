@@ -4,7 +4,7 @@
 #include "LedPWM.h"
 #include "LightSensor.h"
 
-const double Vcc = 5.0;
+static const double Vcc = 5.0;
 
 /* class que pretende implementar um controlador PID
  * Como input do controlador está o erro de luminosidade medido
