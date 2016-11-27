@@ -21,7 +21,7 @@ class Meta{
   double theta2 = 0;
   //Controlador PID
   LightController *_lightcontroller = 0;
-  //String de comunicação
+  //String de comunicacao
   char rI2C[50];
 
   public:
@@ -33,6 +33,7 @@ class Meta{
   
   private:
     bool defineMaster();
+    double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double *u)
 };
 
 #endif

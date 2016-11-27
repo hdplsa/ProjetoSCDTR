@@ -17,7 +17,7 @@ LightController *Meta::getController(){
 }
 
 /*String recebida assincronamente pelo protocolo I2C
- * é copiada para dentro da class para processamento
+ * e copiada para dentro da class para processamento
  * sempre que chamada receivedI2C
  */
 void Meta::receivedI2C(char *str){
@@ -25,13 +25,16 @@ void Meta::receivedI2C(char *str){
 }
 
 void Meta::calibrateLumVoltageModel(){
+    const int N = 10;
     double theta11, theta12;
     double theta21, theta22;
-   /*Indica o master da comunicação, necessário
-    * no protocolo de calibração utilizado
+    double u[N];
+    double *aux;
+   /*Indica o master da comunicacao, necessario
+    * no protocolo de calibracacao utilizado
     * 
-    * Por conveniencia, o Arduino Master na comunicação
-    * assume terá a Primeira linha das matrizes do modelo
+    * Por conveniencia, o Arduino Master na comunicacao
+    * assume tera a Primeira linha das matrizes do modelo
     * [L] = [K]*[U] + [O], e o Slave a segunda linha
     */
    switch(this->defineMaster()){
@@ -54,4 +57,55 @@ bool Meta::defineMaster(){
         return true;
     else
         return false;
+}
+
+double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double *u){
+    //Variavel return
+    double ans[2];
+    //variaveis auxiliares
+    double k;
+    double teta;
+    //Variaveis experimentais
+    double y[N];
+    double usquare[N];
+    //Variaveis Regressao
+    double sum = 0;
+    double sumy = 0;
+    double sumsquare = 0;
+    double sumyu = 0;
+    double det;
+    //Recolha de dados para regressaoo linear
+    for(int n=0;n<N;n++){
+        u[n] = (Vcc/(double)N)*(double)n;
+        this->_lightcontroller->ledp->setLedPWMVoltage(u[n]);
+        delay(50);
+        //Media de 10 observacoes
+        y[n] = this->_lightcontroller->ls->getAverageLuminousIntensity(10);
+    }
+    //Regressao Linear (u - entrada, y - saida) minimos quadrados
+    for(int n=0;n<N;n++){
+        sum+=u[n];
+        usquare[n]=u[n]*u[n];
+        sumsquare+=usquare[n];
+        sumy+=y[n];
+        sumyu+=y[n]*u[n];
+    }
+    //Modelo matematico l = k*u+teta
+    det = 1/(N*sumsquare - sum*sum);
+    k = det*(N*sumyu - sum*sumy);
+    teta = det*(-sum*sumyu + sumsquare*sumy);
+    
+    //Desligar a luz no fim
+    this->-lightcontroller->lightoff();
+    
+    /*//Saturacao inferior (limite do modelo)
+     * this->sat_down = -this->teta/this->k;
+     *
+     * //Esperar um pouco para estar ready*/
+    delay(10);
+    
+    //retornar valores dos m�nimos quadrados
+    ans[0] = k;
+    ans[1] = teta;
+    return ans            
 }
