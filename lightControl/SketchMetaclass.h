@@ -32,9 +32,10 @@ public:
     ~Meta();
     
 private:
-    bool defineMaster();
+    bool defineFirst();
     double *MinSquare(const int N, double *u, double *y);
-    double Meta::SetuGety(LightController *_lightcontroller,const int N, double u, double PWM);
+    void Setu(LightController *_lightcontroller,const int N, double u, double PWM);
+    double Gety();
     
 };
 

@@ -1,7 +1,7 @@
 #include "SketchMetaclass.h"
 
-#define MASTER true
-#define SLAVE false
+#define FIRST true
+#define SEC false
 
 //PUBLIC FUNTIONS
 Meta::Meta(double T,int ledPin,int sensorPin){
@@ -26,8 +26,10 @@ void Meta::receivedI2C(char *str){
 
 void Meta::calibrateLumVoltageModel(){
     const int N = 10;
+    const char _sread = "SENSORREAD";
     double theta11, theta12;
     double theta21, theta22;
+    double u[N];
     /*Indica o master da comunicacao, necessario
      * no protocolo de calibracacao utilizado
      *
@@ -36,10 +38,13 @@ void Meta::calibrateLumVoltageModel(){
      * [L] = [K]*[U] + [O], e o Slave a segunda linha
      */
     switch(this->defineMaster()){
-        case MASTER:
-            
+        case FIRST:
+            for(int n;n<N,n++){
+                this->setu(this->_lightcontroller,N,u[n],n);
+                TWI::send_msg(1,_sread,strlen(_sread));
+            }
             break;
-        case SLAVE:
+        case SEC:
             
             break;
     }
@@ -50,7 +55,7 @@ Meta::~Meta(){
 }
 
 //PRIVATE FUNCTIONS
-bool Meta::defineMaster(){
+bool Meta::defineFirst(){
     if (EEPROM.read(0) == 0)
         return true;
     else
@@ -76,10 +81,12 @@ double *Meta::MinSquare(const int N, double *u, double *y){
     return ans
 }
 
-double Meta::SetuGety(LightController *_lightcontroller,const int N, double u, double PWM){
+void Meta::Setu(LightController *_lightcontroller,const int N, double u, double PWM){
     u = ((this->_lightcontroller->Vcc)/(double)N)*(double)PWM;
     this->lightcontroller->ledp->setLedPWMVoltage(u);
-    
     delay(50);
+}
+double Meta::Gety(){
     return this->_lightcontroller->ls_getAverageLuminousIntensity(N);
 }
+
