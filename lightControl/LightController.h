@@ -14,40 +14,40 @@ static const double Vcc = 5.0;
  */
 
 class LightController{
-  
-  //Parâmetros do controlador
-  const double Kp = 0.008;
-  const double Ki = 0.1;
-  const double Kd = 0.000;
-  
-  //Depêndencias do feedback
-  LightSensor *ls;
-  LedPWM *ledp;
-  
-  //Variáveis do modelo
-  double k, teta;
-  
-  //Input/Output
-  double T = 0;
-  double ref = 0;
-  double e[2] = {0,0};
-  double y = 0;
-  double u[2] = {0,0};
-  double ui_ant = 0;
-  double ud_ant = 0;
-  double sat_up = 5.0;
-  double sat_down = 0;
-  volatile int ffflag = 0; 
-
-  //deadzone
-  const double deadzone = 2;
-
-  // Windup
-  const double Kw = 10;
-  double windup[2] = {0,0};
-
-  
-  public:
+    
+    //Parâmetros do controlador
+    const double Kp = 0.008;
+    const double Ki = 0.1;
+    const double Kd = 0.000;
+    
+    //Depêndencias do feedback
+    LightSensor *ls;
+    LedPWM *ledp;
+    
+    //Variáveis do modelo
+    double k, teta;
+    
+    //Input/Output
+    double T = 0;
+    double ref = 0;
+    double e[2] = {0,0};
+    double y = 0;
+    double u[2] = {0,0};
+    double ui_ant = 0;
+    double ud_ant = 0;
+    double sat_up = 5.0;
+    double sat_down = 0;
+    volatile int ffflag = 0;
+    
+    //deadzone
+    const double deadzone = 2;
+    
+    // Windup
+    const double Kw = 10;
+    double windup[2] = {0,0};
+    
+    
+public:
     LightController(int ledPin, int sensorPin);
     void calibrateLumVoltage();
     void lightoff();
@@ -63,11 +63,11 @@ class LightController{
     double getControlVariable();
     double getY();
     double getError();
-    double calcController(); 
+    double calcController();
     void LEDInputControlVariable();
     ~LightController();
-  
-  private:
+    
+private:
     double getMax(double d1, double d2);
     double getSensorY();
     double calcErro();
@@ -76,8 +76,8 @@ class LightController{
     double calcPController();
     double calcPIController();
     double calcPDController();
-    double calcEnergyCycle();   
-  
+    double calcEnergyCycle();
+    
 };
 
 #endif
