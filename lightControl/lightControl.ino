@@ -7,6 +7,7 @@
 #include "TWI.h"
 
 // Objetos a serem utilizados
+Meta *meta;
 LightController * controller;
 
 // Numeros das portas usadas
@@ -36,7 +37,7 @@ void initTimer1(){
  * a class Meta
  */
 void metaI2CString(char *str){
-  Meta->receivedI2C(str);
+  meta->receivedI2C(str);
 }
 
 void setup() {
@@ -44,10 +45,8 @@ void setup() {
   
   SerialCom::Begin(115200);
 
-  controller = new LightController(ledPin, sensorPin);
-  controller->setT(0.02);
-  controller->setRef(50);
-  controller->setSaturation(5);
+  meta = new Meta(0.02,ledPin, sensorPin);
+  controller = meta->getController();
 
   TWI::begin(EEPROM.read(0));
 

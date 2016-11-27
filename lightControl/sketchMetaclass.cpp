@@ -4,12 +4,16 @@
 #define SLAVE false
 
 //PUBLIC FUNTIONS
-Meta::Meta(int ledPin,int sensorPin){
+Meta::Meta(double T,int ledPin,int sensorPin){
     //Inicialização do controlador PID
     this->_lightcontroller = new LightController(ledPin,sensorPin);
-    this->_lightcontroller->setT(0.02);
+    this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
     this->_lightcontroller->setSaturation(5);
+}
+
+LightController *Meta::getController(){
+  return this->_lightcontroller;
 }
 
 /*String recebida assincronamente pelo protocolo I2C

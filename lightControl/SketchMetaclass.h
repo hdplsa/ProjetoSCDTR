@@ -25,7 +25,8 @@ class Meta{
   char rI2C[50];
 
   public:
-    Meta(int ledPin,int sensorPin);
+    Meta(double T,int ledPin,int sensorPin);
+    LightController *getController();
     void receivedI2C(char *str);
     void calibrateLumVoltageModel();
     ~Meta();
