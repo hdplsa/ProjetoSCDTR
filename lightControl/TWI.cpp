@@ -29,10 +29,14 @@ void TWI::begin(uint8_t SLA){
     
 }
 
-// Função que faz set da callback
+// Função que faz set da callback de receção do slave
 void TWI::onReceive(void (*function)(char*)){
     user_onReceive = function;
-    callback_on = 1;
+}
+
+// Função que faz set da callback de send do master
+void TWI::onSend(void (*function)(void)){
+    master_onSend = function;
 }
 
 /* Coloca os pull ups das portas 4 e 5 ON para não
@@ -146,12 +150,23 @@ void TWI::send_start(){
     Serial.print("SETSTART\n");
 }
 
+// Função que é chamada quando o slave recebe dados 
 void TWI::data_received(){
     
     // Chama a callback
-    if(callback_on){
+    if(user_onReceive != NULL){
         user_onReceive((char*) twi_buf);
     }
+}
+
+// Função chamada assim que o master manda o STOP ao slave
+void TWI::data_sent(){
+
+    // Chama a callback
+    if(master_onSend != NULL){
+        master_onSend();
+    }
+
 }
 
 ISR(TWI_vect){
@@ -213,6 +228,9 @@ void TWI::Interrupt_ISR(){
                 // Após uma escrita bem sucedida, ficamos em modo de espera
                 twi_status = 0;
                 Serial.print("STOP\n");
+
+                set_slaveR(); // Retorna o arduino ao modo slave receiver
+                data_sent(); // chama o callback que avisa que os dados foram enviados
             }
             break;
             

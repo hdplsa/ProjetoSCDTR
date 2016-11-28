@@ -50,8 +50,8 @@ private:
     static volatile unsigned int twi_status;
     
     // Função de callback
-    static bool callback_on;
-    static void (*user_onReceive)(char*);
+    static void (*master_onSend)(void) = NULL;
+    static void (*slave_onReceive)(char*) = NULL;
     
 };
 
