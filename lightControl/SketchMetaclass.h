@@ -10,6 +10,7 @@
 // Meta class que encapsula os modulos (classes) necessarios que cada arduino
 
 
+
 class Meta{
     
     //Parâmetros de calibracao
@@ -34,7 +35,7 @@ public:
 private:
     bool defineFirst();
     double *MinSquare(const int N, double *u, double *y);
-    void Setu(LightController *_lightcontroller,const int N, double u, double PWM);
+    double Setu(const int N, double u, double PWM);
     double Gety();
     
 };

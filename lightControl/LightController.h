@@ -62,6 +62,7 @@ public:
     double getT();
     double getControlVariable();
     double getY();
+    double getAverageY(const int N);
     double getError();
     double calcController();
     void LEDInputControlVariable();

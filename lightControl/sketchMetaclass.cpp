@@ -26,10 +26,11 @@ void Meta::receivedI2C(char *str){
 
 void Meta::calibrateLumVoltageModel(){
     const int N = 10;
-    const char _sread = "SENSORREAD";
+    const char _sread = "SR";
     double theta11, theta12;
     double theta21, theta22;
     double u[N];
+    double y[N];
     /*Indica o master da comunicacao, necessario
      * no protocolo de calibracacao utilizado
      *
@@ -37,17 +38,63 @@ void Meta::calibrateLumVoltageModel(){
      * assume tera a Primeira linha das matrizes do modelo
      * [L] = [K]*[U] + [O], e o Slave a segunda linha
      */
-    switch(this->defineMaster()){
+    switch(this->defineFirst()){
         case FIRST:
-            for(int n;n<N,n++){
-                this->setu(this->_lightcontroller,N,u[n],n);
+            //---------------------------------------------------------------------
+            for(int n;n<N;n++){
+                u[n] = this->Setu(N,u[n],n);
                 TWI::send_msg(1,_sread,strlen(_sread));
+                y[n] = this->Gety();
             }
-            break;
-        case SEC:
+            //---------------------------------------------------------------------
+            this->K11 = (this->MinSquare(N,u,y))[0];
+            theta11 = (this->MinSquare(N,u,y))[1];
+            sscanf(rI2C,"T=%4.1f",&theta12); //criar flag antes receber
+            this->theta1 = (theta11 + theta12)*0.5;
             
-            break;
+            //--------------------------------------------------------------------
+            //--------------------------------------------------------------------
+            for(int n;n<N;n++){
+                while(!strcmp(rI2C,_sread)){}
+                y[n] = this->Gety();
+            }
+            K21 = (this->MinSquare(N,u,y))[0];
+            theta21 = (this->MinSquare(N,u,y))[1];
+            sprintf(_st21,"T=%4.1f",theta21); //criar flag antes de receber
+            TWI::send_msg(1,_st21,strlen(_st21));
+            
+            
     }
+    break;
+    case SEC:
+        //--------------------------------------------------------------------
+        
+        for(int n;n<N;n++){
+            while(!strcmp(rI2C,_sread)){}
+            y[n] = this->Gety();
+        }
+        K12 = (this->MinSquare(N,u,y))[0];
+        theta12 = (this->MinSquare(N,u,y))[1];
+        sprintf(_st12,"T=%4.1f",theta12); //criar flag antes de receber
+        TWI::send_msg(1,_st12,strlen(_st12));
+        
+        //--------------------------------------------------------------------
+        //--------------------------------------------------------------------
+        
+        for(int n;n<N;n++){
+            u[n] = this->Setu(N,u[n],n);
+            TWI::send_msg(1,_sread,strlen(_sread));
+            y[n] = this->Gety();
+        }
+        //---------------------------------------------------------------------
+        
+        this->K22 = (this->MinSquare(N,u,y))[0];
+        theta22 = (this->MinSquare(N,u,y))[1];
+        sscanf(rI2C,"T=%4.1f",&theta22); //criar flag antes receber
+        this->theta2 = (theta21 + theta22)*0.5;
+        
+        
+        break;
 }
 
 Meta::~Meta(){
@@ -63,7 +110,15 @@ bool Meta::defineFirst(){
 }
 
 double *Meta::MinSquare(const int N, double *u, double *y){
+    double sum = 0;
+    double usquare[N];
+    double sumsquare = 0;
+    double sumy = 0;
+    double sumyu = 0;
     double ans[2];
+    double det = 0;
+    double m = 0;
+    double b = 0;
     for(int n=0;n<N;n++){
         sum+=u[n];
         usquare[n]=u[n]*u[n];
@@ -78,15 +133,16 @@ double *Meta::MinSquare(const int N, double *u, double *y){
     
     ans[0] = m;
     ans[1] = b;
-    return ans
+    return ans;
 }
 
-void Meta::Setu(LightController *_lightcontroller,const int N, double u, double PWM){
-    u = ((this->_lightcontroller->Vcc)/(double)N)*(double)PWM;
-    this->lightcontroller->ledp->setLedPWMVoltage(u);
+double Meta::Setu(const int N, double u, double PWM){
+    u = (5.0/(double)N)*(double)PWM;
+    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto é private, é preciso mudar
     delay(50);
+    return u;
 }
 double Meta::Gety(){
-    return this->_lightcontroller->ls_getAverageLuminousIntensity(N);
+    return this->_lightcontroller->ls->getAverageLuminousIntensity(N); //private shit
 }
 

@@ -122,6 +122,7 @@ double LightController::getY(){
     return this->y;
 }
 
+
 // Retorna o erro do ciclo "atual"
 double LightController::getError(){
     return this->e[1];
