@@ -1,11 +1,11 @@
 #include "SketchMetaclass.h"
 
-#define MASTER true
-#define SLAVE false
+#define FIRST true
+#define SEC false
 
 //PUBLIC FUNTIONS
 Meta::Meta(double T,int ledPin,int sensorPin){
-    //Inicialização do controlador PID
+    //Inicializacao do controlador PID
     this->_lightcontroller = new LightController(ledPin,sensorPin);
     this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
@@ -13,7 +13,7 @@ Meta::Meta(double T,int ledPin,int sensorPin){
 }
 
 LightController *Meta::getController(){
-  return this->_lightcontroller;
+    return this->_lightcontroller;
 }
 
 /*String recebida assincronamente pelo protocolo I2C
@@ -21,38 +21,88 @@ LightController *Meta::getController(){
  * sempre que chamada receivedI2C
  */
 void Meta::receivedI2C(char *str){
-  strcpy(this->rI2C, str);
+    strcpy(this->rI2C, str);
 }
 
 void Meta::calibrateLumVoltageModel(){
     const int N = 10;
+    const char _sread = "SR";
     double theta11, theta12;
     double theta21, theta22;
     double u[N];
-    double *aux;
-   /*Indica o master da comunicacao, necessario
-    * no protocolo de calibracacao utilizado
-    * 
-    * Por conveniencia, o Arduino Master na comunicacao
-    * assume tera a Primeira linha das matrizes do modelo
-    * [L] = [K]*[U] + [O], e o Slave a segunda linha
-    */
-   switch(this->defineMaster()){
-      case MASTER:
+    double y[N];
+    /*Indica o master da comunicacao, necessario
+     * no protocolo de calibracacao utilizado
+     *
+     * Por conveniencia, o Arduino Master na comunicacao
+     * assume tera a Primeira linha das matrizes do modelo
+     * [L] = [K]*[U] + [O], e o Slave a segunda linha
+     */
+    switch(this->defineFirst()){
+        case FIRST:
+            //---------------------------------------------------------------------
+            for(int n;n<N;n++){
+                u[n] = this->Setu(N,u[n],n);
+                TWI::send_msg(1,_sread,strlen(_sread));
+                y[n] = this->Gety();
+            }
+            //---------------------------------------------------------------------
+            this->K11 = (this->MinSquare(N,u,y))[0];
+            theta11 = (this->MinSquare(N,u,y))[1];
+            sscanf(rI2C,"T=%4.1f",&theta12); //criar flag antes receber
+            this->theta1 = (theta11 + theta12)*0.5;
+            
+            //--------------------------------------------------------------------
+            //--------------------------------------------------------------------
+            for(int n;n<N;n++){
+                while(!strcmp(rI2C,_sread)){}
+                y[n] = this->Gety();
+            }
+            K21 = (this->MinSquare(N,u,y))[0];
+            theta21 = (this->MinSquare(N,u,y))[1];
+            sprintf(_st21,"T=%4.1f",theta21); //criar flag antes de receber
+            TWI::send_msg(1,_st21,strlen(_st21));
+            
+            
+    }
+    break;
+    case SEC:
+        //--------------------------------------------------------------------
+        
+        for(int n;n<N;n++){
+            while(!strcmp(rI2C,_sread)){}
+            y[n] = this->Gety();
+        }
+        K12 = (this->MinSquare(N,u,y))[0];
+        theta12 = (this->MinSquare(N,u,y))[1];
+        sprintf(_st12,"T=%4.1f",theta12); //criar flag antes de receber
+        TWI::send_msg(1,_st12,strlen(_st12));
+        
+        //--------------------------------------------------------------------
+        //--------------------------------------------------------------------
+        
+        for(int n;n<N;n++){
+            u[n] = this->Setu(N,u[n],n);
+            TWI::send_msg(1,_sread,strlen(_sread));
+            y[n] = this->Gety();
+        }
+        //---------------------------------------------------------------------
+        
+        this->K22 = (this->MinSquare(N,u,y))[0];
+        theta22 = (this->MinSquare(N,u,y))[1];
+        sscanf(rI2C,"T=%4.1f",&theta22); //criar flag antes receber
+        this->theta2 = (theta21 + theta22)*0.5;
+        
         
         break;
-      case SLAVE:
-      
-        break;
-   }
 }
 
 Meta::~Meta(){
     delete this->_lightcontroller;
 }
 
-//PRIVATE FUNCTIONS 
-bool Meta::defineMaster(){
+//PRIVATE FUNCTIONS
+bool Meta::defineFirst(){
     if (EEPROM.read(0) == 0)
         return true;
     else
@@ -70,8 +120,9 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
     double usquare[N];
     //Variaveis Regressao
     double sum = 0;
-    double sumy = 0;
+    double usquare[N];
     double sumsquare = 0;
+    double sumy = 0;
     double sumyu = 0;
     double det;
     //Recolha de dados para regressaoo linear
@@ -90,22 +141,24 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
         sumy+=y[n];
         sumyu+=y[n]*u[n];
     }
-    //Modelo matematico l = k*u+teta
+    //Modelo matematico y = m*u+b
     det = 1/(N*sumsquare - sum*sum);
-    k = det*(N*sumyu - sum*sumy);
-    teta = det*(-sum*sumyu + sumsquare*sumy);
     
-    //Desligar a luz no fim
-    this->_lightcontroller->lightoff();
+    m = det*(N*sumyu - sum*sumy);
+    b = det*(-sum*sumyu + sumsquare*sumy);
     
-    //Saturacao inferior (limite do modelo)
-     * this->sat_down = -this->teta/this->k;
-     *
-     * //Esperar um pouco para estar ready
-    delay(10);
-    
-    //retornar valores dos m�nimos quadrados
-    ans[0] = k;
-    ans[1] = teta;
-    return ans         */   
+    ans[0] = m;
+    ans[1] = b;
+    return ans;*/
 }
+
+double Meta::Setu(const int N, double u, double PWM){
+    u = (5.0/(double)N)*(double)PWM;
+    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto � private, � preciso mudar
+    delay(50);
+    return u;
+}
+double Meta::Gety(){
+    return this->_lightcontroller->ls->getAverageLuminousIntensity(N); //private shit
+}
+
