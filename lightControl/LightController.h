@@ -49,7 +49,7 @@ class LightController{
   
   public:
     LightController(int ledPin, int sensorPin);
-    void calibrateLumVoltage();
+    //void calibrateLumVoltage();
     void lightoff();
     void lighton();
     void setT(double T);
@@ -75,8 +75,7 @@ class LightController{
     double calcDeadzone(double e);
     double calcPController();
     double calcPIController();
-    double calcPDController();
-    double calcEnergyCycle();   
+    double calcPDController();  
   
 };
 

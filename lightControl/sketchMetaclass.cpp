@@ -59,8 +59,8 @@ bool Meta::defineMaster(){
         return false;
 }
 
-double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double *u){
-    //Variavel return
+double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double u){
+    /*//Variavel return
     double ans[2];
     //variaveis auxiliares
     double k;
@@ -80,7 +80,7 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
         this->_lightcontroller->ledp->setLedPWMVoltage(u[n]);
         delay(50);
         //Media de 10 observacoes
-        y[n] = this->_lightcontroller->ls->getAverageLuminousIntensity(10);
+        y[n] = this->_lightcontroller->ls->getAverageLuminousIntensity(N);
     }
     //Regressao Linear (u - entrada, y - saida) minimos quadrados
     for(int n=0;n<N;n++){
@@ -96,16 +96,16 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
     teta = det*(-sum*sumyu + sumsquare*sumy);
     
     //Desligar a luz no fim
-    this->-lightcontroller->lightoff();
+    this->_lightcontroller->lightoff();
     
-    /*//Saturacao inferior (limite do modelo)
+    //Saturacao inferior (limite do modelo)
      * this->sat_down = -this->teta/this->k;
      *
-     * //Esperar um pouco para estar ready*/
+     * //Esperar um pouco para estar ready
     delay(10);
     
-    //retornar valores dos mínimos quadrados
+    //retornar valores dos mï¿½nimos quadrados
     ans[0] = k;
     ans[1] = teta;
-    return ans            
+    return ans         */   
 }

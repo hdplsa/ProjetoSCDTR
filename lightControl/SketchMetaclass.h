@@ -33,7 +33,7 @@ class Meta{
   
   private:
     bool defineMaster();
-    double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double *u)
+    double *calibrateLumVoltage(LightController *_lightcontroller,int N,double u);
 };
 
 #endif
