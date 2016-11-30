@@ -109,7 +109,7 @@ bool Meta::defineFirst(){
         return false;
 }
 
-double *Meta::MinSquare(const int N, double *u, double *y){
+double *Meta::MinSquare(const int N, double u, double *y){
     double sum = 0;
     double usquare[N];
     double sumsquare = 0;
@@ -138,7 +138,7 @@ double *Meta::MinSquare(const int N, double *u, double *y){
 
 double Meta::Setu(const int N, double u, double PWM){
     u = (5.0/(double)N)*(double)PWM;
-    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto é private, é preciso mudar
+    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto ï¿½ private, ï¿½ preciso mudar
     delay(50);
     return u;
 }

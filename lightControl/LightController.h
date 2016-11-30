@@ -76,9 +76,7 @@ private:
     double calcDeadzone(double e);
     double calcPController();
     double calcPIController();
-    double calcPDController();
-    double calcEnergyCycle();
-    
+    double calcPDController();   
 };
 
 #endif
