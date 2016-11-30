@@ -109,8 +109,8 @@ bool Meta::defineFirst(){
         return false;
 }
 
-double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double u){
-    /*//Variavel return
+double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double *u){
+    //Variavel return
     double ans[2];
     //variaveis auxiliares
     double k;
@@ -131,7 +131,7 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
         this->_lightcontroller->ledp->setLedPWMVoltage(u[n]);
         delay(50);
         //Media de 10 observacoes
-        y[n] = this->_lightcontroller->ls->getAverageLuminousIntensity(N);
+        y[n] = this->_lightcontroller->ls->getAverageLuminousIntensity(10);
     }
     //Regressao Linear (u - entrada, y - saida) minimos quadrados
     for(int n=0;n<N;n++){
@@ -144,12 +144,28 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
     //Modelo matematico y = m*u+b
     det = 1/(N*sumsquare - sum*sum);
     
+<<<<<<< HEAD
     m = det*(N*sumyu - sum*sumy);
     b = det*(-sum*sumyu + sumsquare*sumy);
     
     ans[0] = m;
     ans[1] = b;
     return ans;*/
+=======
+    //Desligar a luz no fim
+    this->-lightcontroller->lightoff();
+    
+    /*//Saturacao inferior (limite do modelo)
+     * this->sat_down = -this->teta/this->k;
+     *
+     * //Esperar um pouco para estar ready*/
+    delay(10);
+    
+    //retornar valores dos mínimos quadrados
+    ans[0] = k;
+    ans[1] = teta;
+    return ans            
+>>>>>>> parent of cca952e... Some stuff
 }
 
 double Meta::Setu(const int N, double u, double PWM){

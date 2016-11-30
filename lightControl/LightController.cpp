@@ -8,6 +8,7 @@ LightController::LightController(int ledPin, int sensorPin){
   //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
   this->k = 0;
   this->teta = 0;
+  //this->calibrateLumVoltage();
 }
 
 // //Inicialização - Calibração
@@ -70,13 +71,8 @@ LightController::LightController(int ledPin, int sensorPin){
 //   Serial.print("\n\n");
 // }
 
-void LightController::lightoff(){
-  this->ledp->setLedPWMVoltage(0);
-}
-
-void LightController::lighton(){
-  this->ledp->setLedPWMVoltage(5);
-}
+void LightController::lightoff(){this->ledp->setLedPWMVoltage(0);}
+void LightController::lighton(){this->ledp->setLedPWMVoltage(5);}
 
 void LightController::setT(double T){
     //Periodo de chamada da accao do controlador
@@ -214,8 +210,11 @@ LightController::~LightController(){
     delete this->ledp;
 }
 
+
 double LightController::getSensorY(){
-  return ls->getLuminousIntensity();
+  double y;
+  y = ls->getLuminousIntensity();
+  return y;
 }
 
 double LightController::calcErro(){
@@ -240,11 +239,10 @@ double LightController::calcDeadzone(double e){
 
   if(e > -deadzone && e < 0){
     error = 0;
-  } else {
-    if(e < deadzone && e > 0) {
-      error = 0;
-    }
+  } else if(e < deadzone && e > 0) {
+    error = 0;
   }
+
   return error;
 }
 
@@ -266,3 +264,9 @@ double LightController::calcPDController(){
     u = this->Kd*((2/this->T)*(this->e[1]-this->e[0])) - this->ud_ant;
     return u;
 }
+
+/*double LightController::calcEnergyCycle(){
+  this->E = (this->T/this->ledp->getTPWM())*this->ledp->calculateLedEnergyPeriod();
+  return this->E;
+}*/
+
