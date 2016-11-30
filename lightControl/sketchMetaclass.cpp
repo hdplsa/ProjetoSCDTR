@@ -109,31 +109,16 @@ bool Meta::defineFirst(){
         return false;
 }
 
-double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double *u){
-    //Variavel return
-    double ans[2];
-    //variaveis auxiliares
-    double k;
-    double teta;
-    //Variaveis experimentais
-    double y[N];
-    double usquare[N];
-    //Variaveis Regressao
+double *Meta::MinSquare(const int N, double *u, double *y){
     double sum = 0;
     double usquare[N];
     double sumsquare = 0;
     double sumy = 0;
     double sumyu = 0;
-    double det;
-    //Recolha de dados para regressaoo linear
-    for(int n=0;n<N;n++){
-        u[n] = (Vcc/(double)N)*(double)n;
-        this->_lightcontroller->ledp->setLedPWMVoltage(u[n]);
-        delay(50);
-        //Media de 10 observacoes
-        y[n] = this->_lightcontroller->ls->getAverageLuminousIntensity(10);
-    }
-    //Regressao Linear (u - entrada, y - saida) minimos quadrados
+    double ans[2];
+    double det = 0;
+    double m = 0;
+    double b = 0;
     for(int n=0;n<N;n++){
         sum+=u[n];
         usquare[n]=u[n]*u[n];
@@ -143,34 +128,17 @@ double *Meta::calibrateLumVoltage(LightController *_lightcontroller,int N,double
     }
     //Modelo matematico y = m*u+b
     det = 1/(N*sumsquare - sum*sum);
-    
-<<<<<<< HEAD
     m = det*(N*sumyu - sum*sumy);
     b = det*(-sum*sumyu + sumsquare*sumy);
     
     ans[0] = m;
     ans[1] = b;
-    return ans;*/
-=======
-    //Desligar a luz no fim
-    this->-lightcontroller->lightoff();
-    
-    /*//Saturacao inferior (limite do modelo)
-     * this->sat_down = -this->teta/this->k;
-     *
-     * //Esperar um pouco para estar ready*/
-    delay(10);
-    
-    //retornar valores dos mínimos quadrados
-    ans[0] = k;
-    ans[1] = teta;
-    return ans            
->>>>>>> parent of cca952e... Some stuff
+    return ans;
 }
 
 double Meta::Setu(const int N, double u, double PWM){
     u = (5.0/(double)N)*(double)PWM;
-    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto ï¿½ private, ï¿½ preciso mudar
+    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto é private, é preciso mudar
     delay(50);
     return u;
 }

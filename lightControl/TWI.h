@@ -19,7 +19,6 @@ public:
     static void begin();
     static void begin(uint8_t SLA);
     static void onReceive(void (*function)(char*));
-    void onSend(void (*function)(void));
     static void turn_pullUp();
     static void set_rate();
     static bool busy();
@@ -29,7 +28,6 @@ public:
     static int send_msg(uint8_t SLA, char *msg, unsigned int msg_length);
     static void send_start();
     static void data_received();
-    static void data_sent();
     static void Interrupt_ISR();
     
 private:
@@ -52,8 +50,8 @@ private:
     static volatile unsigned int twi_status;
     
     // Função de callback
-    static void (*master_onSend)(void);
-    static void (*slave_onReceive)(char*);
+    static void (*master_onSend)(void) = NULL;
+    static void (*slave_onReceive)(char*) = NULL;
     
 };
 

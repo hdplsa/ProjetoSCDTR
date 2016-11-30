@@ -5,8 +5,8 @@ volatile unsigned char TWI::twi_buf[TWI_BUFFER_SIZE];
 volatile unsigned int TWI::twi_msg_size = 0;
 volatile unsigned int TWI::twi_ptr = 0;
 volatile unsigned int TWI::twi_status = 0;
-void (*TWI::master_onSend)(void) = NULL;
-void (*TWI::slave_onReceive)(char*) = NULL;
+void (*TWI::user_onReceive)(char*);
+bool TWI::callback_on = 0;
 
 // Função begin SEM o SLA
 // Coloca o Arduino em Slave Receiver
@@ -31,7 +31,7 @@ void TWI::begin(uint8_t SLA){
 
 // Função que faz set da callback de receção do slave
 void TWI::onReceive(void (*function)(char*)){
-    slave_onReceive = function;
+    user_onReceive = function;
 }
 
 // Função que faz set da callback de send do master
@@ -154,8 +154,8 @@ void TWI::send_start(){
 void TWI::data_received(){
     
     // Chama a callback
-    if(slave_onReceive != NULL){
-        slave_onReceive((char*) twi_buf);
+    if(user_onReceive != NULL){
+        user_onReceive((char*) twi_buf);
     }
 }
 

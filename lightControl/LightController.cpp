@@ -1,14 +1,15 @@
 #include "LightController.h"
 
 LightController::LightController(int ledPin, int sensorPin){
-  //Depêndencias do feedback
-  this->ls = new LightSensor(sensorPin,5.0);
-  this->ledp = new LedPWM(ledPin);
-
-  //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
-  this->k = 0;
-  this->teta = 0;
-  //this->calibrateLumVoltage();
+    
+    //Depêndencias do feedback
+    this->ls = new LightSensor(sensorPin,5.0);
+    this->ledp = new LedPWM(ledPin);
+    
+    //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
+    this->k = 0;
+    this->teta = 0;
+    //this->calibrateLumVoltage();
 }
 
 // //Inicialização - Calibração
@@ -212,9 +213,9 @@ LightController::~LightController(){
 
 
 double LightController::getSensorY(){
-  double y;
-  y = ls->getLuminousIntensity();
-  return y;
+    double y;
+    y = ls->getLuminousIntensity();
+    return y;
 }
 
 double LightController::calcErro(){
@@ -231,19 +232,20 @@ double LightController::calcFeedForward(){
 }
 
 double LightController::calcDeadzone(double e){
-
-  double error = e;
-  double deadzone;
-  
-  deadzone = 0.0355*this->ref - 0.5582;
-
-  if(e > -deadzone && e < 0){
-    error = 0;
-  } else if(e < deadzone && e > 0) {
-    error = 0;
-  }
-
-  return error;
+    
+    double error = e;
+    double deadzone;
+    
+    deadzone = 0.0355*this->ref - 0.5582;
+    
+    if(e > -deadzone && e < 0){
+        error = 0;
+    } else if(e < deadzone && e > 0) {
+        error = 0;
+    }
+    
+    return error;
+    
 }
 
 double LightController::calcPController(){
@@ -266,7 +268,7 @@ double LightController::calcPDController(){
 }
 
 /*double LightController::calcEnergyCycle(){
-  this->E = (this->T/this->ledp->getTPWM())*this->ledp->calculateLedEnergyPeriod();
-  return this->E;
-}*/
+ * this->E = (this->T/this->ledp->getTPWM())*this->ledp->calculateLedEnergyPeriod();
+ * return this->E;
+ * }*/
 
