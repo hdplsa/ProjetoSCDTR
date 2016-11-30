@@ -5,7 +5,8 @@ volatile unsigned char TWI::twi_buf[TWI_BUFFER_SIZE];
 volatile unsigned int TWI::twi_msg_size = 0;
 volatile unsigned int TWI::twi_ptr = 0;
 volatile unsigned int TWI::twi_status = 0;
-void (*TWI::user_onReceive)(char*);
+void (*TWI::master_onSend)(void) = NULL;
+void (*TWI::slave_onReceive)(char*) = NULL;
 bool TWI::callback_on = 0;
 
 // Função begin SEM o SLA
