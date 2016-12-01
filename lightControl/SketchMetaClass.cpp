@@ -1,7 +1,9 @@
 #include "SketchMetaClass.h"
 
-#define FIRST true
-#define SEC false
+#define INIT    1
+#define SELFL   2
+#define OTHERL  3
+#define RECIEVE 4
 
 //PUBLIC FUNTIONS
 Meta::Meta(double T,int ledPin,int sensorPin){
@@ -26,77 +28,64 @@ void Meta::receivedI2C(char *str){
 
 void Meta::calibrateLumVoltageModel(){
     const int N = 10;
-    const char _sread = "SR";
-    char *_st21;
-    char *_st12;
-    double theta11, theta12;
-    double theta21, theta22;
     double u[N];
     double y[N];
-    /*Indica o master da comunicacao, necessario
-     * no protocolo de calibracacao utilizado
-     *
-     * Por conveniencia, o Arduino Master na comunicacao
-     * assume tera a Primeira linha das matrizes do modelo
-     * [L] = [K]*[U] + [O], e o Slave a segunda linha
-     */
-    switch(this->defineFirst()){
-        case FIRST:
-            //---------------------------------------------------------------------
-            for(int n;n<N;n++){
-                u[n] = this->Setu(N,u[n],n);
-                TWI::send_msg(1,_sread,strlen(_sread));
-                y[n] = this->Gety(N);
-            }
-            //---------------------------------------------------------------------
-            this->K11 = (this->MinSquare(N,u,y))[0];
-            theta11 = (this->MinSquare(N,u,y))[1];
-            sscanf(rI2C,"T=%4.1f",&theta12); //criar flag antes receber
-            this->theta1 = (theta11 + theta12)*0.5;
-            
-            //--------------------------------------------------------------------
-            //--------------------------------------------------------------------
-            for(int n;n<N;n++){
-                while(!strcmp(rI2C,_sread)){}
-                y[n] = this->Gety(N);
-            }
-            K21 = (this->MinSquare(N,u,y))[0];
-            theta21 = (this->MinSquare(N,u,y))[1];
-            sprintf(_st21,"T=%4.1f",theta21); //criar flag antes de receber
-            TWI::send_msg(1,_st21,strlen(_st21));
-            
-            
-    
-    break;
-    case SEC:
-        //--------------------------------------------------------------------
+    double theta11, theta12;
+    double theta21, theta22;
+    const char _sread = "SR";
+    char *_t11;
+    char *_t12;
+    char *_t21;
+    char *_t22;
+
+    int STATE = INIT;
+    int n = 0;
+    bool END = false;
+
+    while(!END){
+      switch(STATE){
+        //--------------------------------
+        case INIT:
         
-        for(int n;n<N;n++){
-            while(!strcmp(rI2C,_sread)){}
-            y[n] = this->Gety(N);
-        }
-        K12 = (this->MinSquare(N,u,y))[0];
-        theta12 = (this->MinSquare(N,u,y))[1];
-        sprintf(_st12,"T=%4.1f",theta12); //criar flag antes de receber
-        TWI::send_msg(1,_st12,strlen(_st12));
-        
-        //--------------------------------------------------------------------
-        //--------------------------------------------------------------------
-        
-        for(int n;n<N;n++){
-            u[n] = this->Setu(N,u[n],n);
-            TWI::send_msg(1,_sread,strlen(_sread));
-            y[n] = this->Gety(N);
-        }
-        //---------------------------------------------------------------------
-        
-        this->K22 = (this->MinSquare(N,u,y))[0];
-        theta22 = (this->MinSquare(N,u,y))[1];
-        sscanf(rI2C,"T=%4.1f",&theta21); //criar flag antes receber
-        this->theta2 = (theta21 + theta22)*0.5;
-        
-        
+          if(this->First()){
+            STATE = SELFL;
+          }else{
+            STATE = OTHERL; 
+          }
         break;
+        //--------------------------------
+        case SELFL:
+          u[n] = Setu(N,u[n],n);
+          TWI::send_msg(1,_sread,strlen(_sread));
+          y[n] = Gety(N);
+          n++;
+          if(n>=N && this->First()){
+            this->K11 = (this->MinSquare(N,u,y))[0];
+            theta11 = (this->MinSquare(N,u,y))[1]; 
+            STATE = RECIEVE;
+          }
+        break;
+        //--------------------------------
+        case OTHERL:
+          while(!strcmp(rI2C,_sread)){} //NEED SYNCHRNOUS SO IT READS THE RIGHT PWM SET OF THE OTHER MACHINE.
+          y[n] = this->Gety(N);
+          n++;
+          if(n>=N && this->First()){
+            this->K12 = (this->MinSquare(N,u,y))[0];
+            theta21 = (this->MinSquare(N,u,y))[1]; 
+            END = true;
+          }
+        break;
+        //--------------------------------
+        case RECIEVE:
+          if(this->First() /* && Recebeu Algo no rI2C*/){
+            sscanf(rI2C,"T=%4.1f",&theta12);
+            this->theta1 = (theta11 + theta12)*0.5;
+            STATE = OTHERL;
+          }
+        break;
+        //--------------------------------
+        }
     }
 }
 
@@ -105,7 +94,7 @@ Meta::~Meta(){
 }
 
 //PRIVATE FUNCTIONS
-bool Meta::defineFirst(){
+bool Meta::First(){
     if (EEPROM.read(0) == 0)
         return true;
     else

@@ -33,7 +33,7 @@ public:
     ~Meta();
     
 private:
-    bool defineFirst();
+    bool First();
     double *MinSquare(const int N, double *u, double *y);
     double Setu(const int N, double u, double PWM);
     double Gety(const int N);
