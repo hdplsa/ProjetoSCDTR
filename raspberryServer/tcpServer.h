@@ -1,4 +1,4 @@
-#ifndef TECSERVER_H_INCLUDED
+#ifndef TCPSERVER_H_INCLUDED
 #define tcpClient_H_INCLUDED
 
 #define	BOOST_ASIO_ENABLE_HANDLER_TRACKING
@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include "session.h"
 using namespace std;
 using namespace boost::asio;
 
@@ -18,7 +19,7 @@ class tcpServer {
     public:
         tcpServer(string ip, string port);
         void accept();
-        void Write(std::string send);
+        void Write(string send, session* _session);
         bool isWorking();
         void stop();
         ~tcpServer();
@@ -30,9 +31,9 @@ class tcpServer {
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
-        void handle_accept(const boost::system::error_code& e);
+        void handle_accept(const boost::system::error_code &ec, session* _session);
         void start_read();
-        void handle_read(const boost::system::error_code &ec);
+        void handle_read(const boost::system::error_code &ec, string line, session* _session);
         void handle_write(const boost::system::error_code &ec);
         void check_deadline();
     
@@ -50,9 +51,6 @@ class tcpServer {
         // Objeto de receber tcp requests
         acceptor_ptr acceptor;
 
-        // Socket
-        ip::tcp::socket socket_;
-
         // Timers para controlar os timeouts
         deadline_timer deadline;
 
@@ -64,6 +62,9 @@ class tcpServer {
 
         // Valor boleano que nos diz se o server está a ser usado ou não      
         bool working = false;
+
+        // Lista de sessions para depois ser facil terminar todas
+        list<session*> sessions;
 
 };
 
