@@ -37,20 +37,23 @@ class Arduino{
 		Arduino(int N_, string port);
 		int getkNext(int k);
 		int getkPrevious(int k);
+		double getEnergy(int k);
+		double getComfortError(int k);
+		double getComfortVariance(int k);
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(float V);
 		void ledOFF();
-		void calcError();
-		void calcEnergy();
-		void calcComfortError();
-		void calcComfortVariance();
 		void receiveInformation(string info);
 		~Arduino();
 	
 	private:
 		double getMax(double d1, double d2);
 		double getAbs(double d);
+		void calcError();
+		void calcEnergy();
+		void calcComfortError();
+		void calcComfortVariance();
 		Serial *serial = new Serial();
 
 		enum sendcodes { Ref = 0 };

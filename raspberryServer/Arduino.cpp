@@ -55,6 +55,18 @@ int Arduino::getkPrevious(int k){
 	return 0;
 }
 
+double Arduino::getEnergy(int k){
+	return this->E[k];
+}
+
+double Arduino::getComfortError(int k){
+	return this->Cerror[k];
+}
+
+double Arduino::getComfortVariance(int k){
+	return this->Verror[k];
+}
+
 void Arduino::send(string str){
 
 	serial->Write(str);
@@ -89,37 +101,6 @@ void Arduino::ledOFF(){
 
 	ledON(0);
 
-}
-
-/* Calculo do valor do erro no instante k */
-void Arduino::calcError(){
-	if ((k >= 0) && (k < this->N)){
-		this->e[this->k] = this->y[this->k] - this->ref[this->k];
-	}
-}
-
-/* Calculo da energia gasta nos LEDs */
-void Arduino::calcEnergy(){
-	if ((k >= 0) && (k < this->N)){
-		this->E[this->k] = this->E[this->getkPrevious(this->k)] + this->d[this->getkPrevious(this->k)]*this->T;
-	}
-}
-
-/* Calculo do erro de comforto com a luminsidade*/
-void Arduino::calcComfortError(){
-	if ((k >= 0) && (k < this->N)){
-		this->Cerror[this->k] = ((this->t-1)/this->t)*getMax(this->e[this->k],0);
-	}
-}
-
-/* Calculo da variancia de comforto */
-void Arduino::calcComfortVariance(){
-	double sum1, sum2;
-	double sum; // (?)
-	if ((k >= 0) && (k < this->N)){
-		sum = this->getAbs(this->y[this->k]-2*this->y[this->getkPrevious(this->k)]+this->y[this->getkPrevious(this->getkPrevious(this->k))]);
-		this->Verror[this->k] = ((this->t-1)/this->t)*sum/(this->T*this->T);
-	}
 }
 
 /* Função chamada ciclicamente para receber e guardar dados
@@ -172,5 +153,36 @@ double Arduino::getAbs(double d){
 		return d;
 	} else {
 		return -1*d;
+	}
+}
+
+/* Calculo do valor do erro no instante k */
+void Arduino::calcError(){
+	if ((k >= 0) && (k < this->N)){
+		this->e[this->k] = this->y[this->k] - this->ref[this->k];
+	}
+}
+
+/* Calculo da energia gasta nos LEDs */
+void Arduino::calcEnergy(){
+	if ((k >= 0) && (k < this->N)){
+		this->E[this->k] = this->E[this->getkPrevious(this->k)] + this->d[this->getkPrevious(this->k)]*this->T;
+	}
+}
+
+/* Calculo do erro de comforto com a luminsidade*/
+void Arduino::calcComfortError(){
+	if ((k >= 0) && (k < this->N)){
+		this->Cerror[this->k] = ((this->t-1)/this->t)*getMax(this->e[this->k],0);
+	}
+}
+
+/* Calculo da variancia de comforto */
+void Arduino::calcComfortVariance(){
+	double sum1, sum2;
+	double sum; // (?)
+	if ((k >= 0) && (k < this->N)){
+		sum = this->getAbs(this->y[this->k]-2*this->y[this->getkPrevious(this->k)]+this->y[this->getkPrevious(this->getkPrevious(this->k))]);
+		this->Verror[this->k] = ((this->t-1)/this->t)*sum/(this->T*this->T);
 	}
 }
