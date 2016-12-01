@@ -2,10 +2,11 @@
 
 Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
 
+	//Valores iniciais
 	this->N = N;
 	this->k = 0;
 
-	this->o = false; // Mudei de 'o1' para 'o' para compilar. Vê se é suposto ser 'o' --- Ass: Hugo
+	this->o = false;
 
 	// Abre a porta serial
 	serial->Begin(115200, (const char*) port.c_str());
@@ -15,7 +16,16 @@ Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_
 
 	// Começa a leitura do serial
 	serial->Read_ln();
-
+	
+	// Definição de comprimentos dos vectores
+	this->ref->resize(N);
+	this->e->resize(N);
+	this->u->resize(N);
+	this->y->resize(N);
+	this->d->resize(N);
+	this->E->resize(N);
+	this->Cerror->resize(N);
+	this->Verror->resize(N);
 }
 
 /* Implementação dos indices do vector em anel
