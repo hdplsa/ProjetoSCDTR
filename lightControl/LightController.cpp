@@ -11,66 +11,6 @@ LightController::LightController(int ledPin, int sensorPin){
     this->teta = 0;
 }
 
-// //Inicialização - Calibração
-// void LightController::calibrateLumVoltage(){
-//   //Número de testes
-//   const int N = 10;
-//   //Variáveis experimentais
-//   double y[N];
-//   double u[N];
-//   double usquare[N];
-//   //Variáveis Regressão
-//   double sum = 0;
-//   double sumy = 0;
-//   double sumsquare = 0;
-//   double sumyu = 0;
-//   double det;
-//   //Recolha de dados para regressão linear
-//   for(int n=0;n<N;n++){
-//     u[n] = (Vcc/(double)N)*(double)n;
-//     this->ledp->setLedPWMVoltage(u[n]);
-//     delay(50);
-//     //Média de 10 observações
-//     y[n] = this->ls->getAverageLuminousIntensity(10);
-//     //Prints de debug
-//     /*Serial.print(n);
-//     Serial.print(' ');
-//     Serial.print(y[n]);
-//     Serial.print('\n');
-//     Serial.println("------------------------------------------");*/
-//   }
-//
-//   //Regressão Linear (u - entrada, y - saída) mínimos quadrados
-//   for(int n=0;n<N;n++){
-//     sum+=u[n];
-//     usquare[n]=u[n]*u[n];
-//     sumsquare+=usquare[n];
-//     sumy+=y[n];
-//     sumyu+=y[n]*u[n];
-//   }
-//   //Modelo matemático l = k*u+teta
-//   det = 1/(N*sumsquare - sum*sum);
-//   this->k = det*(N*sumyu - sum*sumy);
-//   this->teta = det*(-sum*sumyu + sumsquare*sumy);
-//
-//   //Desligar a luz no fim
-//   this->lightoff();
-//
-//   //Saturação inferior (limite do modelo)
-//   this->sat_down = -this->teta/this->k;
-//
-//   //Esperar um pouco para estar ready
-//   delay(10);
-//
-//   //Debug Stuff. descomentar quando necessário
-//   Serial.print("K = ");
-//   Serial.print(this->k);
-//   Serial.print('\n');
-//   Serial.print("theta = ");
-//   Serial.print(this->teta);
-//   Serial.print("\n\n");
-// }
-
 void LightController::lightoff(){
   this->ledp->setLedPWMVoltage(0);
 }
@@ -126,6 +66,13 @@ double LightController::getY(){
     return this->y;
 }
 
+double LightController::getAverageY(const int N){
+    return this->ls->getAverageLuminousIntensity(N);
+}
+
+void LightController::_Setu(double u){
+    return this->ledp->setLedPWMVoltage(u);
+}
 
 // Retorna o erro do ciclo "atual"
 double LightController::getError(){

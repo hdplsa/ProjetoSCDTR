@@ -34,9 +34,9 @@ public:
     
 private:
     bool defineFirst();
-    double *MinSquare(const int N, double u, double *y);
+    double *MinSquare(const int N, double *u, double *y);
     double Setu(const int N, double u, double PWM);
-    double Gety();
+    double Gety(const int N);
     
 };
 

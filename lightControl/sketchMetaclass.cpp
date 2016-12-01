@@ -27,6 +27,8 @@ void Meta::receivedI2C(char *str){
 void Meta::calibrateLumVoltageModel(){
     const int N = 10;
     const char _sread = "SR";
+    char *_st21;
+    char *_st12;
     double theta11, theta12;
     double theta21, theta22;
     double u[N];
@@ -44,7 +46,7 @@ void Meta::calibrateLumVoltageModel(){
             for(int n;n<N;n++){
                 u[n] = this->Setu(N,u[n],n);
                 TWI::send_msg(1,_sread,strlen(_sread));
-                y[n] = this->Gety();
+                y[n] = this->Gety(N);
             }
             //---------------------------------------------------------------------
             this->K11 = (this->MinSquare(N,u,y))[0];
@@ -56,7 +58,7 @@ void Meta::calibrateLumVoltageModel(){
             //--------------------------------------------------------------------
             for(int n;n<N;n++){
                 while(!strcmp(rI2C,_sread)){}
-                y[n] = this->Gety();
+                y[n] = this->Gety(N);
             }
             K21 = (this->MinSquare(N,u,y))[0];
             theta21 = (this->MinSquare(N,u,y))[1];
@@ -64,14 +66,14 @@ void Meta::calibrateLumVoltageModel(){
             TWI::send_msg(1,_st21,strlen(_st21));
             
             
-    }
+    
     break;
     case SEC:
         //--------------------------------------------------------------------
         
         for(int n;n<N;n++){
             while(!strcmp(rI2C,_sread)){}
-            y[n] = this->Gety();
+            y[n] = this->Gety(N);
         }
         K12 = (this->MinSquare(N,u,y))[0];
         theta12 = (this->MinSquare(N,u,y))[1];
@@ -84,17 +86,18 @@ void Meta::calibrateLumVoltageModel(){
         for(int n;n<N;n++){
             u[n] = this->Setu(N,u[n],n);
             TWI::send_msg(1,_sread,strlen(_sread));
-            y[n] = this->Gety();
+            y[n] = this->Gety(N);
         }
         //---------------------------------------------------------------------
         
         this->K22 = (this->MinSquare(N,u,y))[0];
         theta22 = (this->MinSquare(N,u,y))[1];
-        sscanf(rI2C,"T=%4.1f",&theta22); //criar flag antes receber
+        sscanf(rI2C,"T=%4.1f",&theta21); //criar flag antes receber
         this->theta2 = (theta21 + theta22)*0.5;
         
         
         break;
+    }
 }
 
 Meta::~Meta(){
@@ -109,7 +112,7 @@ bool Meta::defineFirst(){
         return false;
 }
 
-double *Meta::MinSquare(const int N, double u, double *y){
+double *Meta::MinSquare(const int N, double *u, double *y){
     double sum = 0;
     double usquare[N];
     double sumsquare = 0;
@@ -138,11 +141,11 @@ double *Meta::MinSquare(const int N, double u, double *y){
 
 double Meta::Setu(const int N, double u, double PWM){
     u = (5.0/(double)N)*(double)PWM;
-    this->_lightcontroller->ledp->setLedPWMVoltage(u); //isto � private, � preciso mudar
+    this->_lightcontroller->_Setu(u);
     delay(50);
     return u;
 }
-double Meta::Gety(){
-    return this->_lightcontroller->ls->getAverageLuminousIntensity(N); //private shit
+double Meta::Gety(const int N){
+    return this->_lightcontroller->getAverageY(N);
 }
 
