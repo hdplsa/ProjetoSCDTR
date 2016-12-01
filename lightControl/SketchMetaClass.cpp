@@ -1,4 +1,4 @@
-#include "SketchMetaclass.h"
+#include "SketchMetaClass.h"
 
 #define FIRST true
 #define SEC false
