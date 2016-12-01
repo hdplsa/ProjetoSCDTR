@@ -32,9 +32,6 @@ class Arduino{
 	vector<double> Verror;
 	//Estado de ocupação
 	bool o;
-
-	// (?) Parâmetro adicionado para compilar NÃO ESTÁ NO CONSTRUTOR
-	int t;
 	
 	public:
 		Arduino(int N_, string port);
@@ -44,7 +41,6 @@ class Arduino{
 		void ledON(int pwm = 255);
 		void ledON(float V);
 		void ledOFF();
-		void calibrate();
 		void calcError();
 		void calcEnergy();
 		void calcComfortError();

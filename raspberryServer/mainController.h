@@ -1,12 +1,12 @@
 #ifndef MAINCONTROLLER_H_INCLUDED
 #define MAINCONTROLLER_H_INCLUDED
 
-#include "Arduino.h"
+#include <stdio.h>
 
 class MainController{
 	//Variável que guarda o instante actual
 	int t;
-	// (?)
+	//Variável de instante actual no vector
 	int k;
 	//Numero de pontos guardados
 	int N = 10000;
@@ -23,6 +23,7 @@ class MainController{
 
 	public:
 		MainController();
+		void printMetrics();
 		~MainController();
 		
 	private:

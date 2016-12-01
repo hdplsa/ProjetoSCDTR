@@ -91,13 +91,6 @@ void Arduino::ledOFF(){
 
 }
 
-/* Calculo dos valores das constantes no modelo 
- * linear  entre tensão e luminosidade l = k u + theta
- * Método de minimos quadrados */
-void Arduino::calibrate(){
-	
-}
-
 /* Calculo do valor do erro no instante k */
 void Arduino::calcError(){
 	if ((k >= 0) && (k < this->N)){

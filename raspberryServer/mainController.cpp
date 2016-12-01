@@ -15,6 +15,10 @@ MainController::MainController(){
 	this->theta2 = 0;
 }
 
+void MainController::printMetrics(){
+	
+}
+
 MainController::~MainController(){
 	//Desalocação dos arduinos
 	delete this->arduino1;
