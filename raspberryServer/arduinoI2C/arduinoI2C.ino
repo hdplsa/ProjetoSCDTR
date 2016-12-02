@@ -31,7 +31,6 @@ void setup() {
 
   TWI::begin(EEPROM.read(0));
   TWI::onReceive(print_char);
-  TWI::set_DEBUG();
 
   SREG |= 0b10000000; // enable interrupts
 
