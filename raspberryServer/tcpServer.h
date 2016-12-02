@@ -28,13 +28,14 @@ class tcpServer {
         void set_Writecallback(std::function<void(void)> fcn);
         void set_ReadErrorcallback(std::function<void(void)> fcn);
         void set_WriteErrorcallback(std::function<void(void)> fcn);
+
+        void handle_read(const boost::system::error_code &ec, string line, session* _session);
+        void handle_write(const boost::system::error_code &ec);
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
         void handle_accept(const boost::system::error_code &ec, session* _session);
         void start_read();
-        void handle_read(const boost::system::error_code &ec, string line, session* _session);
-        void handle_write(const boost::system::error_code &ec);
         void check_deadline();
     
         // Callbacks

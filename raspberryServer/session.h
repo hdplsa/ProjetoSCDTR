@@ -21,16 +21,17 @@ public:
     void Write(string send);
     ~session();
 
-    void set_Readcallback(std::function<void(const boost::system::error_code, string , session*)> fcn);
+    void set_Readcallback(std::function<void(boost::system::error_code, string, session*)> fcn);
     void set_Writecallback(std::function<void(void)> fcn);
     void set_ReadErrorcallback(std::function<void(void)> fcn);
     void set_WriteErrorcallback(std::function<void(void)> fcn);
 
-private:
-
     // Funções
     void handle_read(const boost::system::error_code &ec);
     void handle_write(const boost::system::error_code &ec);
+
+private:
+
     void check_deadline();
 
     // Callbacks

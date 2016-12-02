@@ -100,7 +100,7 @@ void session::check_deadline()
   deadline.async_wait(boost::bind(&session::check_deadline, this));
 }
 
-void session::set_Readcallback(std::function<void(string)> fcn){
+void session::set_Readcallback(std::function<void(const boost::system::error_code&, string , session*)> fcn){
 
   onRead = fcn;
 

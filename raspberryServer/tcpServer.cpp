@@ -39,7 +39,7 @@ void tcpServer::handle_accept(const boost::system::error_code &ec, session* _ses
 
     cout << "Conexão aceite." << endl;
 
-    _session->set_Readcallback(std::bind(&tcpServer::handle_read, this, boost::asio::placeholders::error, _1, _2));
+    _session->set_Readcallback(std::bind(&tcpServer::handle_read, this, boost::asio::placeholders::error, _1, _session));
     _session->start_read();
   
     sessions.push_front(_session);
@@ -145,7 +145,6 @@ bool tcpServer::isWorking(){
 void tcpServer::stop()
 {
   t.interrupt();
-  socket_.close();
   deadline.cancel();
   working = false;
 }
