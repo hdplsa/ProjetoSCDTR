@@ -33,6 +33,7 @@ void Meta::calibrateLumVoltageModel(){
     double theta11, theta12;
     double theta21, theta22;
     const char _sread = "SR";
+    const char _done  = "DN";
     char *_t11;
     char *_t12;
     char *_t21;
@@ -46,19 +47,21 @@ void Meta::calibrateLumVoltageModel(){
       switch(STATE){
         //--------------------------------
         case INIT:
-        
+          Serial.println("INIT");
           if(this->First()){
             STATE = SELFL;
           }else{
             STATE = OTHERL; 
           }
+          Serial.println(STATE);
         break;
         //--------------------------------
         case SELFL:
-        
+          Serial.println("SELFL");
           u[n] = Setu(N,u[n],n);
           TWI::send_msg(1,_sread,strlen(_sread));
           y[n] = Gety(N);
+          while(!strcmp(this->rI2C,_done)){}
           n++;
           if(n>=N){
             if(this->First()){
@@ -75,9 +78,10 @@ void Meta::calibrateLumVoltageModel(){
         break;
         //--------------------------------
         case OTHERL:
-        
+          Serial.println("OTHERL");
           while(!strcmp(rI2C,_sread)){} //NEED SYNCHRNOUS SO IT READS THE RIGHT PWM SET OF THE OTHER MACHINE.
           y[n] = this->Gety(N);
+          TWI::send_msg(1,_done,strlen(_done));
           n++;
           if(n>=N){
             if(this->First()){
@@ -98,7 +102,7 @@ void Meta::calibrateLumVoltageModel(){
         break;
         //--------------------------------
         case RECIEVE:
-        
+          Serial.println("RECEIVE");
           while((!strcmp(this->rI2C,_t12)) || (!strcmp(this->rI2C,_t21))){}
           if(this->First() /* && Recebeu Algo no rI2C*/){
             sscanf(this->rI2C,"T=%4.1f",&theta12);
