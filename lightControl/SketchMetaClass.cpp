@@ -1,9 +1,13 @@
 #include "SketchMetaClass.h"
 
+//Estados de calibração
 #define INIT    1
 #define SELFL   2
 #define OTHERL  3
 #define RECIEVE 4
+//Endereços I2C
+#define I2CAddFir 10
+#define I2CAddSec 11
 
 //PUBLIC FUNTIONS
 Meta::Meta(double T,int ledPin,int sensorPin){
@@ -43,14 +47,18 @@ void Meta::calibrateLumVoltageModel(){
     int n = 0;
     bool END = false;
 
+    int Addr = 0;
+
     while(!END){
       switch(STATE){
         //--------------------------------
         case INIT:
           Serial.println("INIT");
           if(this->First()){
+            Addr = I2CAddSec;
             STATE = SELFL;
           }else{
+            Addr = I2CAddFir;
             STATE = OTHERL; 
           }
           Serial.println(STATE);
@@ -59,7 +67,7 @@ void Meta::calibrateLumVoltageModel(){
         case SELFL:
           Serial.println("SELFL");
           u[n] = Setu(N,u[n],n);
-          TWI::send_msg(1,_sread,strlen(_sread));
+          TWI::send_msg(Addr,_sread,strlen(_sread));
           y[n] = Gety(N);
           //while(!sendflag){};
           //TWI::set_slaveR();
@@ -85,20 +93,20 @@ void Meta::calibrateLumVoltageModel(){
           Serial.println("OTHERL");
           while(!strcmp(rI2C,_sread)){} //NEED SYNCHRNOUS SO IT READS THE RIGHT PWM SET OF THE OTHER MACHINE.
           y[n] = this->Gety(N);
-          TWI::send_msg(1,_done,strlen(_done));
+          TWI::send_msg(Addr,_done,strlen(_done));
           n++;
           if(n>=N){
             if(this->First()){
               this->K12 = (this->MinSquare(N,u,y))[0];
               theta21 = (this->MinSquare(N,u,y))[1]; 
               sprintf(_t21,"T=%4.1f",theta21);
-              TWI::send_msg(1,_t21,strlen(_t21));
+              TWI::send_msg(Addr,_t21,strlen(_t21));
               END = true;
             }else{
               this->K21 = (this->MinSquare(N,u,y))[0];
               theta12 = (this->MinSquare(N,u,y))[1];
               sprintf(_t12,"T=%4.1f",theta12);
-              TWI::send_msg(1,_t12,strlen(_t12));
+              TWI::send_msg(Addr,_t12,strlen(_t12));
               STATE = SELFL;
             }
             n=0;
