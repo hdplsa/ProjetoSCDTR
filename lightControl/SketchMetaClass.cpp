@@ -70,6 +70,7 @@ void Meta::calibrateLumVoltageModel(){
               theta22 = (this->MinSquare(N,u,y))[1]; 
               STATE = RECIEVE;
             }
+            n=0;
           }
         break;
         //--------------------------------
@@ -92,6 +93,7 @@ void Meta::calibrateLumVoltageModel(){
               TWI::send_msg(1,_t12,strlen(_t12));
               STATE = SELFL;
             }
+            n=0;
           }
         break;
         //--------------------------------
@@ -103,8 +105,8 @@ void Meta::calibrateLumVoltageModel(){
             this->theta1 = (theta11 + theta12)*0.5;
             STATE = OTHERL;
           }else{
-            sscanf(rI2C,"T=%4.1f",&theta21);
-            this->theta1 = (theta21 + theta22)*0.5;
+            sscanf(this->rI2C,"T=%4.1f",&theta21);
+            this->theta2 = (theta21 + theta22)*0.5;
             END = true;
           }
         break;
