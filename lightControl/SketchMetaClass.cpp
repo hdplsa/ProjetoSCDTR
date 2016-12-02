@@ -125,7 +125,7 @@ Meta::~Meta(){
 
 //PRIVATE FUNCTIONS
 bool Meta::First(){
-    if (EEPROM.read(0) == 0)
+    if (EEPROM.read(0) == 10)
         return true;
     else
         return false;
