@@ -18,6 +18,7 @@ public:
     
     static void begin();
     static void begin(uint8_t SLA);
+    static void set_DEBUG();
     static void onReceive(void (*function)(char*));
     static void onSend(void (*function)(void));
     static void turn_pullUp();
@@ -32,6 +33,10 @@ public:
     static void Interrupt_ISR();
     
 private:
+
+    // Variável que indica se estamos em DEBUG do TWI ou não
+
+    static bool DEBUG;
     
     // Variàveis a serem usadas durante a execução
     
