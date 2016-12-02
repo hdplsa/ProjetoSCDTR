@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "TWI.h"
+#include "EEPROM.h"
+#include "string.h"
 
 char teste[] = "Teste";
 
@@ -11,13 +13,13 @@ void print_char(char* str){
 void setup() {
   // put your setup code here, to run once:
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Faz setup do I2C
 
   sei();
 
-  TWI::begin(2);
+  TWI::begin(EEPROM.read(0));
   TWI::onReceive(print_char);
 
   SREG |= 0b10000000; // enable interrupts
@@ -31,8 +33,10 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  delay(2000);
-  Serial.println(TWCR,BIN);
-  //TWI::send_msg(2, teste, 6);
+  if(EEPROM.read(0) == 10){
+    TWI::send_msg(11, (char*) "Teste\n", strlen("Teste\n"));
+  }
+
+  delay(100000);
 
 }
