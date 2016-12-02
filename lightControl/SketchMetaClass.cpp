@@ -55,33 +55,57 @@ void Meta::calibrateLumVoltageModel(){
         break;
         //--------------------------------
         case SELFL:
+        
           u[n] = Setu(N,u[n],n);
           TWI::send_msg(1,_sread,strlen(_sread));
           y[n] = Gety(N);
           n++;
-          if(n>=N && this->First()){
-            this->K11 = (this->MinSquare(N,u,y))[0];
-            theta11 = (this->MinSquare(N,u,y))[1]; 
-            STATE = RECIEVE;
+          if(n>=N){
+            if(this->First()){
+              this->K11 = (this->MinSquare(N,u,y))[0];
+              theta11 = (this->MinSquare(N,u,y))[1]; 
+              STATE = RECIEVE;
+            }else{
+              this->K22 = (this->MinSquare(N,u,y))[0];
+              theta22 = (this->MinSquare(N,u,y))[1]; 
+              STATE = RECIEVE;
+            }
           }
         break;
         //--------------------------------
         case OTHERL:
+        
           while(!strcmp(rI2C,_sread)){} //NEED SYNCHRNOUS SO IT READS THE RIGHT PWM SET OF THE OTHER MACHINE.
           y[n] = this->Gety(N);
           n++;
-          if(n>=N && this->First()){
-            this->K12 = (this->MinSquare(N,u,y))[0];
-            theta21 = (this->MinSquare(N,u,y))[1]; 
-            END = true;
+          if(n>=N){
+            if(this->First()){
+              this->K12 = (this->MinSquare(N,u,y))[0];
+              theta21 = (this->MinSquare(N,u,y))[1]; 
+              sprintf(_t21,"T=%4.1f",theta21);
+              TWI::send_msg(1,_t21,strlen(_t21));
+              END = true;
+            }else{
+              this->K21 = (this->MinSquare(N,u,y))[0];
+              theta12 = (this->MinSquare(N,u,y))[1];
+              sprintf(_t12,"T=%4.1f",theta12);
+              TWI::send_msg(1,_t12,strlen(_t12));
+              STATE = SELFL;
+            }
           }
         break;
         //--------------------------------
         case RECIEVE:
+        
+          while((!strcmp(this->rI2C,_t12)) || (!strcmp(this->rI2C,_t21))){}
           if(this->First() /* && Recebeu Algo no rI2C*/){
-            sscanf(rI2C,"T=%4.1f",&theta12);
+            sscanf(this->rI2C,"T=%4.1f",&theta12);
             this->theta1 = (theta11 + theta12)*0.5;
             STATE = OTHERL;
+          }else{
+            sscanf(rI2C,"T=%4.1f",&theta21);
+            this->theta1 = (theta21 + theta22)*0.5;
+            END = true;
           }
         break;
         //--------------------------------
