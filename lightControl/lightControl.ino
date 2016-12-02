@@ -44,11 +44,12 @@ void setup() {
   // put your setup code here, to run once:
   
   SerialCom::Begin(115200);
-
+  //Inicializações do controlador
   meta = new Meta(0.02,ledPin, sensorPin);
   controller = meta->getController();
-
+  //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
+  TWI::onReceive(metaI2CString);
 
   Serial.println((char*)"Ready");
 
