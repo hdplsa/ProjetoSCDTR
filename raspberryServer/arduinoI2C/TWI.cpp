@@ -189,7 +189,9 @@ void TWI::Interrupt_ISR(){
                     // Coloca no data register o SLA+W
                     TWDR = twi_buf[0];
                     // Envia o SLA+W
-                    TWCR = (1<<TWINT) | (1 << TWEN) | (1<<TWIE);
+                    TWCR = (1 << TWINT)    // Flag a 1 
+                         | (1 << TWEN)     // Enable TWI
+                         | (1 << TWIE);    // Enable interrupção
                     // Coloca o ponteiro a mandar dados para a posição 1
                     twi_ptr = 1;
                     Serial.print("SLA+W: ");
@@ -216,17 +218,18 @@ void TWI::Interrupt_ISR(){
                 // Coloca o próximo byte no registo
                 TWDR = twi_buf[twi_ptr];
                 // Envia o byte
-                TWCR = (1<<TWINT) // Flag a 1
-                | (1<<TWEN)       // Enable do TWI
-                | (1<<TWIE);      // Interrupt ON
+                TWCR = (1 << TWINT) // Flag a 1
+                     | (1 << TWEN)  // Enable do TWI
+                     | (1 << TWIE); // Interrupt ON
                 // Incrementa a posição do ponteiro
                 twi_ptr++;
                 // Coloca o estado
                 twi_status = 2;
             } else { // Se tivermos chegado ao fim
-                TWCR = (1<<TWINT) // Flag a 1
-                | (1<<TWSTO) // Envia STOP
-                | (1<<TWIE);   // Enable interrupção
+                TWCR = (1 << TWINT) // Flag a 1
+                     | (1 << TWSTO) // Envia STOP
+                     | (1 << TWEN)  // Enable ao TWI
+                     | (1 << TWIE); // Enable interrupção
                 // Após uma escrita bem sucedida, ficamos em modo de espera
                 twi_status = 0;
                 Serial.print("STOP\n");
@@ -247,9 +250,9 @@ void TWI::Interrupt_ISR(){
             twi_ptr = 0; // Começa-se a receber bytes no 0
             
             TWCR = (1 << TWINT) // Flag a 1
-            | (1 << TWEA)       // Enable ACK
-            | (1 << TWEN)       // TWI Enable
-            | (1 << TWIE);      // ENable interrupts
+                 | (1 << TWEA)  // Enable ACK
+                 | (1 << TWEN)  // TWI Enable
+                 | (1 << TWIE); // ENable interrupts
             Serial.print("Recebi SLA+W\n");
             break;
             

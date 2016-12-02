@@ -6,6 +6,8 @@
 
 char teste[] = "Teste";
 
+int count = 0;
+
 void print_char(char* str){
   Serial.println("Total:");
   Serial.println(str);
@@ -34,10 +36,16 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  if(EEPROM.read(0) == 10){
-    TWI::send_msg(11, teste, strlen(teste));
-  }
 
+  if(count % 2 == 0){
+    if(EEPROM.read(0) == 10){
+      TWI::send_msg(11, teste, strlen(teste));
+    } 
+  } else {
+    if(EEPROM.read(0) == 11){
+      TWI::send_msg(11, teste, strlen(teste));
+    } 
+  }
   delay(10000);
 
 }
