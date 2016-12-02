@@ -162,8 +162,6 @@ void TWI::data_received(){
 // Função chamada assim que o master manda o STOP ao slave
 void TWI::data_sent(){
 
-    TWI::set_slaveR();
-
     // Chama a callback
     if(master_onSend != NULL){
         master_onSend();
@@ -207,7 +205,7 @@ void TWI::Interrupt_ISR(){
         case TWI_MTX_ADR_ACK:
             
             Serial.print("ACK\n");
-            twi_ptr = 0;
+            twi_ptr = 1;
             
             // Foi recebido um acknowledge do slave depois de mandar data
         case TWI_MTX_DATA_ACK:
@@ -218,7 +216,9 @@ void TWI::Interrupt_ISR(){
                 // Coloca o próximo byte no registo
                 TWDR = twi_buf[twi_ptr];
                 // Envia o byte
-                TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWIE);
+                TWCR = (1<<TWINT) // Flag a 1
+                | (1<<TWEN)       // Enable do TWI
+                | (1<<TWIE);      // Interrupt ON
                 // Incrementa a posição do ponteiro
                 twi_ptr++;
                 // Coloca o estado
@@ -241,15 +241,15 @@ void TWI::Interrupt_ISR(){
             send_start();
             break;
             
-            // Recebemos o SLA+W e enviàmos o ACK
+            // Recebemos o SLA+W e enviámos o ACK
         case TWI_SRX_ADR_ACK:
             twi_status = 3; // Estado de a receber
             twi_ptr = 0; // Começa-se a receber bytes no 0
             
-            TWCR = (1 << TWINT)
-            | (1 << TWEA)
-            | (1 << TWEN)
-            | (1 << TWIE);
+            TWCR = (1 << TWINT) // Flag a 1
+            | (1 << TWEA)       // Enable ACK
+            | (1 << TWEN)       // TWI Enable
+            | (1 << TWIE);      // ENable interrupts
             Serial.print("Recebi SLA+W\n");
             break;
             
@@ -261,15 +261,16 @@ void TWI::Interrupt_ISR(){
                 
                 // Avança uma posição na string
                 twi_ptr++;
-                
-                // Avisa que os dados foram processados
-                TWCR = (1<<TWINT)
-                | ( 1 << TWEA)
-                | (1 << TWEN)
-                | (1 << TWIE);
             }
+
+            // Avisa que os dados foram processados
+            TWCR = (1<<TWINT)
+            | (1 << TWEA)
+            | (1 << TWEN)
+            | (1 << TWIE);
+            
             Serial.print("Recebi ");
-            Serial.print((char)TWDR);
+            Serial.print((char)twi_buf[twi_ptr-1]);
             Serial.print('\n');
             break;
             

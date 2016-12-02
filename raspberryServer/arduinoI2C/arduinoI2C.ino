@@ -7,6 +7,7 @@
 char teste[] = "Teste";
 
 void print_char(char* str){
+  Serial.println("Total:");
   Serial.println(str);
 }
 
@@ -24,9 +25,9 @@ void setup() {
 
   SREG |= 0b10000000; // enable interrupts
 
-  //TWCR = (1 << TWEN) | (1 << TWIE);
+  Serial.println(strlen(teste));
 
-  //TWI::send_msg(2, teste, 6);
+  delay(5000);
 
 }
 
@@ -34,9 +35,9 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   if(EEPROM.read(0) == 10){
-    TWI::send_msg(11, (char*) "Teste\n", strlen("Teste\n"));
+    TWI::send_msg(11, teste, strlen(teste));
   }
 
-  delay(100000);
+  delay(10000);
 
 }
