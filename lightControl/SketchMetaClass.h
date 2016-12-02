@@ -24,12 +24,14 @@ class Meta{
     LightController *_lightcontroller = 0;
     //String de comunicacao
     char rI2C[10];
+    volatile bool sendflag = false;
     
 public:
     Meta(double T,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
     void calibrateLumVoltageModel();
+    void setSendFlag(bool sendflag);
     ~Meta();
     
 private:

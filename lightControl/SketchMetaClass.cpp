@@ -73,6 +73,8 @@ void Meta::calibrateLumVoltageModel(){
               theta22 = (this->MinSquare(N,u,y))[1]; 
               STATE = RECIEVE;
             }
+             Serial.print("u = ");
+             Serial.println(u[n],4);
             n=0;
           }
         break;
@@ -103,6 +105,7 @@ void Meta::calibrateLumVoltageModel(){
         //--------------------------------
         case RECIEVE:
           Serial.println("RECEIVE");
+          TWI::set_slaveR();
           while((!strcmp(this->rI2C,_t12)) || (!strcmp(this->rI2C,_t21))){}
           if(this->First() /* && Recebeu Algo no rI2C*/){
             sscanf(this->rI2C,"T=%4.1f",&theta12);
@@ -113,11 +116,17 @@ void Meta::calibrateLumVoltageModel(){
             this->theta2 = (theta21 + theta22)*0.5;
             END = true;
           }
+          Serial.print("string: ");
+          Serial.println(this->rI2C);
         break;
         //--------------------------------
         }
     }
 }
+
+ void Meta::setSendFlag(bool sendflag){
+  this->sendflag = sendflag;
+ }
 
 Meta::~Meta(){
     delete this->_lightcontroller;

@@ -42,6 +42,14 @@ void metaI2CString(char *str){
   meta->receivedI2C(str);
 }
 
+/*Funcao callback, chamada sempre que
+ * e enviada uma string via I2C, e 
+ * que modifica a flag da class Meta
+ */
+void sendI2CState(){
+  meta->setSendFlag(true);
+}
+
 void setup() {
   // put your setup code here, to run once:
   
@@ -52,6 +60,7 @@ void setup() {
   //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   TWI::onReceive(metaI2CString);
+  TWI::onSend(sendI2CState);
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
   //Inicialização completa
