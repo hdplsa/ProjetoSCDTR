@@ -52,6 +52,8 @@ void setup() {
   //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   TWI::onReceive(metaI2CString);
+  //Calibração do modelo
+  meta->calibrateLumVoltageModel();
   //Inicialização completa
   Serial.println((char*)"Ready");
 
