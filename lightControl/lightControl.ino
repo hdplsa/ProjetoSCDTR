@@ -10,6 +10,8 @@
 Meta *meta;
 LightController * controller;
 
+const double T = 0.02;
+
 // Numeros das portas usadas
 constexpr int ledPin = 11;
 constexpr int sensorPin = 5;
@@ -45,12 +47,12 @@ void setup() {
   
   SerialCom::Begin(115200);
   //Inicializações do controlador
-  meta = new Meta(0.02,ledPin, sensorPin);
+  meta = new Meta(T,ledPin, sensorPin);
   controller = meta->getController();
   //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   TWI::onReceive(metaI2CString);
-
+  //Inicialização completa
   Serial.println((char*)"Ready");
 
   //Init interrupções
