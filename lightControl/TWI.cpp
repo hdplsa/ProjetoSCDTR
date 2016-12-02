@@ -162,6 +162,8 @@ void TWI::data_received(){
 // Função chamada assim que o master manda o STOP ao slave
 void TWI::data_sent(){
 
+    TWI::set_slaveR();
+
     // Chama a callback
     if(master_onSend != NULL){
         master_onSend();

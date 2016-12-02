@@ -61,6 +61,8 @@ void Meta::calibrateLumVoltageModel(){
           u[n] = Setu(N,u[n],n);
           TWI::send_msg(1,_sread,strlen(_sread));
           y[n] = Gety(N);
+          //while(!sendflag){};
+          //TWI::set_slaveR();
           while(!strcmp(this->rI2C,_done)){}
           n++;
           if(n>=N){
