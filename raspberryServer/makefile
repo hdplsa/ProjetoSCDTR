@@ -23,7 +23,7 @@ tcpServer.o: tcpServer.cpp
 	$(CC) $(CFLAGS) tcpServer.cpp
 
 session.o:
-	$(CC) &(CFLAGS) session.cpp
+	$(CC) $(CFLAGS) session.cpp
 
 clean:
 	rm *o app

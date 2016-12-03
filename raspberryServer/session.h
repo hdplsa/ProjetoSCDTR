@@ -11,7 +11,6 @@ using namespace boost::asio;
 
 typedef boost::shared_ptr<ip::tcp::socket>   socket_ptr;
 
-
 class session{
 
 public:
@@ -21,7 +20,7 @@ public:
     void Write(string send);
     ~session();
 
-    void set_Readcallback(std::function<void(boost::system::error_code, string, session*)> fcn);
+    void set_Readcallback(std::function<void(string, session*)> fcn);
     void set_Writecallback(std::function<void(void)> fcn);
     void set_ReadErrorcallback(std::function<void(void)> fcn);
     void set_WriteErrorcallback(std::function<void(void)> fcn);
@@ -35,7 +34,7 @@ private:
     void check_deadline();
 
     // Callbacks
-    std::function<void(const boost::system::error_code, string , session*)> onRead = NULL;
+    std::function<void(string , session*)> onRead = NULL;
     std::function<void(void)> onWrite = NULL;
 
     // Callbacks para o erro

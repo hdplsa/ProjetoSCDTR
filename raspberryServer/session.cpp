@@ -1,6 +1,6 @@
 #include "session.h"
 
-session::session(boost::asio::io_service& io) : socket_(io_service), deadline(io){
+session::session(boost::asio::io_service& io) : socket_(io), deadline(io){
 
     // Set do timer sem nenhum tempo definido (ainda)
     deadline.async_wait(boost::bind(&session::check_deadline, this));
@@ -9,7 +9,7 @@ session::session(boost::asio::io_service& io) : socket_(io_service), deadline(io
 
 ip::tcp::socket& session::get_socket(){
 
-    return this->_socket;
+    return this->socket_;
 
 }
 
@@ -41,7 +41,7 @@ void session::handle_read(const boost::system::error_code &ec)
       std::cout << "Received: " << line << "\n";
     }
 
-    if(onRead != NULL) onRead(line);
+    if(onRead != NULL) onRead(line, this);
 
     start_read();
   }
@@ -51,7 +51,7 @@ void session::handle_read(const boost::system::error_code &ec)
 
     if(onReadError != NULL) onReadError();
 
-    stop();
+    //stop();
   }
 }
 
@@ -100,7 +100,7 @@ void session::check_deadline()
   deadline.async_wait(boost::bind(&session::check_deadline, this));
 }
 
-void session::set_Readcallback(std::function<void(const boost::system::error_code&, string , session*)> fcn){
+void session::set_Readcallback(std::function<void(string, session*)> fcn){
 
   onRead = fcn;
 
@@ -124,7 +124,7 @@ void session::set_WriteErrorcallback(std::function<void(void)> fcn){
 
 }
 
-~session(){
+session::~session(){
     socket_.close();
     deadline.cancel();
 }

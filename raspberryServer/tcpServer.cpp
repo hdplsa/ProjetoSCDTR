@@ -39,7 +39,9 @@ void tcpServer::handle_accept(const boost::system::error_code &ec, session* _ses
 
     cout << "Conexão aceite." << endl;
 
-    _session->set_Readcallback(std::bind(&tcpServer::handle_read, this, boost::asio::placeholders::error, _1, _session));
+    std::function<void(string, session*)> fcn = std::bind(&tcpServer::handle_read, this, std::placeholders::_1, _session);
+
+    _session->set_Readcallback(fcn);
     _session->start_read();
   
     sessions.push_front(_session);
@@ -51,17 +53,20 @@ void tcpServer::handle_accept(const boost::system::error_code &ec, session* _ses
     delete _session;
 
   }
+
+  accept();
   
 }
 
 //Recebe a mensagem das sessões e o callback para retornar o valor
-void tcpServer::handle_read(const boost::system::error_code &ec, string line, session* _session)
+void tcpServer::handle_read(string line, session* _session)
 {
 
   // Ignora mensagens vazias
   if (!line.empty())
   {
     std::cout << "Received: " << line << "\n";
+    Write(line, _session);
   }
 
   if(onRead != NULL) onRead(line);

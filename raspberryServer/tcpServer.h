@@ -29,7 +29,7 @@ class tcpServer {
         void set_ReadErrorcallback(std::function<void(void)> fcn);
         void set_WriteErrorcallback(std::function<void(void)> fcn);
 
-        void handle_read(const boost::system::error_code &ec, string line, session* _session);
+        void handle_read(string line, session* _session);
         void handle_write(const boost::system::error_code &ec);
         
     private:
