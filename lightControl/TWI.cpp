@@ -241,7 +241,8 @@ void TWI::Interrupt_ISR(){
             if(TWI_DEBUG) Serial.print("ADR NACK MTX\n");
             send_start();
             break;
-            
+            // Recebemos o General call address
+        case TWI_SRX_GEN_ACK:
             // Recebemos o SLA+W e enviámos o ACK
         case TWI_SRX_ADR_ACK:
             twi_status = 3; // Estado de a receber
