@@ -254,7 +254,8 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWIE); // ENable interrupts
             if(TWI_DEBUG) Serial.print("Recebi SLA+W\n");
             break;
-            
+            // Recebi dados pelo general call
+        case TWI_SRX_GEN_DATA_ACK:
             // Recebemos dados
         case TWI_SRX_ADR_DATA_ACK:
             if(twi_ptr < (TWI_BUFFER_SIZE - 1)){
