@@ -49,7 +49,7 @@ void Meta::calibrateLumVoltageModel(){
   const int Udim = 5;
   double theta_[this->Narduino];
   double u[Udim], y[Udim];
-  double ms[2];
+  double *ms;
   int j,n;
   //Valores de input no LED
   for(n = 0; n < Udim; n++){
@@ -84,6 +84,7 @@ void Meta::calibrateLumVoltageModel(){
       ms = this->MinSquare(N, u, y);
       this->k[j] = ms[0];
       theta_[j] = ms[1];
+      delete ms;
       //Esperar pelos calculos
       delay(20);
     } else {
@@ -105,6 +106,7 @@ void Meta::calibrateLumVoltageModel(){
         ms = this->MinSquare(N, u, y);
         this->k[j] = ms[0];
         theta_[j] = ms[1]; 
+        delete ms;
       }
     }   
   }
@@ -259,7 +261,7 @@ double *Meta::MinSquare(const int N, double *u, double *y){
     double sumsquare = 0;
     double sumy = 0;
     double sumyu = 0;
-    double ans[2];
+    double *ans;
     double det = 0;
     double m = 0;
     double b = 0;
@@ -274,7 +276,8 @@ double *Meta::MinSquare(const int N, double *u, double *y){
     det = 1/(N*sumsquare - sum*sum);
     m = det*(N*sumyu - sum*sumy);
     b = det*(-sum*sumyu + sumsquare*sumy);
-    
+
+    ans = new double[2];
     ans[0] = m;
     ans[1] = b;
     return ans;
