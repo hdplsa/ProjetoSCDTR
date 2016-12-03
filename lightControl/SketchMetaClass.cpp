@@ -70,7 +70,7 @@ void Meta::calibrateLumVoltageModel(){
         TWI::send_msg(0,"SR",strlen("SR"));
         //Esperar que os restantes leiam
         while(!this->sendflag){};
-        this->sendflag = true;
+        this->sendflag = false;
         //Leitura do próprio sensor
         y[n] = this->Gety(N);
         delay(10);
@@ -79,7 +79,7 @@ void Meta::calibrateLumVoltageModel(){
       TWI::send_msg(0,"MS",strlen("MS"));
       //Esperar que os restantes leiam
       while(!this->sendflag){};
-      this->sendflag = true;
+      this->sendflag = false;
       //Determinar k_j, theta_j
       ms = this->MinSquare(N, u, y);
       this->k[j] = ms[0];
@@ -92,7 +92,7 @@ void Meta::calibrateLumVoltageModel(){
       for(n = 0; n < Udim; n++){
         //Esperar pelo "SR"
         while(!this->recvflag){};
-        this->recvflag = true;
+        this->recvflag = false;
         if(!strcmp(this->rI2C,"SR")){
           Serial.println("SR ==");
           //Leitura do próprio sensor
@@ -101,7 +101,7 @@ void Meta::calibrateLumVoltageModel(){
       }
       //Esperar pelo "MS"
       while(!this->recvflag){};
-      this->recvflag = true;
+      this->recvflag = false;
       if(!strcmp(this->rI2C,"MS")){
         Serial.println("MS ==");
         //Determinar k_j, theta_j
