@@ -147,7 +147,7 @@ void TWI::send_start(){
     | (1 << TWEN)  // Enable TWI
     | (1 << TWIE); // Enable interrupções
     
-    Serial.print("SETSTART\n");
+    if(TWI_DEBUG) Serial.print("SETSTART\n");
 }
 
 // Função que é chamada quando o slave recebe dados 
@@ -161,8 +161,6 @@ void TWI::data_received(){
 
 // Função chamada assim que o master manda o STOP ao slave
 void TWI::data_sent(){
-
-    TWI::set_slaveR();
 
     // Chama a callback
     if(master_onSend != NULL){
@@ -184,52 +182,54 @@ void TWI::Interrupt_ISR(){
         // Foi enviado o start e tem que ser enviado o SLA+R/W
         case TWI_START:
         case TWI_REP_START:
-            Serial.print("START\n");
-            switch(twi_status){
+            if(TWI_DEBUG) Serial.print("START\n");
                 // Temos que enviar o SLA+W
-                case 1:
-                    // Coloca no data register o SLA+W
-                    TWDR = twi_buf[0];
-                    // Envia o SLA+W
-                    TWCR = (1<<TWINT) | (1 << TWEN) | (1<<TWIE);
-                    // Coloca o ponteiro a mandar dados para a posição 1
-                    twi_ptr = 1;
-                    Serial.print("SLA+W: ");
-                    Serial.print(twi_buf[0],BIN);
-                    Serial.print('\n');
-                    //Serial.print("SLA+W SENT\n");
-                    break;
-            }
+                    
+                // Coloca no data register o SLA+W
+                TWDR = twi_buf[0];
+                // Envia o SLA+W
+                TWCR = (1 << TWINT)    // Flag a 1 
+                     | (1 << TWEN)     // Enable TWI
+                     | (1 << TWIE);    // Enable interrupção
+                // Coloca o ponteiro a mandar dados para a posição 1
+                twi_ptr = 1;
+                if(TWI_DEBUG) Serial.print("SLA+W: ");
+                if(TWI_DEBUG) Serial.print(twi_buf[0],BIN);
+                if(TWI_DEBUG) Serial.print('\n');
+                break;
             
             break;
             
             // Foi recebido um acknowledge do slave depois dum SLA+W
         case TWI_MTX_ADR_ACK:
             
-            Serial.print("ACK\n");
-            twi_ptr = 0;
+            if(TWI_DEBUG) Serial.print("ACK\n");
+            twi_ptr = 1;
             
             // Foi recebido um acknowledge do slave depois de mandar data
         case TWI_MTX_DATA_ACK:
             
-            Serial.print("DATA\n");
+            if(TWI_DEBUG) Serial.print("DATA\n");
             // Se ainda não tivermos chegado ao fim dos dados
             if(twi_ptr < twi_msg_size){
                 // Coloca o próximo byte no registo
                 TWDR = twi_buf[twi_ptr];
                 // Envia o byte
-                TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWIE);
+                TWCR = (1 << TWINT) // Flag a 1
+                     | (1 << TWEN)  // Enable do TWI
+                     | (1 << TWIE); // Interrupt ON
                 // Incrementa a posição do ponteiro
                 twi_ptr++;
                 // Coloca o estado
                 twi_status = 2;
             } else { // Se tivermos chegado ao fim
-                TWCR = (1<<TWINT) // Flag a 1
-                | (1<<TWSTO) // Envia STOP
-                | (1<<TWIE);   // Enable interrupção
+                TWCR = (1 << TWINT) // Flag a 1
+                     | (1 << TWSTO) // Envia STOP
+                     | (1 << TWEN)  // Enable ao TWI
+                     | (1 << TWIE); // Enable interrupção
                 // Após uma escrita bem sucedida, ficamos em modo de espera
                 twi_status = 0;
-                Serial.print("STOP\n");
+                if(TWI_DEBUG) Serial.print("STOP\n");
 
                 set_slaveR(); // Retorna o arduino ao modo slave receiver
                 data_sent(); // chama o callback que avisa que os dados foram enviados
@@ -238,19 +238,20 @@ void TWI::Interrupt_ISR(){
             
             // O slave lançou um NACK
         case TWI_MTX_ADR_NACK:
+            if(TWI_DEBUG) Serial.print("ADR NACK MTX\n");
             send_start();
             break;
             
-            // Recebemos o SLA+W e enviàmos o ACK
+            // Recebemos o SLA+W e enviámos o ACK
         case TWI_SRX_ADR_ACK:
             twi_status = 3; // Estado de a receber
             twi_ptr = 0; // Começa-se a receber bytes no 0
             
-            TWCR = (1 << TWINT)
-            | (1 << TWEA)
-            | (1 << TWEN)
-            | (1 << TWIE);
-            Serial.print("Recebi SLA+W\n");
+            TWCR = (1 << TWINT) // Flag a 1
+                 | (1 << TWEA)  // Enable ACK
+                 | (1 << TWEN)  // TWI Enable
+                 | (1 << TWIE); // ENable interrupts
+            if(TWI_DEBUG) Serial.print("Recebi SLA+W\n");
             break;
             
             // Recebemos dados
@@ -261,43 +262,45 @@ void TWI::Interrupt_ISR(){
                 
                 // Avança uma posição na string
                 twi_ptr++;
-                
-                // Avisa que os dados foram processados
-                TWCR = (1<<TWINT)
-                | ( 1 << TWEA)
-                | (1 << TWEN)
-                | (1 << TWIE);
             }
-            Serial.print("Recebi ");
-            Serial.print((char)TWDR);
-            Serial.print('\n');
+
+            // Avisa que os dados foram processados
+            TWCR = (1<<TWINT)
+                 | (1 << TWEA)
+                 | (1 << TWEN)
+                 | (1 << TWIE);
+            
+            if(TWI_DEBUG) Serial.print("Recebi ");
+            if(TWI_DEBUG) Serial.print((char)twi_buf[twi_ptr-1]);
+            if(TWI_DEBUG) Serial.print('\n');
             break;
             
             // Indica que já estão os dados todos
         case TWI_SRX_STOP_RESTART:
             
-            Serial.print("STOP\n");
+            if(TWI_DEBUG) Serial.print("STOP\n");
             twi_buf[twi_ptr] = '\0';
             
             // Reset do ponteiro para evitar error
             twi_ptr = 0;
             
             TWCR = (1 << TWINT) // Toma conhecimento do STOP
-            | (1 << TWEA)  // Enable aknowledge
-            | (1 << TWEN)  // TWI enable
-            | (1 << TWIE); // Enable interrupção
+                 | (1 << TWEA)  // Enable aknowledge
+                 | (1 << TWEN)  // TWI enable
+                 | (1 << TWIE); // Enable interrupção
             
             data_received();
             break;
-            
+
+        // Caso recebamos um comando não préprogramado
         default:
-            Serial.print("Recebi: ");
-            Serial.print(TWSR, HEX);
-            Serial.print('\n');
-            TWCR = (1 << TWINT)
-            | (1 << TWSTO)
-            | (1 << TWEN)
-            | (1 << TWIE);
+            if(TWI_DEBUG) Serial.print("Recebi: ");
+            if(TWI_DEBUG) Serial.print(TWSR, HEX);
+            if(TWI_DEBUG) Serial.print('\n');
+            TWCR = (1 << TWINT) //
+                 | (1 << TWSTO)
+                 | (1 << TWEN)
+                 | (1 << TWIE);
             break;
             
     }

@@ -10,6 +10,8 @@
 #define TWI_BUFFER_SIZE 32
 #define TWI_BIT_RATE    152
 
+#define TWI_DEBUG       1
+
 /// Classe de TWI
 
 class TWI{
@@ -32,6 +34,10 @@ public:
     static void Interrupt_ISR();
     
 private:
+
+    // Variável que indica se estamos em DEBUG do TWI ou não
+
+    static bool DEBUG;
     
     // Variàveis a serem usadas durante a execução
     
