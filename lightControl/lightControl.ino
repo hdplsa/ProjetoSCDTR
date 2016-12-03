@@ -66,7 +66,7 @@ void setup() {
   meta->calibrateLumVoltageModel();
   //Inicialização completa
   Serial.println((char*)"Ready");
-
+  meta->printModel();
   //Init interrupções
   initTimer1();
 }
