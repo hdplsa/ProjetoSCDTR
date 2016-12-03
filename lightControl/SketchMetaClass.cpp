@@ -16,6 +16,10 @@ Meta::Meta(double T,int ledPin,int sensorPin){
     this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
     this->_lightcontroller->setSaturation(5);
+
+    for(int i = 0; i < 20; i++){
+      this->rI2C[i] = '\0';
+    }
 }
 
 LightController *Meta::getController(){
@@ -27,6 +31,8 @@ LightController *Meta::getController(){
  * sempre que chamada receivedI2C
  */
 void Meta::receivedI2C(char *str){
+    Serial.print("Meta");
+    Serial.println(str);
     strcpy(this->rI2C, str);
 }
 
@@ -36,12 +42,12 @@ void Meta::calibrateLumVoltageModel(){
     double y[N];
     double theta11, theta12;
     double theta21, theta22;
-    const char _sread = "SR";
-    const char _done  = "DN";
-    char *_t11;
-    char *_t12;
-    char *_t21;
-    char *_t22;
+    char _sread[] = "SR";
+    char _done[]  = "DN";
+    char _t11[20];
+    char _t12[20];
+    char _t21[20];
+    char _t22[20];
 
     int STATE = INIT;
     int n = 0;
@@ -140,6 +146,10 @@ void Meta::calibrateLumVoltageModel(){
 
 Meta::~Meta(){
     delete this->_lightcontroller;
+}
+
+char *strAlloc(int len){
+  return new char[len+1];
 }
 
 //PRIVATE FUNCTIONS

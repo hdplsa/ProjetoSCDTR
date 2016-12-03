@@ -23,7 +23,7 @@ class Meta{
     //Controlador PID
     LightController *_lightcontroller = 0;
     //String de comunicacao
-    char rI2C[10];
+    char rI2C[20];
     volatile bool sendflag = false;
     
 public:
@@ -35,6 +35,7 @@ public:
     ~Meta();
     
 private:
+    char *strAlloc(int len);
     bool First();
     double *MinSquare(const int N, double *u, double *y);
     double Setu(const int N, double u, double PWM);
