@@ -238,6 +238,7 @@ void TWI::Interrupt_ISR(){
             
             // O slave lançou um NACK
         case TWI_MTX_ADR_NACK:
+            if(TWI_DEBUG) Serial.print("ADR NACK MTX\n");
             send_start();
             break;
             
