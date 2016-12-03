@@ -63,7 +63,7 @@ void setup() {
   TWI::onSend(sendI2CState);
   delay(5000);
   //Calibração do modelo
-  meta->calibrateLumVoltageModel2();
+  meta->calibrateLumVoltageModel();
   //Inicialização completa
   Serial.println((char*)"Ready");
 

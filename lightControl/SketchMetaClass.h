@@ -35,8 +35,9 @@ public:
     Meta(int Narduino, double T,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
+    void calibrateLumVoltageModel_old();
     void calibrateLumVoltageModel();
-    void calibrateLumVoltageModel2();
+    void printModel();
     void setSendFlag(bool sendflag);
     bool getSendFlag();
     ~Meta();

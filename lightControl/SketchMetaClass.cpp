@@ -44,11 +44,12 @@ void Meta::receivedI2C(char *str){
     this->recvflag = true;
 }
 
-void Meta::calibrateLumVoltageModel2(){
+void Meta::calibrateLumVoltageModel(){
   const int N = 10; //Numero de leituras por teste
   const int Udim = 5;
   double theta_[this->Narduino];
   double u[Udim], y[Udim];
+  double ms[2];
   int j,n;
   //Valores de input no LED
   for(n = 0; n < Udim; n++){
@@ -80,7 +81,9 @@ void Meta::calibrateLumVoltageModel2(){
       while(!this->sendflag){};
       this->sendflag = true;
       //Determinar k_j, theta_j
-      this->MinSquare(N, u, y);
+      ms = this->MinSquare(N, u, y);
+      this->k[j] = ms[0];
+      theta_[j] = ms[1];
       //Esperar pelos calculos
       delay(20);
     } else {
@@ -99,7 +102,9 @@ void Meta::calibrateLumVoltageModel2(){
       this->recvflag = true;
       if(strcmp(this->rI2C,"MS")){
         //Determinar k_j, theta_j
-        this->MinSquare(N, u, y); 
+        ms = this->MinSquare(N, u, y);
+        this->k[j] = ms[0];
+        theta_[j] = ms[1]; 
       }
     }   
   }
@@ -110,7 +115,17 @@ void Meta::calibrateLumVoltageModel2(){
   this->theta = this->theta/this->Narduino;
 }
 
-void Meta::calibrateLumVoltageModel(){
+void Meta::printModel(){
+  int i;
+  Serial.print("[");
+  for(i=0; i < this->Narduino; i++){
+    Serial.print(this->k[i],4);
+  }
+  Serial.print("] ");
+  Serial.println(this->theta,4);
+}
+
+void Meta::calibrateLumVoltageModel_old(){
     const int N = 10;
     double u[N];
     double y[N];
