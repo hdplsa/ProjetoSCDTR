@@ -93,7 +93,8 @@ void Meta::calibrateLumVoltageModel(){
         //Esperar pelo "SR"
         while(!this->recvflag){};
         this->recvflag = false;
-        if(!strcmp(this->rI2C,"SR")){
+        //if(!strcmp(this->rI2C,"SR")){
+        if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
           Serial.println("SR ==");
           //Leitura do próprio sensor
           y[n] = this->Gety(N);       
@@ -102,7 +103,8 @@ void Meta::calibrateLumVoltageModel(){
       //Esperar pelo "MS"
       while(!this->recvflag){};
       this->recvflag = false;
-      if(!strcmp(this->rI2C,"MS")){
+      //if(!strcmp(this->rI2C,"MS")){
+      if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
         Serial.println("MS ==");
         //Determinar k_j, theta_j
         ms = this->MinSquare(N, u, y);
