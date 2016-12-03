@@ -20,18 +20,25 @@ class Meta{
     double K22 = 0;
     double theta1 = 0;
     double theta2 = 0;
+    //Parâmetros de calibração
+    int Narduino;
+    double *k;
+    double theta;
     //Controlador PID
     LightController *_lightcontroller = 0;
     //String de comunicacao
     char rI2C[20];
     volatile bool sendflag = false;
+    volatile bool recvflag = false;
     
 public:
-    Meta(double T,int ledPin,int sensorPin);
+    Meta(int Narduino, double T,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
     void calibrateLumVoltageModel();
+    void calibrateLumVoltageModel2();
     void setSendFlag(bool sendflag);
+    bool getSendFlag();
     ~Meta();
     
 private:
@@ -39,6 +46,7 @@ private:
     bool First();
     double *MinSquare(const int N, double *u, double *y);
     double Setu(const int N, double u, double PWM);
+    void setu2(double u);
     double Gety(const int N);
     
 };

@@ -9,17 +9,26 @@
 #define I2CAddFir 10
 #define I2CAddSec 11
 
+const double Umax = 5.0;
+
 //PUBLIC FUNTIONS
-Meta::Meta(double T,int ledPin,int sensorPin){
+Meta::Meta(int Narduino,double T,int ledPin,int sensorPin){
+    int i;
     //Inicializacao do controlador PID
     this->_lightcontroller = new LightController(ledPin,sensorPin);
     this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
     this->_lightcontroller->setSaturation(5);
 
-    for(int i = 0; i < 20; i++){
+    for(i = 0; i < 20; i++){
       this->rI2C[i] = '\0';
     }
+    //Init do modelo feedforward
+    this->Narduino = Narduino;
+    for(i = 0; i < this->Narduino; i++){
+      this->k[i] = 0;
+    }
+    this->theta = 0;
 }
 
 LightController *Meta::getController(){
@@ -31,9 +40,71 @@ LightController *Meta::getController(){
  * sempre que chamada receivedI2C
  */
 void Meta::receivedI2C(char *str){
-    Serial.print("Meta");
-    Serial.println(str);
     strcpy(this->rI2C, str);
+    this->recvflag = true;
+}
+
+void Meta::calibrateLumVoltageModel2(){
+  const int N = 10; //Numero de leituras por teste
+  const int Udim = 5;
+  double theta_[this->Narduino];
+  double u[Udim], y[Udim];
+  int j,n;
+  //Valores de input no LED
+  for(n = 0; n < Udim; n++){
+    u[n] = n*(Umax/Udim);
+  }
+  //Coluna j da matriz [k]
+  for(j=10; j < 10+this->Narduino; j++){
+    //Define master actual
+    if(j == EEPROM.read(0)){
+      //Caso de ser MASTER
+      for(n = 0; n < Udim; n++){
+        //Valor de entrada no LED
+        this->setu2(u[n]);
+        //Global call para todos lerem y
+        TWI::send_msg(0,"SR",strlen("SR"));
+        //Esperar que os restantes leiam
+        while(!this->sendflag){};
+        this->sendflag = true;
+        //Leitura do próprio sensor
+        y[n] = this->Gety(N);
+        delay(10);
+      }
+      //Global call para todos lerem y
+      TWI::send_msg(0,"MS",strlen("MS"));
+      //Esperar que os restantes leiam
+      while(!this->sendflag){};
+      this->sendflag = true;
+      //Determinar k_j, theta_j
+      this->MinSquare(N, u, y);
+      //Esperar pelos calculos
+      delay(20);
+    } else {
+      //Caso de ser SLAVE
+      for(n = 0; n < Udim; n++){
+        //Esperar pelo "SR"
+        while(!this->recvflag){};
+        this->recvflag = true;
+        if(strcmp(this->rI2C,"SR")){
+          //Leitura do próprio sensor
+          y[n] = this->Gety(N);       
+        } 
+      }
+      //Esperar pelo "MS"
+      while(!this->recvflag){};
+      this->recvflag = true;
+      if(strcmp(this->rI2C,"MS")){
+        //Determinar k_j, theta_j
+        this->MinSquare(N, u, y); 
+      }
+    }   
+  }
+  //Valor final do offset
+  for(j=0; j < this->Narduino; j++){
+    this->theta = this->theta + theta_[j];
+  }
+  this->theta = this->theta/this->Narduino;
 }
 
 void Meta::calibrateLumVoltageModel(){
@@ -140,9 +211,13 @@ void Meta::calibrateLumVoltageModel(){
     }
 }
 
- void Meta::setSendFlag(bool sendflag){
+void Meta::setSendFlag(bool sendflag){
   this->sendflag = sendflag;
- }
+}
+
+bool Meta::getSendFlag(){
+  return this->sendflag;
+}
 
 Meta::~Meta(){
     delete this->_lightcontroller;
@@ -193,6 +268,12 @@ double Meta::Setu(const int N, double u, double PWM){
     delay(50);
     return u;
 }
+
+void Meta::setu2(double u){
+  this->_lightcontroller->_Setu(u);
+  delay(50);
+}
+
 double Meta::Gety(const int N){
     return this->_lightcontroller->getAverageY(N);
 }

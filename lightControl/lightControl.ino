@@ -55,14 +55,14 @@ void setup() {
   
   SerialCom::Begin(115200);
   //Inicializações do controlador
-  meta = new Meta(T,ledPin, sensorPin);
+  meta = new Meta(2,T,ledPin, sensorPin);
   controller = meta->getController();
   //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   TWI::onReceive(metaI2CString);
   TWI::onSend(sendI2CState);
   //Calibração do modelo
-  meta->calibrateLumVoltageModel();
+  meta->calibrateLumVoltageModel2();
   //Inicialização completa
   Serial.println((char*)"Ready");
 
