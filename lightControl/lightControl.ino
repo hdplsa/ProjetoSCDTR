@@ -61,6 +61,7 @@ void setup() {
   TWI::begin(EEPROM.read(0));
   TWI::onReceive(metaI2CString);
   TWI::onSend(sendI2CState);
+  delay(5000);
   //Calibração do modelo
   meta->calibrateLumVoltageModel2();
   //Inicialização completa

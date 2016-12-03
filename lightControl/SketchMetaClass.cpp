@@ -56,12 +56,15 @@ void Meta::calibrateLumVoltageModel2(){
   }
   //Coluna j da matriz [k]
   for(j=10; j < 10+this->Narduino; j++){
+    Serial.println("MUDEI DE ARDUINO MASTER------------");
+    delay(2000);
     //Define master actual
     if(j == EEPROM.read(0)){
       //Caso de ser MASTER
       for(n = 0; n < Udim; n++){
         //Valor de entrada no LED
         this->setu2(u[n]);
+        Serial.println("MUDEI u");
         //Global call para todos lerem y
         TWI::send_msg(0,"SR",strlen("SR"));
         //Esperar que os restantes leiam
