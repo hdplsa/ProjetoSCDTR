@@ -5,13 +5,11 @@
 #include "tcpServer.h"
 #include "Arduino.h"
 #include <signal.h>
+#include <boost/asio.hpp>
 
 using namespace std;
 
-const string host("127.0.0.1");
-const string port("4444");
-
-tcpServer *server = new tcpServer(host, port);
+tcpServer *server;
 
 // Função chamada quando se dá CTRL + C 
 void close_all(int sig){
@@ -41,14 +39,25 @@ void test_serial(){
 
 int main(){
 
-    // Diz o que deve acontecer quandp se carraga no CTRL+C
+    // Diz o que deve acontecer quando se carraga no CTRL+C
     signal(SIGINT, close_all); 
 
-    server->accept();
+    try{
+        // Serviço que realiza as transações do servidor
+        boost::asio::io_service server_io;
 
-    while(server->isWorking()){}
+        const string host("127.0.0.1");
+        const string port("4444");
 
-    delete server;
+        server = new tcpServer(server_io,host, port);
+
+        server_io.run();
+
+    }catch (std::exception& e)
+    {
+        std::cerr << "Exception: " << e.what() << "\n";
+    }
+
 
     return 0;
 
