@@ -17,6 +17,7 @@ constexpr int ledPin = 11;
 constexpr int sensorPin = 5;
 
 constexpr uint8_t deviceID = 2;
+volatile int Narduinos = 0;
 
 void initTimer1(){
   cli();
@@ -91,10 +92,14 @@ int count_TWI(){
   return count;
 }
 
+void get_Narduinos(char* str){
+  if(str[0] == 'C'){
+    Narduinos = str[2];
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
-
-  int Narduinos = 0;
   
   SerialCom::Begin(115200);
 
@@ -107,8 +112,26 @@ void setup() {
       TWI::onSendError(count_I2CsendError);
       Narduinos = count_TWI();
 
+      char msg[4] = {'C', ' ', (char)Narduinos, '\0'};
+
+      TWI::send_msg(0,msg,3);
+
+      // Espera que a mensagem seja enviada
+      while(send_success == false && send_error == false){}
+
       // Remove o onSendError que não é mais usado
       TWI::onSendError(NULL);
+      
+  } else { // Os restantes arduinos têm que receber o Narduinos por TWI
+
+    TWI::onReceive(get_Narduinos);
+
+    // Espera para receber o Narduino
+    while(!Narduinos){}
+
+    Serial.print("Narduinos: ");
+    Serial.println(Narduinos);
+    
   }
   
   TWI::onReceive(metaI2CString);
