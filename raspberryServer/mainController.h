@@ -23,10 +23,13 @@ class MainController{
 
 	public:
 		MainController();
+		void get_clientRequest(string str, std::function<void(string)> callback);
 		void printMetrics();
 		~MainController();
 		
 	private:
+		void get_id(string str, std::function<void(string)> callback);
+		string compose_string(string param1, string param2, double val);
 		
 };
 

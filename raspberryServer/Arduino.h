@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdio>
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 #include "Serial.h"
 using namespace std;
 
@@ -24,6 +26,8 @@ class Arduino{
 	vector<double> y;
 	//Valores do duty cycle do sistema
 	vector<double> d;
+	//Valores do tempo em que recebemos cada valor
+	vector<boost::posix_time::ptime> t;
 	//Valores de consumo de energia
 	vector<double> E;
 	//Valores de erro de comforto
@@ -40,6 +44,8 @@ class Arduino{
 		double getEnergy(int k);
 		double getComfortError(int k);
 		double getComfortVariance(int k);
+		double getIlluminance(int k = this->k);
+		double getDuty(int k = this->k);
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(float V);

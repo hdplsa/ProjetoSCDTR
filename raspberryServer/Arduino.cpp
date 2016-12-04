@@ -17,15 +17,6 @@ Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_
 	// Começa a leitura do serial
 	serial->Read_ln();
 	
-	// Definição de comprimentos dos vectores
-	this->ref->resize(N);
-	this->e->resize(N);
-	this->u->resize(N);
-	this->y->resize(N);
-	this->d->resize(N);
-	this->E->resize(N);
-	this->Cerror->resize(N);
-	this->Verror->resize(N);
 }
 
 /* Implementação dos indices do vector em anel
@@ -65,6 +56,14 @@ double Arduino::getComfortError(int k){
 
 double Arduino::getComfortVariance(int k){
 	return this->Verror[k];
+}
+
+double Arduino::getIlluminance(int k = this->k){
+	return this->y[k];
+}
+
+double Arduino::getDuty(int k = this->k){
+	return this->u[k]*255.0/5.0;
 }
 
 void Arduino::send(string str){
@@ -110,16 +109,16 @@ void Arduino::receiveInformation(string info){
 	float y;
 	float e;
 	float u;
-	long t;
+	long t_;
 
 	// Estrai os dados da string
-	sscanf(info.c_str(), "y = %f;e = %f; u = %f; t = %ld\n", &y, &e, &u, &t);
+	sscanf(info.c_str(), "y = %f;e = %f; u = %f; t = %ld\n", &y, &e, &u, &t_);
 
 	// Guarda os dados no objeto
 	this->y[k] = y;
 	this->e[k] = e;
 	this->u[k] = u;
-		// Guardar o tempo tbm?
+	this->t[k] = boost::posix_time::microsec_clock::local_time();
 
 	//Calcula erro
 	this->calcError();
