@@ -1,6 +1,6 @@
 #include "tcpServer.h"
 
-tcpServer::tcpServer(string ip, string port) : socket_(io), deadline(io)
+tcpServer::tcpServer(string ip, string port) : deadline(io)
 {
 
   // Faz set do objeto que vai aceitar as ligações ao server
@@ -19,17 +19,19 @@ tcpServer::tcpServer(string ip, string port) : socket_(io), deadline(io)
 void tcpServer::accept()
 {
 
+  session* _session = new session(this->io);
+
   cout << "A aceitar ligações." << endl;
 
-  acceptor->async_accept(socket_,
+  acceptor->async_accept(_session->get_socket(),
     boost::bind(&tcpServer::handle_accept, this,
-    boost::asio::placeholders::error));
+    boost::asio::placeholders::error, _session));
 
   // Corre o resolve numa thread
   t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
 }
 
-void tcpServer::handle_accept(const boost::system::error_code &ec)
+void tcpServer::handle_accept(const boost::system::error_code &ec, session* _session)
 {
 
   // Se não tiver ocorrido erro, segue para ler o cliente
@@ -37,59 +39,46 @@ void tcpServer::handle_accept(const boost::system::error_code &ec)
 
     cout << "Conexão aceite." << endl;
 
-    start_read();
-  } 
+    std::function<void(string, session*)> fcn = std::bind(&tcpServer::handle_read, this, std::placeholders::_1, _session);
+
+    _session->set_Readcallback(fcn);
+    _session->start_read();
+  
+    sessions.push_front(_session);
+
+  } else {
+
+    cout << "Erro na criação da ligação: " << ec.message() << endl;
+
+    delete _session;
+
+  }
+
+  accept();
   
 }
 
-void tcpServer::start_read()
+//Recebe a mensagem das sessões e o callback para retornar o valor
+void tcpServer::handle_read(string line, session* _session)
 {
-  // Set a deadline for the read operation.
-  //deadline.expires_from_now(boost::posix_time::seconds(30));
 
-  // Start an asynchronous operation to read a newline-delimited message.
-  boost::asio::async_read_until(socket_, buf, '\n',
-                                boost::bind(&tcpServer::handle_read, this, 
-                                boost::asio::placeholders::error));
+  // Ignora mensagens vazias
+  if (!line.empty())
+  {
+    std::cout << "Received: " << line << "\n";
+    Write(line, _session);
+  }
+
+  if(onRead != NULL) onRead(line);
 
 }
 
-void tcpServer::handle_read(const boost::system::error_code &ec)
-{
-
-  if (!ec)
-  {
-    // Extract the newline-delimited message from the buffer.
-    std::string line;
-    std::istream is(&buf);
-    std::getline(is, line);
-
-    // Empty messages are heartbeats and so ignored.
-    if (!line.empty())
-    {
-      std::cout << "Received: " << line << "\n";
-    }
-
-    if(onRead != NULL) onRead(line);
-
-    start_read();
-  }
-  else
-  {
-    std::cout << "Error on receive: " << ec.message() << "\n";
-
-    if(onReadError != NULL) onReadError();
-
-    stop();
-  }
-}
-
-void tcpServer::Write(string send)
+void tcpServer::Write(string send, session* _session)
 {
 
   // Envia o send para o cliente tcp
-  boost::asio::async_write(socket_, boost::asio::buffer(send, send.length()),
-                           boost::bind(&tcpServer::handle_write, this, 
+  boost::asio::async_write(_session->get_socket(), boost::asio::buffer(send, send.length()),
+                           boost::bind(&session::handle_write, _session, 
                            boost::asio::placeholders::error));
 }
 
@@ -118,7 +107,8 @@ void tcpServer::check_deadline()
   {
     // The deadline has passed. The socket is closed so that any outstanding
     // asynchronous operations are cancelled.
-    socket_.close();
+
+    //socket_.close();
 
     // There is no longer an active deadline. The expiry is set to positive
     // infinity so that the actor takes no action until a new deadline is set.
@@ -160,7 +150,6 @@ bool tcpServer::isWorking(){
 void tcpServer::stop()
 {
   t.interrupt();
-  socket_.close();
   deadline.cancel();
   working = false;
 }
