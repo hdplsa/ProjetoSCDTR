@@ -123,9 +123,9 @@ void Meta::calibrateLumVoltageModel(){
                     this->k[j-10] = ms[0];
                     theta_[j-10] = ms[1];
                     delete ms;
+
+                    STATE = CHOICE;
                 }
-                
-                STATE = CHOICE;
             break;
             //-----------------------------
         }
