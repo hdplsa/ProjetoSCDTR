@@ -10,13 +10,14 @@
 using namespace std;
 using namespace boost::asio;
 
+typedef boost::shared_ptr<ip::tcp::acceptor> acceptor_ptr;
 typedef boost::shared_ptr<ip::tcp::resolver> resolver_ptr;
 typedef boost::shared_ptr<ip::tcp::socket>   socket_ptr;
 
 class tcpServer {
 
     public:
-        tcpServer(io_service& io_, string ip, string port);
+        tcpServer(string ip, string port);
         void accept();
         void Write(string send, session* _session);
         bool isWorking();
@@ -46,13 +47,13 @@ class tcpServer {
         std::function<void(void)> onWriteError = NULL;
 
         // Serviço que realiza as transações do servidor
-        boost::asio::io_service& io;
+        boost::asio::io_service io;
 
         // Objeto de receber tcp requests
-        ip::tcp::acceptor acceptor;
+        acceptor_ptr acceptor;
 
         // Timers para controlar os timeouts
-        //deadline_timer deadline;
+        deadline_timer deadline;
 
         // buffer para enviar e receber dados
         boost::asio::streambuf buf;
