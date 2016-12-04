@@ -10,7 +10,7 @@
 #define TWI_BUFFER_SIZE 32
 #define TWI_BIT_RATE    152
 
-#define TWI_DEBUG       1
+#define TWI_DEBUG       0
 
 /// Classe de TWI
 
@@ -22,6 +22,7 @@ public:
     static void begin(uint8_t SLA);
     static void onReceive(void (*function)(char*));
     static void onSend(void (*function)(void));
+    static void onSendError(void (*function)(void));
     static void turn_pullUp();
     static void set_rate();
     static bool busy();
@@ -59,9 +60,11 @@ private:
     //Funções pré callback
     static void data_received();
     static void data_sent();
+    static void data_errorSend();
     
     // Função de callback
     static void (*master_onSend)(void);
+    static void (*master_onSendError)(void);
     static void (*slave_onReceive)(char*);
     
 };

@@ -6,6 +6,7 @@ volatile unsigned int TWI::twi_msg_size = 0;
 volatile unsigned int TWI::twi_ptr = 0;
 volatile unsigned int TWI::twi_status = 0;
 void (*TWI::master_onSend)(void) = NULL;
+void (*TWI::master_onSendError)(void) = NULL;
 void (*TWI::slave_onReceive)(char*) = NULL;
 
 // Função begin SEM o SLA
@@ -37,6 +38,11 @@ void TWI::onReceive(void (*function)(char*)){
 // Função que faz set da callback de send do master
 void TWI::onSend(void (*function)(void)){
     master_onSend = function;
+}
+
+// Função que faz set da callback de send do master
+void TWI::onSendError(void (*function)(void)){
+    master_onSendError = function;
 }
 
 /* Coloca os pull ups das portas 4 e 5 ON para não
@@ -169,6 +175,16 @@ void TWI::data_sent(){
 
 }
 
+// Função chamada assim que o master manda o STOP ao slave
+void TWI::data_errorSend(){
+
+    // Chama a callback
+    if(master_onSendError != NULL){
+        master_onSendError();
+    }
+
+}
+
 ISR(TWI_vect){
     
     TWI::Interrupt_ISR();
@@ -182,7 +198,9 @@ void TWI::Interrupt_ISR(){
         // Foi enviado o start e tem que ser enviado o SLA+R/W
         case TWI_START:
         case TWI_REP_START:
-            if(TWI_DEBUG) Serial.print("START\n");
+            if(TWI_DEBUG){ 
+              Serial.print("START\n");
+            }
                 // Temos que enviar o SLA+W
                     
                 // Coloca no data register o SLA+W
@@ -193,9 +211,13 @@ void TWI::Interrupt_ISR(){
                      | (1 << TWIE);    // Enable interrupção
                 // Coloca o ponteiro a mandar dados para a posição 1
                 twi_ptr = 1;
-                if(TWI_DEBUG) Serial.print("SLA+W: ");
-                if(TWI_DEBUG) Serial.print(twi_buf[0],BIN);
-                if(TWI_DEBUG) Serial.print('\n');
+                if(TWI_DEBUG){ 
+                  Serial.print("SLA+W: ");
+                  Serial.print((int)(twi_buf[0] >> 1));
+                  Serial.print('+');
+                  Serial.print(twi_buf[0] & 1);
+                  Serial.print('\n');
+                }
                 break;
             
             break;
@@ -203,13 +225,17 @@ void TWI::Interrupt_ISR(){
             // Foi recebido um acknowledge do slave depois dum SLA+W
         case TWI_MTX_ADR_ACK:
             
-            if(TWI_DEBUG) Serial.print("ACK\n");
+            if(TWI_DEBUG){ 
+              Serial.print("ACK\n");
+            }
             twi_ptr = 1;
             
             // Foi recebido um acknowledge do slave depois de mandar data
         case TWI_MTX_DATA_ACK:
             
-            if(TWI_DEBUG) Serial.print("DATA\n");
+            if(TWI_DEBUG){
+              Serial.print("DATA\n");
+            }
             // Se ainda não tivermos chegado ao fim dos dados
             if(twi_ptr < twi_msg_size){
                 // Coloca o próximo byte no registo
@@ -229,19 +255,30 @@ void TWI::Interrupt_ISR(){
                      | (1 << TWIE); // Enable interrupção
                 // Após uma escrita bem sucedida, ficamos em modo de espera
                 twi_status = 0;
-                if(TWI_DEBUG) Serial.print("STOP\n");
+                if(TWI_DEBUG){
+                  Serial.print("STOP\n");
+                }
 
                 set_slaveR(); // Retorna o arduino ao modo slave receiver
                 data_sent(); // chama o callback que avisa que os dados foram enviados
             }
             break;
             
-            // O slave lançou um NACK
+            // O slave lançou um NACK (ou não existe este slave)
         case TWI_MTX_ADR_NACK:
-            if(TWI_DEBUG) Serial.print("ADR NACK MTX\n");
-            send_start();
+            if(TWI_DEBUG){
+              Serial.print("ADR NACK MTX\n");
+            }
+
+            TWCR = (1 << TWINT) // Flag TWI
+                 | (1 << TWSTO) // Manda STOP
+                 | (1 << TWEN)  // Enable TWI
+                 | (1 << TWIE); // Enable interrupção
+
+            data_errorSend();
             break;
-            
+            // Recebemos o General call address
+        case TWI_SRX_GEN_ACK:
             // Recebemos o SLA+W e enviámos o ACK
         case TWI_SRX_ADR_ACK:
             twi_status = 3; // Estado de a receber
@@ -251,9 +288,12 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEA)  // Enable ACK
                  | (1 << TWEN)  // TWI Enable
                  | (1 << TWIE); // ENable interrupts
-            if(TWI_DEBUG) Serial.print("Recebi SLA+W\n");
+            if(TWI_DEBUG){
+              Serial.print("Recebi SLA+W\n");
+            }
             break;
-            
+            // Recebi dados pelo general call
+        case TWI_SRX_GEN_DATA_ACK:
             // Recebemos dados
         case TWI_SRX_ADR_DATA_ACK:
             if(twi_ptr < (TWI_BUFFER_SIZE - 1)){
@@ -270,15 +310,20 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEN)
                  | (1 << TWIE);
             
-            if(TWI_DEBUG) Serial.print("Recebi ");
-            if(TWI_DEBUG) Serial.print((char)twi_buf[twi_ptr-1]);
-            if(TWI_DEBUG) Serial.print('\n');
+            if(TWI_DEBUG){
+              Serial.print("Recebi ");
+              Serial.print((char)twi_buf[twi_ptr-1]);
+              Serial.print('\n');
+            }
+
             break;
             
             // Indica que já estão os dados todos
         case TWI_SRX_STOP_RESTART:
             
-            if(TWI_DEBUG) Serial.print("STOP\n");
+            if(TWI_DEBUG){
+              Serial.print("STOP\n");
+            }
             twi_buf[twi_ptr] = '\0';
             
             // Reset do ponteiro para evitar error
@@ -294,9 +339,11 @@ void TWI::Interrupt_ISR(){
 
         // Caso recebamos um comando não préprogramado
         default:
-            if(TWI_DEBUG) Serial.print("Recebi: ");
-            if(TWI_DEBUG) Serial.print(TWSR, HEX);
-            if(TWI_DEBUG) Serial.print('\n');
+            if(TWI_DEBUG){ 
+              Serial.print("Recebi: ");
+              Serial.print(TWSR, HEX);
+              Serial.print('\n');
+            }
             TWCR = (1 << TWINT) //
                  | (1 << TWSTO)
                  | (1 << TWEN)
