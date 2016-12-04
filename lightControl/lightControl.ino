@@ -2,7 +2,7 @@
 #include <avr/interrupt.h>
 #include "SerialCom.h"
 #include "LightController.h"
-#include "SketchMetaClass.h"
+#include "MetaClass.h"
 #include "EEPROM.h"
 #include "TWI.h"
 
@@ -50,17 +50,74 @@ void sendI2CState(){
   meta->setSendFlag(true);
 }
 
+volatile bool send_success = false;
+volatile bool send_error   = false;
+
+void count_I2Csend(){
+  send_success = true;
+}
+
+void count_I2CsendError(){
+  send_error = true;
+}
+
+int count_TWI(){
+
+  char msg[] = "\n";
+
+  int count = 1;
+
+  // Itera sobre todos os endereços
+  for(int i = 10; i <= 120; i++){
+
+    Serial.print(i);
+    Serial.print('\n');
+    // Envia 
+    TWI::send_msg(i, msg, 1);
+    
+    // Espera até o TWI conseguir ou não mandar para esse endereço
+    while(send_success == false && send_error == false){}
+
+    // Se conseguirmos mandar, então existe esse endereço
+    if(send_success){
+      count++;
+      send_success = false;
+    }
+    // Se não onseguirmos mandar, então não há esse endereço
+    if(send_error){
+      send_error = false;
+    } 
+  }
+  return count;
+}
+
 void setup() {
   // put your setup code here, to run once:
+
+  int Narduinos = 0;
   
   SerialCom::Begin(115200);
-  //Inicializações do controlador
-  meta = new Meta(2,T,ledPin, sensorPin);
-  controller = meta->getController();
-  //Inicialização do I2C
+
+    //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
+  
+  // O arduino 10 faz a contagem do numero de arduinos
+  if(EEPROM.read(0) == 10){
+      TWI::onSend(count_I2Csend);
+      TWI::onSendError(count_I2CsendError);
+      Narduinos = count_TWI();
+
+      // Remove o onSendError que não é mais usado
+      TWI::onSendError(NULL);
+  }
+  
   TWI::onReceive(metaI2CString);
   TWI::onSend(sendI2CState);
+
+  //Inicializações do controlador
+  meta = new Meta(Narduinos,T,ledPin, sensorPin);
+  controller = meta->getController();
+  
   delay(5000);
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
