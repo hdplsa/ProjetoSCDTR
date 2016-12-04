@@ -35,7 +35,6 @@ public:
     Meta(int Narduino, double T,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
-    void calibrateLumVoltageModel_old();
     void calibrateLumVoltageModel();
     void printModel();
     void setSendFlag(bool sendflag);
@@ -46,8 +45,7 @@ private:
     char *strAlloc(int len);
     bool First();
     double *MinSquare(const int N, double *u, double *y);
-    double Setu(const int N, double u, double PWM);
-    void setu2(double u);
+    void Setu(double u);
     double Gety(const int N);
     
 };
