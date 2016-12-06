@@ -46,12 +46,24 @@ int Arduino::getkPrevious(int k){
 	return 0;
 }
 
+double Arduino::getEnergy(){
+	return this->E[this->K];
+}
+
 double Arduino::getEnergy(int k){
 	return this->E[k];
 }
 
+double Arduino::getComfortError(){
+	return this->Cerror[this->K];
+}
+
 double Arduino::getComfortError(int k){
 	return this->Cerror[k];
+}
+
+double Arduino::getComfortVariance(){
+	return this->Verror[this->K];
 }
 
 double Arduino::getComfortVariance(int k){
@@ -74,10 +86,26 @@ double Arduino::getDuty(int k){
 	return this->d[k];
 }
 
+bool Arduino::getOccupancy(){
+	return this->o;
+}
+
+void Arduino::setOccupancy(bool value){
+	this->o = value;
+}
+
+double Arduino::getRef(){
+	return this->ref[K];
+}
+
 void Arduino::send(string str){
 
 	serial->Write(str);
 
+}
+
+double Arduino::getPower(){
+	throw "myFunction is not implemented yet.";
 }
 
 void Arduino::ledON(int pwm /* = 255 */){

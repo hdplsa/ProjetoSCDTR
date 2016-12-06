@@ -29,7 +29,7 @@ class MainController{
 		~MainController();
 		
 	private:
-		int get_id(string str, std::function<void(string)> callback);
+		int get_id(string str, std::function<void(string)> callback, int start = 4);
 		string compose_string(string param1, string param2, double val);
 		
 };

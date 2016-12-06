@@ -29,7 +29,7 @@ class Arduino{
 	vector<double> y;
 	//Valores do duty cycle do sistema
 	vector<double> d;
-	//Valores do tempo em que recebemos cada valor
+	//Valores do tempo (do pi) em que recebemos cada valor
 	vector<boost::posix_time::ptime> t;
 	//Valores de consumo de energia
 	vector<double> E;
@@ -44,13 +44,20 @@ class Arduino{
 		Arduino(int N_, string port);
 		int getkNext(int k);
 		int getkPrevious(int k);
+		double getEnergy();
 		double getEnergy(int k);
+		double getComfortError();
 		double getComfortError(int k);
+		double getComfortVariance();
 		double getComfortVariance(int k);
 		double getIlluminance();
 		double getIlluminance(int k);
 		double getDuty();
 		double getDuty(int k);
+		bool getOccupancy();
+		void setOccupancy(bool value);
+		double getRef();
+		double getPower(); // Nâo implementada
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(float V);
