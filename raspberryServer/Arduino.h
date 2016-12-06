@@ -8,12 +8,15 @@
 
 #include "Serial.h"
 using namespace std;
+using namespace boost::posix_time;
 
 class Arduino{
 	//Variável que guarda a posição actual nos vectores
-	int k;
+	int K;
 	//Numero de pontos guardados
 	int N;
+	//Numero de ciclos desde o inicio
+	long cycle = 0;
 	//Periodo do ciclo de controlo
 	double T;
 	//Valores do sistema fisico
@@ -44,8 +47,10 @@ class Arduino{
 		double getEnergy(int k);
 		double getComfortError(int k);
 		double getComfortVariance(int k);
-		double getIlluminance(int k = this->k);
-		double getDuty(int k = this->k);
+		double getIlluminance();
+		double getIlluminance(int k);
+		double getDuty();
+		double getDuty(int k);
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(float V);

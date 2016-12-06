@@ -1,11 +1,12 @@
 #include "mainController.h"
 
-MainController::MainController(){
+MainController::MainController(int Narduino, vector<string> ports) : arduino(Narduino,NULL) {
 	this->t = 0;
 	this->k = 0;
 	//Inicialização dos arduinos
-	this->arduino1 = new Arduino(this->N, port1);
-	this->arduino2 = new Arduino(this->N, port2);
+	for(int i = 0; i < N; i++){
+		arduino[i] = new Arduino(this->N, ports[i]);
+	}
 	//Modelo dos minimos quadrados
 	this->k11 = 0;
 	this->k12 = 0;
@@ -21,20 +22,22 @@ void MainController::printMetrics(){
 
 void MainController::get_clientRequest(string str, std::function<void(string)> callback){
 
+	int i;
+
 	switch(str[0]){
 		case 'g':
 			switch(str[1]){
 				case 'l':
 
-					int i = get_id(str, callback);
+					i = get_id(str, callback);
 
 					// Se houver erro a ler o id saímos
 					if(i == -1) return;
 
 					try{
-						double val = arduino.at(i).getIlluminance();
+						double val = arduino.at(i)->getIlluminance();
 
-						string send = compose_string(string("l"), string(i), val);
+						string send = compose_string(string("l"), to_string(i), val);
 					} catch (std::exception &e){
 						callback("invalid id");
 					}
@@ -42,15 +45,15 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 				break;
 
 				case 'd':
-					int i = get_id(str, callback);
+					i = get_id(str, callback);
 
 					// Se houver erro a ler o id saímos
 					if(i == -1) return;
 
 					try{
-						double val = arduino.at(i).getIlluminance();
+						double val = arduino.at(i)->getDuty();
 
-						string send = compose_string(string("d"), string(i), val);
+						string send = compose_string(string("d"), to_string(i), val);
 					} catch (std::exception &e){
 						callback("invalid id");
 					}
@@ -117,14 +120,14 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 			// Enviar invalid command
 
-		break
+		break;
 
 
 	}
 
 }
 
-void MainController::get_id(string str, std::function<void(string)> callback){
+int MainController::get_id(string str, std::function<void(string)> callback){
 	try{
 		int i = std::stoi(str.substr(3,str.length()-1));
 		return i;
@@ -150,6 +153,7 @@ string MainController::compose_string(string param1, string param2, double val){
 
 MainController::~MainController(){
 	//Desalocação dos arduinos
-	delete this->arduino1;
-	delete this->arduino2;
+	for(int i = 0; i < Narduino; i ++){
+		delete arduino.at(i);
+	}
 }

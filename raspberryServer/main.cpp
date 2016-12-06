@@ -3,6 +3,7 @@
 #include <string>
 #include "Serial.h"
 #include "tcpServer.h"
+#include "mainController.h"
 #include "Arduino.h"
 #include <signal.h>
 
@@ -40,6 +41,15 @@ void test_serial(){
 }
 
 int main(){
+
+    // Inicia o mailController
+    	// Portas dos arduinos
+	const string port1 = "/dev/ttyUSB0";
+	const string port2 = "/dev/ttyUSB1";
+
+    vector<string> ports = {port1, port2};
+
+    MainController controller(2, ports);
 
     // Diz o que deve acontecer quandp se carraga no CTRL+C
     signal(SIGINT, close_all); 

@@ -1,10 +1,10 @@
 #include "Arduino.h"
 
-Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
+Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0), t(N_) {
 
 	//Valores iniciais
 	this->N = N;
-	this->k = 0;
+	this->K = 0;
 
 	this->o = false;
 
@@ -58,12 +58,20 @@ double Arduino::getComfortVariance(int k){
 	return this->Verror[k];
 }
 
-double Arduino::getIlluminance(int k = this->k){
+double Arduino::getIlluminance(){
+	return this->y[this->K];
+}
+
+double Arduino::getIlluminance(int k){
 	return this->y[k];
 }
 
-double Arduino::getDuty(int k = this->k){
-	return this->u[k]*255.0/5.0;
+double Arduino::getDuty(){
+	return this->d[this->K];
+}
+
+double Arduino::getDuty(int k){
+	return this->d[k];
 }
 
 void Arduino::send(string str){
@@ -109,23 +117,23 @@ void Arduino::receiveInformation(string info){
 	float y;
 	float e;
 	float u;
-	long t_;
+	long t_; // Está aqui para ser removido <----------
 
 	// Estrai os dados da string
 	sscanf(info.c_str(), "y = %f;e = %f; u = %f; t = %ld\n", &y, &e, &u, &t_);
 
 	// Guarda os dados no objeto
-	this->y[k] = y;
-	this->e[k] = e;
-	this->u[k] = u;
-	this->t[k] = boost::posix_time::microsec_clock::local_time();
+	this->y[K] = y;
+	this->e[K] = e;
+	this->u[K] = u;
+	this->t[K] = boost::posix_time::microsec_clock::local_time();
 
 	//Calcula erro
 	this->calcError();
 	
 	//Avança da o instante seguinte
-	this->k = this->getkNext(this->k);
-	this->t = this->t + 1;
+	this->K = this->getkNext(this->K);
+	this->cycle++;
 
 	// Manda ler a próxima linha
 	serial->Read_ln();
@@ -157,31 +165,35 @@ double Arduino::getAbs(double d){
 
 /* Calculo do valor do erro no instante k */
 void Arduino::calcError(){
-	if ((k >= 0) && (k < this->N)){
-		this->e[this->k] = this->y[this->k] - this->ref[this->k];
+	if ((K >= 0) && (K < this->N)){
+		this->e[this->K] = this->y[this->K] - this->ref[this->K];
 	}
 }
 
 /* Calculo da energia gasta nos LEDs */
 void Arduino::calcEnergy(){
-	if ((k >= 0) && (k < this->N)){
-		this->E[this->k] = this->E[this->getkPrevious(this->k)] + this->d[this->getkPrevious(this->k)]*this->T;
+	boost::posix_time::time_duration td;
+	if ((K >= 0) && (K < this->N)){
+		td = this->t[K] - this->t[getkPrevious(K)];
+		this->E[this->K] = this->E[this->getkPrevious(this->K)] 
+			+ this->d[this->getkPrevious(this->K)]*td.total_milliseconds()*1e-3;
 	}
 }
 
 /* Calculo do erro de comforto com a luminsidade*/
 void Arduino::calcComfortError(){
-	if ((k >= 0) && (k < this->N)){
-		this->Cerror[this->k] = ((this->t-1)/this->t)*getMax(this->e[this->k],0);
+	if ((K >= 0) && (K < this->N)){
+		this->Cerror[this->K] = ((this->cycle-1)/this->cycle)*getMax(this->e[this->K],0);
 	}
 }
 
 /* Calculo da variancia de comforto */
 void Arduino::calcComfortVariance(){
-	double sum1, sum2;
-	double sum; // (?)
-	if ((k >= 0) && (k < this->N)){
-		sum = this->getAbs(this->y[this->k]-2*this->y[this->getkPrevious(this->k)]+this->y[this->getkPrevious(this->getkPrevious(this->k))]);
-		this->Verror[this->k] = ((this->t-1)/this->t)*sum/(this->T*this->T);
+	double sum;
+	if ((K >= 0) && (K < this->N)){
+		sum = this->getAbs(this->y[this->K] - 
+			  2*this->y[this->getkPrevious(this->K)] + 
+			  this->y[this->getkPrevious(this->getkPrevious(this->K))]);
+		this->Verror[this->K] = ((cycle-1)/cycle)*sum/(this->T*this->T);
 	}
 }

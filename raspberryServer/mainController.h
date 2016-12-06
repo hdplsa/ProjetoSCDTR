@@ -2,6 +2,10 @@
 #define MAINCONTROLLER_H_INCLUDED
 
 #include <stdio.h>
+#include <iostream>
+#include "Arduino.h"
+
+using namespace std;
 
 class MainController{
 	//Variável que guarda o instante actual
@@ -10,25 +14,22 @@ class MainController{
 	int k;
 	//Numero de pontos guardados
 	int N = 10000;
+	// Numero de arduinos
+	int Narduino;
 	//Arduinos
-	Arduino *arduino1;
-	Arduino *arduino2;
-	// Portas dos arduinos
-	const string port1 = "/dev/ttyUSB0";
-	const string port2 = "/dev/ttyUSB1";
+	vector<Arduino*> arduino;
 	//Calibração minimos quadrados
 	double k11, k12, k21, k22;
 	double theta1, theta2;
 	
-
 	public:
-		MainController();
+		MainController(int Narduino, vector<string> ports);
 		void get_clientRequest(string str, std::function<void(string)> callback);
 		void printMetrics();
 		~MainController();
 		
 	private:
-		void get_id(string str, std::function<void(string)> callback);
+		int get_id(string str, std::function<void(string)> callback);
 		string compose_string(string param1, string param2, double val);
 		
 };
