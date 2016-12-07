@@ -1,15 +1,14 @@
 #include "Arduino.h"
 
-Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0), t(N_) {
+Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), t(N_), E(N_,0), Cerror(N_,0), Verror(N_,0) {
 
 	//Valores iniciais
-	this->N = N;
 	this->K = 0;
-
 	this->o = false;
 
 	// Abre a porta serial
-	serial->Begin(115200, (const char*) port.c_str());
+	serial = new Serial();
+	serial->Begin(115200, port.c_str());
 
 	// Atribui os callbacks
 	serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
@@ -78,12 +77,25 @@ double Arduino::getIlluminance(int k){
 	return this->y[k];
 }
 
+vector<double> Arduino::getLastMinuteIlluminance(){
+	vector<double> sum = get_minute(y);
+
+	return sum;
+}
+
 double Arduino::getDuty(){
 	return this->d[this->K];
 }
 
 double Arduino::getDuty(int k){
 	return this->d[k];
+}
+
+vector<double> Arduino::getLastMinuteDuty(){
+
+	vector<double> sum = get_minute(d);
+
+	return sum;
 }
 
 bool Arduino::getOccupancy(){
@@ -105,7 +117,7 @@ void Arduino::send(string str){
 }
 
 double Arduino::getPower(){
-	throw "myFunction is not implemented yet.";
+	throw "Not implemented";
 }
 
 void Arduino::ledON(int pwm /* = 255 */){
@@ -155,20 +167,19 @@ void Arduino::receiveInformation(string info){
 	this->e[K] = e;
 	this->u[K] = u;
 	this->t[K] = boost::posix_time::microsec_clock::local_time();
-
-	//Calcula erro
-	this->calcError();
 	
 	//Avança da o instante seguinte
 	this->K = this->getkNext(this->K);
 	this->cycle++;
 
+	newInformationCallback();
+
 	// Manda ler a próxima linha
 	serial->Read_ln();
 }
 
-Arduino::~Arduino(){
-	
+void Arduino::setNewInformationCallback(std::function<void(void)> fcn){
+	newInformationCallback = fcn;
 }
 
 /* Retorna o valor máximo entre d1 e d2
@@ -204,14 +215,16 @@ void Arduino::calcEnergy(){
 	if ((K >= 0) && (K < this->N)){
 		td = this->t[K] - this->t[getkPrevious(K)];
 		this->E[this->K] = this->E[this->getkPrevious(this->K)] 
-			+ this->d[this->getkPrevious(this->K)]*td.total_milliseconds()*1e-3;
+			             + this->d[this->getkPrevious(this->K)]*td.total_milliseconds()*1e-3;
 	}
 }
 
 /* Calculo do erro de comforto com a luminsidade*/
 void Arduino::calcComfortError(){
 	if ((K >= 0) && (K < this->N)){
-		this->Cerror[this->K] = ((this->cycle-1)/this->cycle)*getMax(this->e[this->K],0);
+		// O comfort error acumulado é (N-1)/N*C(k-1) + 1/N*C(k)
+		this->Cerror[this->K] = ((this->cycle-1)/this->cycle)*this->Cerror[getkPrevious(this->K)]
+							  + 1/cycle*getMax(this->e[this->K],0);
 	}
 }
 
@@ -219,9 +232,41 @@ void Arduino::calcComfortError(){
 void Arduino::calcComfortVariance(){
 	double sum;
 	if ((K >= 0) && (K < this->N)){
-		sum = this->getAbs(this->y[this->K] - 
-			  2*this->y[this->getkPrevious(this->K)] + 
-			  this->y[this->getkPrevious(this->getkPrevious(this->K))]);
-		this->Verror[this->K] = ((cycle-1)/cycle)*sum/(this->T*this->T);
+		sum = this->getAbs(this->y[this->K] 
+		    - 2*this->y[this->getkPrevious(this->K)] 
+			+ this->y[this->getkPrevious(this->getkPrevious(this->K))]);
+		// O erro da variância acumulada é (N-1)/N*V(k-1) + 1/N*V(k)
+		this->Verror[this->K] = ((cycle-1)/cycle)*this->Verror[getkPrevious(this->K)] 
+							  + 1/cycle*sum/(this->T*this->T);
 	}
+
+	
+}
+
+vector<double> Arduino::get_minute(vector<double> vec){
+	int n = K;
+	int ciclos = 0;
+	vector<double> new_vec(N);
+
+	boost::posix_time::time_duration td;
+
+	do{
+		td = t[K] - t[getkPrevious(n)];
+		new_vec.push_back(vec.at(n));
+		n = getkPrevious(n);
+		ciclos++;
+
+	} while(td.total_seconds() < 60 && ciclos < N);
+
+	return new_vec;
+
+}
+
+void Arduino::reset(){
+	throw "Not implemented";
+}
+
+
+Arduino::~Arduino(){
+	
 }

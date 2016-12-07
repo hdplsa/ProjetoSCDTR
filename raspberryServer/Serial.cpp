@@ -2,10 +2,10 @@
 
 /* Construtor, inicia o objeto da porta serial do boost
  */
-Serial::Serial()
+Serial::Serial() : arduino(io)
 {
 
-    arduino = serial_port_ptr(new boost::asio::serial_port(io));
+    //arduino = new boost::asio::serial_port(io);
 }
 
 /* Função que faz setup da serial port e a abre
@@ -19,20 +19,20 @@ Serial::Serial()
 int Serial::Begin(long baudrate, const char *port)
 {
 
-    arduino->open(port, error); //connect to port
+    arduino.open(port, error); //connect to port
 
     // Error handling
     if (error)
     {
-        cout << "Error";
+        cout << "Error" << endl;
         return -1;
     }
 
     //set baud rate
-    arduino->set_option(boost::asio::serial_port_base::baud_rate(baudrate), error);
+    arduino.set_option(boost::asio::serial_port_base::baud_rate(baudrate), error);
     if (error)
     {
-        cout << "Error";
+        cout << "Error" << endl;
         return -1;
     }
 
@@ -79,10 +79,10 @@ void Serial::Read_ln()
 {
 
     // Se a porta estiver aberta
-    if (arduino->is_open())
+    if (arduino.is_open())
     {
 
-        async_read_until(*arduino, buf, '\n',
+        async_read_until(arduino, buf, '\n',
                          boost::bind(
                              &Serial::read_complete,
                              this, boost::asio::placeholders::error,
@@ -107,14 +107,14 @@ void Serial::Read_ln()
 void Serial::Write(std::string send)
 {
 
-    if (arduino->is_open())
+    if (arduino.is_open())
     {
 
         // Escreve os dados no buffer
         ostream os(&buf);
         os.write(send.c_str(), send.length());
 
-        async_write(*arduino, buf,
+        async_write(arduino, buf,
                     boost::bind(
                         &Serial::write_complete,
                         this, boost::asio::placeholders::error,
@@ -204,14 +204,14 @@ void Serial::write_complete(const boost::system::error_code &e, std::size_t size
 void Serial::Close()
 {
 
-    arduino->close();
+    arduino.close();
 }
 /* Deconstrutor
  */
 Serial::~Serial()
 {
 
-    arduino->close();
+    arduino.close();
 
     // Não é preciso apagar o arduino, porque é um smart pointer
 }

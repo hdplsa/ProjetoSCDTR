@@ -1,6 +1,8 @@
 #ifndef SERIAL_H_INCLUDED
 #define SERIAL_H_INCLUDED
 
+#define	BOOST_ASIO_ENABLE_HANDLER_TRACKING
+
 #include <iostream>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -41,7 +43,7 @@ class Serial {
         boost::asio::io_service io;
 
         // Objeto da porta serial (é um smart pointer)
-        serial_port_ptr arduino;
+        boost::asio::serial_port arduino;
 
         // buffer para enviar e receber dados
         boost::asio::streambuf buf;
@@ -54,6 +56,9 @@ class Serial {
 
         // Valor boleano que nos diz se a thread está a ser usada ou não       
         bool working = false;
+
+        enum { max_length = 1024 };
+        char data_[max_length];
 
 };
 

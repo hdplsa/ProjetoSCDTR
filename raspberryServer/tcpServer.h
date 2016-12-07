@@ -24,7 +24,7 @@ class tcpServer {
         void stop();
         ~tcpServer();
 
-        void set_Readcallback(std::function<void(string)> fcn);
+        void set_Readcallback(std::function<void(string,std::function<void(string)>)> fcn);
         void set_Writecallback(std::function<void(void)> fcn);
         void set_ReadErrorcallback(std::function<void(void)> fcn);
         void set_WriteErrorcallback(std::function<void(void)> fcn);
@@ -39,7 +39,7 @@ class tcpServer {
         void check_deadline();
     
         // Callbacks
-        std::function<void(string)> onRead = NULL;
+        std::function<void(string,std::function<void(string)>)> onRead = NULL;
         std::function<void(void)> onWrite = NULL;
 
         // Callbacks para o erro

@@ -4,7 +4,7 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 	this->t = 0;
 	this->k = 0;
 	//Inicialização dos arduinos
-	for(int i = 0; i < N; i++){
+	for(int i = 0; i < Narduino; i++){
 		arduino[i] = new Arduino(this->N, ports[i]);
 	}
 	//Modelo dos minimos quadrados
@@ -82,7 +82,9 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 						value = (double) occupancy;
 					} 
 
-					string send = compose_string(to_string(str.c_str()[2]), to_string(i), value);
+					string param1(1,str.c_str()[2]);
+
+					string send = compose_string(param1, to_string(i), value);
 					
 					// Envia a string
 					callback(send);
@@ -149,9 +151,60 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		case 'r':
 
+		cout << "Faz reset do sistema" << endl;
+
+		try{
+			for(int i = 0; i < Narduino; i++){
+				arduino.at(i)->reset();
+			}
+
+			callback("ack");
+		} catch (std::exception &e) {
+			cout << "Erro " << e.what() << endl;
+			callback("Unknown error occured");
+			return;
+		}
+
 		break;
 
+		// Daqui para a frente são os novos comandos
+
 		case 'b':
+
+			i = get_id(str, callback, 4);
+
+			try {
+
+				vector<double> value;
+
+				switch(str.c_str()[2]){
+					case 'l':
+						value = arduino.at(i)->getLastMinuteIlluminance();
+						break;
+					case 'd':
+						value = arduino.at(i)->getLastMinuteDuty();
+						break;
+					default:
+						callback("Invalid command");
+						return;
+				}
+
+				string value_str = "b ";
+				value_str += str[2];
+
+				for(vector<double>::iterator it = value.begin(); it != value.end(); it++){
+					value_str += to_string(*it);
+					value_str += ",";
+				}
+
+				value_str += "\n";
+
+				callback(value_str);
+
+			} catch(std::exception &e){
+				callback("Invalid id");
+				return;
+			}
 
 		break;
 
@@ -193,7 +246,8 @@ string MainController::compose_string(string param1, string param2, double val){
 	str += ' ';
 	str += param2;
 	str += ' ';
-	str += val;
+	str += to_string(val);
+	str += '\n';
 
 	return str;
 

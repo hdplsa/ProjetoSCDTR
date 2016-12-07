@@ -66,10 +66,10 @@ void tcpServer::handle_read(string line, session* _session)
   if (!line.empty())
   {
     std::cout << "Received: " << line << "\n";
-    Write(line, _session);
+    //Write(line, _session);
   }
 
-  if(onRead != NULL) onRead(line);
+  if(onRead != NULL) onRead(line, std::bind(&tcpServer::Write, this, std::placeholders::_1, _session));
 
 }
 
@@ -119,7 +119,7 @@ void tcpServer::check_deadline()
   deadline.async_wait(boost::bind(&tcpServer::check_deadline, this));
 }
 
-void tcpServer::set_Readcallback(std::function<void(string)> fcn){
+void tcpServer::set_Readcallback(std::function<void(string, std::function<void(string)>)> fcn){
 
   onRead = fcn;
 

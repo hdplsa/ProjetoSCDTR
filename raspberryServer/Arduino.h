@@ -52,8 +52,10 @@ class Arduino{
 		double getComfortVariance(int k);
 		double getIlluminance();
 		double getIlluminance(int k);
+		vector<double> getLastMinuteIlluminance();
 		double getDuty();
 		double getDuty(int k);
+		vector<double> getLastMinuteDuty();
 		bool getOccupancy();
 		void setOccupancy(bool value);
 		double getRef();
@@ -63,6 +65,9 @@ class Arduino{
 		void ledON(float V);
 		void ledOFF();
 		void receiveInformation(string info);
+		void setNewInformationCallback(std::function<void(void)> fcn);
+		vector<double> get_minute(vector<double> vec);
+		void reset();
 		~Arduino();
 	
 	private:
@@ -72,7 +77,9 @@ class Arduino{
 		void calcEnergy();
 		void calcComfortError();
 		void calcComfortVariance();
-		Serial *serial = new Serial();
+		Serial *serial;
+
+		std::function<void(void)> newInformationCallback = NULL;
 
 		enum sendcodes { Ref = 0 };
 };
