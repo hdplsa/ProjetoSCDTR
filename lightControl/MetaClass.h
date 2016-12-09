@@ -36,7 +36,6 @@ public:
     
 private:
     char *strAlloc(int len);
-    bool First();
     double *MinSquare(const int N, double *u, double *y);
     void Setu(double u);
     double Gety(const int N);

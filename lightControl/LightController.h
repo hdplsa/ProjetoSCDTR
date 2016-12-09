@@ -27,6 +27,9 @@ class LightController{
     //Número de Arduinos
     int Narduino;
 
+    //Index do Arduino
+    int index;
+
     //Parametros de Calibração
     double *k;
     double theta;
@@ -71,6 +74,7 @@ public:
     double getError();
     double calcController();
     void LEDInputControlVariable();
+    void SetIndex(int index);
     ~LightController();
     
 private:

@@ -155,6 +155,9 @@ void LightController::LEDInputControlVariable(){
     this->ledp->setLedPWMVoltage(this->u[1]);
 }
 
+void LightController::SetIndex(int index){
+    this->index = index;
+}
 
 LightController::~LightController(){
     //Free à memória
@@ -175,7 +178,7 @@ double LightController::calcErro(){
 double LightController::calcFeedForward(){
     double feedforward;
     
-    feedforward = (this->ref - this->theta)/this->k[0];
+    //feedforward = (this->ref - this->theta)/this->k[j];
     
     return feedforward;
 }

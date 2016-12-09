@@ -63,6 +63,7 @@ void Meta::calibrateLumVoltageModel(){
             //-----------------------------
             case CHOICE:
                 if(j == EEPROM.read(0)){
+                    this->_lightcontroller->SetIndex(j);
                     STATE = MASTER;
                 }else{
                     STATE = SLAVE;
@@ -167,14 +168,6 @@ Meta::~Meta(){
 
 char *strAlloc(int len){
   return new char[len+1];
-}
-
-//PRIVATE FUNCTIONS
-bool Meta::First(){
-    if (EEPROM.read(0) == 10)
-        return true;
-    else
-        return false;
 }
 
 double *Meta::MinSquare(const int N, double *u, double *y){
