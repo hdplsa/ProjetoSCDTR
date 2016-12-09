@@ -1,6 +1,6 @@
 #include "LightController.h"
 
-LightController::LightController(int ledPin, int sensorPin){
+LightController::LightController(int Narduino,int ledPin, int sensorPin){
     
     //Depêndencias do feedback
     this->ls = new LightSensor(sensorPin,5.0);
@@ -8,7 +8,7 @@ LightController::LightController(int ledPin, int sensorPin){
     
     //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
     this->k = 0;
-    this->teta = 0;
+    this->theta = 0;
 }
 
 void LightController::lightoff(){
@@ -41,14 +41,14 @@ void LightController::setSaturation(double sat_up){
     this->sat_up = sat_up;
 }
 
-// Retorna o parametro K da plant (LED)
-double LightController::getK(){
-    return this->k;
+// Mete o parametro K da plant (LED)
+void LightController::setK(double *k){
+    this->k = k;
 }
 
-// Retorna o parâmetro Teta da plant (LED)
-double LightController::getTeta(){
-    return this->teta;
+// Mete o parâmetro Teta da plant (LED)
+void LightController::setTheta(double theta){
+    this->theta = theta;
 }
 
 // Retorna o periodo
@@ -175,7 +175,7 @@ double LightController::calcErro(){
 double LightController::calcFeedForward(){
     double feedforward;
     
-    feedforward = (this->ref - this->teta)/this->k;
+    feedforward = (this->ref - this->theta)/this->k[0];
     
     return feedforward;
 }

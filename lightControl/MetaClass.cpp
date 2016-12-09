@@ -12,7 +12,7 @@ const double Umax = 5.0;
 Meta::Meta(int Narduino,double T,int ledPin,int sensorPin){
     int i;
     //Inicializacao do controlador PID
-    this->_lightcontroller = new LightController(ledPin,sensorPin);
+    this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
     this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
     this->_lightcontroller->setSaturation(5);
@@ -136,6 +136,10 @@ void Meta::calibrateLumVoltageModel(){
         this->theta = this->theta + theta_[j];
     }
     this->theta = this->theta/this->Narduino;
+
+    //Meter os valores dentro da classe do controlador (LightController)
+    this->_lightcontroller->setK(k);
+    this->_lightcontroller->setTheta(theta);
 }
 
 

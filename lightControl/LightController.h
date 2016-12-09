@@ -24,8 +24,12 @@ class LightController{
     LightSensor *ls;
     LedPWM *ledp;
     
-    //Variáveis do modelo
-    double k, teta;
+    //Número de Arduinos
+    int Narduino;
+
+    //Parametros de Calibração
+    double *k;
+    double theta;
     
     //Input/Output
     double T = 0;
@@ -48,7 +52,7 @@ class LightController{
     
     
 public:
-    LightController(int ledPin, int sensorPin);
+    LightController(int Narduino, int ledPin, int sensorPin);
     void calibrateLumVoltage();
     void lightoff();
     void lighton();
@@ -57,8 +61,8 @@ public:
     void setRef(int ref);
     void setU(double u);
     void setSaturation(double sat_up);
-    double getK();
-    double getTeta();
+    void setK(double *k);
+    void setTheta(double theta);
     double getT();
     double getControlVariable();
     double getY();

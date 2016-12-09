@@ -13,13 +13,6 @@
 
 class Meta{
     
-    //Parâmetros de calibracao
-    double K11 = 0;
-    double K12 = 0;
-    double K21 = 0;
-    double K22 = 0;
-    double theta1 = 0;
-    double theta2 = 0;
     //Parâmetros de calibração
     int Narduino;
     double *k;
