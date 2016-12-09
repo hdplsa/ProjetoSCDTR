@@ -208,7 +208,7 @@ void Meta::Setu(double u){
 
 void Meta::Setu_vec(){
 	
-	double aux;
+    char *send;
 	STATE = SHUT;
 	
 	for(j=10; j < 10+this->Narduino; j++){
@@ -221,27 +221,24 @@ void Meta::Setu_vec(){
 					STATE = TALK;
 				}else{
 					//recebe cenas;
-					if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
+					if((this->rI2C[0] == 'U')&&(this->rI2C[1] == '=')){
 					Serial.println("SR ==");
-					//Leitura do próprio sensor
-					y[n] = this->Gety(N);
+					//sscanf(rI2C,"%*s %4.1f",/*meter o valor no vector de tensão do Arduino*/);
 					}
 				}
 			break;
 			//-----------------------------
 			case TALK:
 				//Valor de entrada no LED
-				this->Setu(u[n]);
-				Serial.println("MUDEI u");
+				//sprintf(send,"U=%4.1f",/*meter o valor que está no vector de tensão do Arduino*/)
+				Serial.println("MANDEI U");
 				//Global call para todos lerem y
-				TWI::send_msg(0,"SR",strlen("SR"));
+				TWI::send_msg(0,send,strlen(send));
 				//Esperar que os restantes leiam
 				while(!this->sendflag){};
 				this->sendflag = false;
-				//Leitura do próprio sensor
-				y[n] = this->Gety(N);
 				delay(10);
-				STATE = CHOICE;
+				STATE = SHUT;
 			break;
 			//-----------------------------
 		}

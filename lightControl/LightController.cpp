@@ -58,6 +58,8 @@ void LightController::_Setu(double u){
     return this->ledp->setLedPWMVoltage(u);
 }
 
+
+
 // Retorna o erro do ciclo "atual"
 double LightController::getError(){
     return this->e[1];
