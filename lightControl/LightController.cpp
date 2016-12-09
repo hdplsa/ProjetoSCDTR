@@ -11,23 +11,6 @@ LightController::LightController(int Narduino,int ledPin, int sensorPin){
     this->theta = 0;
 }
 
-void LightController::lightoff(){
-  this->ledp->setLedPWMVoltage(0);
-}
-
-void LightController::lighton(){
-  this->ledp->setLedPWMVoltage(5);
-}
-
-void LightController::setT(double T){
-    //Periodo de chamada da accao do controlador
-    this->T = T;
-}
-
-void LightController::setY(double y){
-    this->y = y;
-}
-
 void LightController::setRef(int ref){
     this->ref = (double)ref;
     this->ffflag = 1;

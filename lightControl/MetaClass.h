@@ -25,7 +25,7 @@ class Meta{
     volatile bool recvflag = false;
     
 public:
-    Meta(int Narduino, double T,int ledPin,int sensorPin);
+    Meta(int Narduino,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
     void calibrateLumVoltageModel();

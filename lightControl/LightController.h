@@ -35,7 +35,7 @@ class LightController{
     double theta;
     
     //Input/Output
-    double T = 0;
+    double T = 0.02;
     double ref = 0;
     double e[2] = {0,0};
     double y = 0;
@@ -56,10 +56,6 @@ class LightController{
     
 public:
     LightController(int Narduino, int ledPin, int sensorPin);
-    void lightoff();
-    void lighton();
-    void setT(double T);
-    void setY(double y);
     void setRef(int ref);
     void setU(double u);
     void setSaturation(double sat_up, double sat_down);

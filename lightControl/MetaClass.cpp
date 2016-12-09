@@ -9,11 +9,10 @@
 const double Umax = 5.0;
 
 //PUBLIC FUNTIONS
-Meta::Meta(int Narduino,double T,int ledPin,int sensorPin){
+Meta::Meta(int Narduino,int ledPin,int sensorPin){
     int i;
     //Inicializacao do controlador PID
     this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
-    this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
     this->_lightcontroller->setSaturation(5,0);
 
