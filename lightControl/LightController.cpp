@@ -37,8 +37,9 @@ void LightController::setU(double u){
     this->u[1] = u;
 }
 
-void LightController::setSaturation(double sat_up){
+void LightController::setSaturation(double sat_up, double sat_down){
     this->sat_up = sat_up;
+    this->sat_down = sat_down;
 }
 
 // Mete o parametro K da plant (LED)

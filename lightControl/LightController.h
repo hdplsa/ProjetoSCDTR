@@ -56,14 +56,13 @@ class LightController{
     
 public:
     LightController(int Narduino, int ledPin, int sensorPin);
-    void calibrateLumVoltage();
     void lightoff();
     void lighton();
     void setT(double T);
     void setY(double y);
     void setRef(int ref);
     void setU(double u);
-    void setSaturation(double sat_up);
+    void setSaturation(double sat_up, double sat_down);
     void setK(double *k);
     void setTheta(double theta);
     double getT();

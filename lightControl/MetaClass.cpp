@@ -15,7 +15,7 @@ Meta::Meta(int Narduino,double T,int ledPin,int sensorPin){
     this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
     this->_lightcontroller->setT(T);
     this->_lightcontroller->setRef(50);
-    this->_lightcontroller->setSaturation(5);
+    this->_lightcontroller->setSaturation(5,0);
 
     for(i = 0; i < 20; i++){
       this->rI2C[i] = '\0';
@@ -50,6 +50,7 @@ void Meta::calibrateLumVoltageModel(){
     int j,n;
     
     //STATE AND VARIABLE INIT
+    this->Setu(0);
     int STATE = CHOICE;
     for(n = 0; n < dimU; n++){
         u[n] = n*(Umax/dimU);
@@ -84,7 +85,8 @@ void Meta::calibrateLumVoltageModel(){
                     y[n] = this->Gety(N);
                     delay(10);
                 }
-                //Global call para todos lerem y
+                this->Setu(0); // lightoff
+                //Global call para todos fazer minSquare
                 TWI::send_msg(0,"MS",strlen("MS"));
                 //Esperar que os restantes leiam
                 while(!this->sendflag){};
