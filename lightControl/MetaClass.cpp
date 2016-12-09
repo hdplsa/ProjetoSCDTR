@@ -4,6 +4,8 @@
 #define CHOICE  1
 #define MASTER  2
 #define SLAVE   3
+#define SHUT 	4
+#define TALK	5
 
 
 const double Umax = 5.0;
@@ -202,6 +204,48 @@ double *Meta::MinSquare(const int N, double *u, double *y){
 void Meta::Setu(double u){
   this->_lightcontroller->_Setu(u);
   delay(50);
+}
+
+void Meta::Setu_vec(){
+	
+	double aux;
+	STATE = SHUT;
+	
+	for(j=10; j < 10+this->Narduino; j++){
+		Serial.println("MUDEI DE ARDUINO MASTER------------");
+		delay(2000);
+		switch(STATE){
+			//-----------------------------
+			case SHUT:
+				if(j == EEPROM.read(0)){
+					STATE = TALK;
+				}else{
+					//recebe cenas;
+					if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
+					Serial.println("SR ==");
+					//Leitura do próprio sensor
+					y[n] = this->Gety(N);
+					}
+				}
+			break;
+			//-----------------------------
+			case TALK:
+				//Valor de entrada no LED
+				this->Setu(u[n]);
+				Serial.println("MUDEI u");
+				//Global call para todos lerem y
+				TWI::send_msg(0,"SR",strlen("SR"));
+				//Esperar que os restantes leiam
+				while(!this->sendflag){};
+				this->sendflag = false;
+				//Leitura do próprio sensor
+				y[n] = this->Gety(N);
+				delay(10);
+				STATE = CHOICE;
+			break;
+			//-----------------------------
+		}
+	}
 }
 
 double Meta::Gety(const int N){
