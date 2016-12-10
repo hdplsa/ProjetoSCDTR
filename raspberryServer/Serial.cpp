@@ -2,10 +2,9 @@
 
 /* Construtor, inicia o objeto da porta serial do boost
  */
-Serial::Serial() : arduino(io)
+Serial::Serial() : io(), work(io), arduino(io), deadline(io)
 {
 
-    //arduino = new boost::asio::serial_port(io);
 }
 
 /* Função que faz setup da serial port e a abre
@@ -24,7 +23,7 @@ int Serial::Begin(long baudrate, const char *port)
     // Error handling
     if (error)
     {
-        cout << "Error" << endl;
+        cout << "Erro a abrir. Message: " << error.message() << endl;
         return -1;
     }
 
@@ -32,9 +31,15 @@ int Serial::Begin(long baudrate, const char *port)
     arduino.set_option(boost::asio::serial_port_base::baud_rate(baudrate), error);
     if (error)
     {
-        cout << "Error" << endl;
+        cout << "Error a atribuir baudrate. Message: " << error.message() << endl;
         return -1;
     }
+
+    // Espera que o arduino ligue completamente
+    deadline.expires_from_now(boost::posix_time::seconds(5));
+    deadline.async_wait(boost::bind(&Serial::Read_ln, this));
+
+    t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
 
     return 0;
 }
@@ -88,7 +93,8 @@ void Serial::Read_ln()
                              this, boost::asio::placeholders::error,
                              boost::asio::placeholders::bytes_transferred));
 
-        t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
+        //t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
+
         working = true;
     }
     else
@@ -122,6 +128,8 @@ void Serial::Write(std::string send)
 
         t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
         working = true;
+
+
     }
     else
     {
@@ -149,7 +157,9 @@ void Serial::read_complete(const boost::system::error_code &e, std::size_t size)
         string data(size, '\0');
         is.read(&data[0], size);
 
-        std::cout << "Received data:" << data;
+        std::cout << "Received data:" << data << endl;
+
+        this->Read_ln();
 
         if (onRead != NULL)
         {
@@ -162,6 +172,13 @@ void Serial::read_complete(const boost::system::error_code &e, std::size_t size)
         if (onReadError != NULL)
         {
             onReadError();
+        }
+
+        cout << "Erro: " << e.message() << endl;
+
+        if(e.message() == "End of file"){
+            deadline.expires_from_now(boost::posix_time::milliseconds(1000));
+            deadline.async_wait(boost::bind(&Serial::Read_ln, this));
         }
     }
 }

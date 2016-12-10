@@ -1,7 +1,7 @@
 #ifndef SERIAL_H_INCLUDED
 #define SERIAL_H_INCLUDED
 
-#define	BOOST_ASIO_ENABLE_HANDLER_TRACKING
+//#define	BOOST_ASIO_ENABLE_HANDLER_TRACKING
 
 #include <iostream>
 #include <boost/asio.hpp>
@@ -41,6 +41,7 @@ class Serial {
 
         // Serviço que realiza as transações do serial
         boost::asio::io_service io;
+        boost::asio::io_service::work work;
 
         // Objeto da porta serial (é um smart pointer)
         boost::asio::serial_port arduino;
@@ -50,6 +51,9 @@ class Serial {
 
         // objeto usado para obter os erros do boost
         boost::system::error_code error;
+
+        // Timer para garantir que não recebemos lixo
+        boost::asio::deadline_timer deadline;
 
         // Thread para o serial ser relamente asincrono
         boost::thread t;

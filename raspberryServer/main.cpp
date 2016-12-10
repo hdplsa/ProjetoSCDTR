@@ -35,20 +35,20 @@ void test_serial(){
 
 int main(){
 
-    const string host("127.0.0.1");
-    const string port("4444");
-
-    tcpServer *server = new tcpServer(host, port);
-    server->accept();
-
-    // Inicia o mailController
+        // Inicia o mailController
     	// Portas dos arduinos
-	const string port1 = "/dev/ttyUSB0";
+	const string port1 = "/dev/ttyACM0";
 	const string port2 = "/dev/ttyUSB1";
 
     vector<string> ports = {port1};
 
     MainController controller(1, ports);
+
+    const string host("127.0.0.1");
+    const string port("4444");
+
+    tcpServer *server = new tcpServer(host, port);
+    server->accept();
 
     server->set_Readcallback(std::bind(&MainController::get_clientRequest, &controller, std::placeholders::_1, std::placeholders::_2));
 
