@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdio>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 #include "Serial.h"
@@ -78,6 +80,8 @@ class Arduino{
 		void calcComfortError();
 		void calcComfortVariance();
 		Serial *serial;
+
+		boost::thread th;
 
 		std::function<void(void)> newInformationCallback = NULL;
 

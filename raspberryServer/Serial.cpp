@@ -1,234 +1,99 @@
 #include "Serial.h"
 
-/* Construtor, inicia o objeto da porta serial do boost
- */
-Serial::Serial() : io(), work(io), arduino(io), deadline(io)
-{
+Serial::Serial(){
+
+
 
 }
 
-/* Função que faz setup da serial port e a abre
- *  Input:
- * baudrate -> baudrate igual à do arduino
- * port     -> "COMX" ou "ttyX" onde está ligado o arduino
- *  Retorna:
- * 0  -> setup bem feito
- * -1 -> setup falhou
- */
-int Serial::Begin(long baudrate, const char *port)
-{
+void Serial::Begin(long baudrate, const char* port){
 
-    arduino.open(port, error); //connect to port
+    arduino = open("/dev/ttyACM0", O_RDWR| O_NOCTTY );
 
-    // Error handling
-    if (error)
-    {
-        cout << "Erro a abrir. Message: " << error.message() << endl;
-        return -1;
+    if(arduino == -1){
+        throw std::runtime_error("Erro a criar a porta Serial.");
     }
 
-    //set baud rate
-    arduino.set_option(boost::asio::serial_port_base::baud_rate(baudrate), error);
-    if (error)
-    {
-        cout << "Error a atribuir baudrate. Message: " << error.message() << endl;
-        return -1;
+    struct termios tty;
+    std::memset (&tty, 0, sizeof tty);
+
+    /* Error Handling */
+    if ( tcgetattr ( arduino, &tty ) != 0 ) {
+        std::cout << "Error " << " from tcgetattr: " << std::endl;
     }
 
-    // Espera que o arduino ligue completamente
-    deadline.expires_from_now(boost::posix_time::seconds(5));
-    deadline.async_wait(boost::bind(&Serial::Read_ln, this));
+    /* Set Baud Rate */
+    cfsetospeed (&tty, (speed_t)baudrate);
+    cfsetispeed (&tty, (speed_t)baudrate);
 
-    t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
+    /* Setting other Port Stuff */
+    tty.c_cflag     &=  ~PARENB;            // Make 8n1
+    tty.c_cflag     &=  ~CSTOPB;
+    tty.c_cflag     &=  ~CSIZE;
+    tty.c_cflag     |=  CS8;
 
-    return 0;
-}
+    tty.c_cflag     &=  ~CRTSCTS;           // no flow control
+    tty.c_cc[VMIN]   =  1;                  // read doesn't block
+    tty.c_cc[VTIME]  =  5;                  // 0.5 seconds read timeout
+    tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
 
-/* Faz set da função de callback de leitura
- */
-void Serial::set_Readcallback(std::function<void(string)> fcn)
-{
+    /* Make raw */
+    cfmakeraw(&tty);
 
-    this->onRead = fcn;
-}
-
-/* Faz set da função de callback de escrita
- */
-void Serial::set_Writecallback(std::function<void(void)> fcn)
-{
-
-    this->onWrite = fcn;
-}
-
-/* Faz set da função de callback de erro de leitura
- */
-void Serial::set_ReadErrorcallback(std::function<void(void)> fcn)
-{
-
-    this->onReadError = fcn;
-}
-
-/* Faz set da função de callback de erro de escrita
- */
-void Serial::set_WriteErrorcallback(std::function<void(void)> fcn)
-{
-
-    this->onWriteError = fcn;
-}
-
-/* Função qua inicia a leitura do serial até um endl
- *  Erros possiveis:
- * "Porta fechada": se o arduino tiver sido close()
- */
-void Serial::Read_ln()
-{
-
-    // Se a porta estiver aberta
-    if (arduino.is_open())
-    {
-
-        async_read_until(arduino, buf, '\n',
-                         boost::bind(
-                             &Serial::read_complete,
-                             this, boost::asio::placeholders::error,
-                             boost::asio::placeholders::bytes_transferred));
-
-        //t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
-
-        working = true;
+    /* Flush Port, then applies attributes */
+    tcflush( arduino, TCIFLUSH );
+    if ( tcsetattr ( arduino, TCSANOW, &tty ) != 0) {
+        std::cout << "Error" << " from tcsetattr" << std::endl;
     }
-    else
-    {
-        cout << "Closed connection" << endl;
-        throw std::runtime_error("Porta fechada");
-    }
+
 }
 
-/* Função qua inicia a escrita de uma string para o arduino
- *  Input:
- * send -> string a enviar ao arduino
- *  Erros possiveis:
- * "Porta fechada": se o arduino tiver sido close()
- */
-void Serial::Write(std::string send)
-{
+void Serial::Write(string str){
 
-    if (arduino.is_open())
-    {
+    int n = 0;
 
-        // Escreve os dados no buffer
-        ostream os(&buf);
-        os.write(send.c_str(), send.length());
-
-        async_write(arduino, buf,
-                    boost::bind(
-                        &Serial::write_complete,
-                        this, boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
-
-        t = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
-        working = true;
-
-
+    if(str[str.length()-1] != '\n'){
+        str += '\n';
+        cout << str[str.length()];
     }
-    else
-    {
-        cout << "Closed connection" << endl;
-        throw std::runtime_error("Porta fechada");
+
+    for(unsigned int i = 0; i < str.length(); i++){
+        n = write(arduino, &str[i], 1);
     }
-}
-/* Função iniciada assim que se recebe a string
- *  Input:
- * e    -> erro do async_read_until()
- * size -> tamanho da resposta
- *  Chama:
- * Chama a função de callback definida na classe
- */
-void Serial::read_complete(const boost::system::error_code &e, std::size_t size)
-{
 
-    working = false;
-
-    // Verifica se houve erro
-    if (!e)
-    {
-        // Reescreve os dados do buffer na string data
-        istream is(&buf);
-        string data(size, '\0');
-        is.read(&data[0], size);
-
-        std::cout << "Received data:" << data << endl;
-
-        this->Read_ln();
-
-        if (onRead != NULL)
-        {
-            onRead(data);
-        }
-    }
-    else
-    {
-        // Se ocorrer erro, é executado o callback de erro
-        if (onReadError != NULL)
-        {
-            onReadError();
-        }
-
-        cout << "Erro: " << e.message() << endl;
-
-        if(e.message() == "End of file"){
-            deadline.expires_from_now(boost::posix_time::milliseconds(1000));
-            deadline.async_wait(boost::bind(&Serial::Read_ln, this));
-        }
-    }
 }
 
-/* Função chamada assim que é enviada a string
- *  Input:
- * e    -> erro do async_write()
- * size -> tamanho da string enviada (?)
- *  Chama:
- * Chama a função de callback definida na classe
- */
-void Serial::write_complete(const boost::system::error_code &e, std::size_t size)
-{
+void Serial::read_ln(){
 
-    working = false;
+    int n = 0;
+    string str;
+    char buffer = '\0';
+    do {
+        n = read(arduino, &buffer, 1);
+        str += buffer;
+    } while(buffer != '\n' && n > 0 && n < 10);
+    
+    cout << str;
 
-    // Se não tiver ocorrido executa normalmente o callback
-    if (!e)
-    {
+    if(onRead != NULL) onRead(str);
 
-        cout << "Imprimi" << endl;
-
-        if (onWrite != NULL)
-        {
-            onWrite();
-        }
-    }
-    else
-    {
-        // Caso tenha acontecido um erro, executa o callback de erro
-        if (onWriteError != NULL)
-        {
-            onWriteError();
-        }
-    }
 }
 
-/* Função que fecha a porta do arduino
- */
-void Serial::Close()
-{
-
-    arduino.close();
+void Serial::set_Readcallback(std::function<void(string)> fcn){
+    onRead = fcn;
 }
-/* Deconstrutor
- */
-Serial::~Serial()
-{
 
-    arduino.close();
+void Serial::set_Writecallback(std::function<void(void)> fcn){
+    onWrite = fcn;
+}
 
-    // Não é preciso apagar o arduino, porque é um smart pointer
+void Serial::Close(){
+
+    close(arduino);
+
+}
+
+Serial::~Serial(){
+
+    Close();
 }

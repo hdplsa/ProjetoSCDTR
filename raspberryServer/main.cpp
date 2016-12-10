@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include "Serial.h"
 #include "tcpServer.h"
 #include "mainController.h"
 #include "Arduino.h"

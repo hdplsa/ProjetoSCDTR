@@ -14,7 +14,7 @@ Arduino::Arduino(int N_, string port) : N(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_
 	serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
 
 	// Começa a leitura do serial
-	//serial->Read_ln();
+	th = boost::thread(boost::bind(&Serial::read_ln,serial));
 	
 }
 
@@ -175,7 +175,7 @@ void Arduino::receiveInformation(string info){
 	if(newInformationCallback != NULL) newInformationCallback();
 
 	// Manda ler a próxima linha
-	serial->Read_ln();
+	serial->read_ln();
 }
 
 void Arduino::setNewInformationCallback(std::function<void(void)> fcn){
