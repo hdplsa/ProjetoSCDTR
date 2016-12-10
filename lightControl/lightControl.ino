@@ -10,8 +10,6 @@
 Meta *meta;
 LightController * controller;
 
-const double T = 0.02;
-
 // Numeros das portas usadas
 constexpr int ledPin = 11;
 constexpr int sensorPin = 5;
@@ -138,7 +136,7 @@ void setup() {
   TWI::onSend(sendI2CState);
 
   //Inicializações do controlador
-  meta = new Meta(Narduinos,T,ledPin, sensorPin);
+  meta = new Meta(Narduinos,ledPin, sensorPin);
   controller = meta->getController();
   
   delay(5000);

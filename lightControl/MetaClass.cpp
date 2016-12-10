@@ -4,18 +4,19 @@
 #define CHOICE  1
 #define MASTER  2
 #define SLAVE   3
+#define SHUT 	4
+#define TALK	5
 
 
 const double Umax = 5.0;
 
 //PUBLIC FUNTIONS
-Meta::Meta(int Narduino,double T,int ledPin,int sensorPin){
+Meta::Meta(int Narduino,int ledPin,int sensorPin){
     int i;
     //Inicializacao do controlador PID
-    this->_lightcontroller = new LightController(ledPin,sensorPin);
-    this->_lightcontroller->setT(T);
+    this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
     this->_lightcontroller->setRef(50);
-    this->_lightcontroller->setSaturation(5);
+    this->_lightcontroller->setSaturation(5,0);
 
     for(i = 0; i < 20; i++){
       this->rI2C[i] = '\0';
@@ -50,6 +51,7 @@ void Meta::calibrateLumVoltageModel(){
     int j,n;
     
     //STATE AND VARIABLE INIT
+    this->Setu(0);
     int STATE = CHOICE;
     for(n = 0; n < dimU; n++){
         u[n] = n*(Umax/dimU);
@@ -63,6 +65,7 @@ void Meta::calibrateLumVoltageModel(){
             //-----------------------------
             case CHOICE:
                 if(j == EEPROM.read(0)){
+                    this->_lightcontroller->SetIndex(j);
                     STATE = MASTER;
                 }else{
                     STATE = SLAVE;
@@ -83,7 +86,8 @@ void Meta::calibrateLumVoltageModel(){
                     y[n] = this->Gety(N);
                     delay(10);
                 }
-                //Global call para todos lerem y
+                this->Setu(0); // lightoff
+                //Global call para todos fazer minSquare
                 TWI::send_msg(0,"MS",strlen("MS"));
                 //Esperar que os restantes leiam
                 while(!this->sendflag){};
@@ -136,6 +140,10 @@ void Meta::calibrateLumVoltageModel(){
         this->theta = this->theta + theta_[j];
     }
     this->theta = this->theta/this->Narduino;
+
+    //Meter os valores dentro da classe do controlador (LightController)
+    this->_lightcontroller->setK(k);
+    this->_lightcontroller->setTheta(theta);
 }
 
 
@@ -163,14 +171,6 @@ Meta::~Meta(){
 
 char *strAlloc(int len){
   return new char[len+1];
-}
-
-//PRIVATE FUNCTIONS
-bool Meta::First(){
-    if (EEPROM.read(0) == 10)
-        return true;
-    else
-        return false;
 }
 
 double *Meta::MinSquare(const int N, double *u, double *y){
@@ -204,6 +204,45 @@ double *Meta::MinSquare(const int N, double *u, double *y){
 void Meta::Setu(double u){
   this->_lightcontroller->_Setu(u);
   delay(50);
+}
+
+void Meta::Setu_vec(){
+	
+    char *send;
+	STATE = SHUT;
+	
+	for(j=10; j < 10+this->Narduino; j++){
+		Serial.println("MUDEI DE ARDUINO MASTER------------");
+		delay(2000);
+		switch(STATE){
+			//-----------------------------
+			case SHUT:
+				if(j == EEPROM.read(0)){
+					STATE = TALK;
+				}else{
+					//recebe cenas;
+					if((this->rI2C[0] == 'U')&&(this->rI2C[1] == '=')){
+					Serial.println("SR ==");
+					//sscanf(rI2C,"%*s %4.1f",/*meter o valor no vector de tensão do Arduino*/);
+					}
+				}
+			break;
+			//-----------------------------
+			case TALK:
+				//Valor de entrada no LED
+				//sprintf(send,"U=%4.1f",/*meter o valor que está no vector de tensão do Arduino*/)
+				Serial.println("MANDEI U");
+				//Global call para todos lerem y
+				TWI::send_msg(0,send,strlen(send));
+				//Esperar que os restantes leiam
+				while(!this->sendflag){};
+				this->sendflag = false;
+				delay(10);
+				STATE = SHUT;
+			break;
+			//-----------------------------
+		}
+	}
 }
 
 double Meta::Gety(const int N){

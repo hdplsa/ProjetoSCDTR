@@ -1,6 +1,6 @@
 #include "LightController.h"
 
-LightController::LightController(int ledPin, int sensorPin){
+LightController::LightController(int Narduino,int ledPin, int sensorPin){
     
     //Depêndencias do feedback
     this->ls = new LightSensor(sensorPin,5.0);
@@ -8,24 +8,7 @@ LightController::LightController(int ledPin, int sensorPin){
     
     //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
     this->k = 0;
-    this->teta = 0;
-}
-
-void LightController::lightoff(){
-  this->ledp->setLedPWMVoltage(0);
-}
-
-void LightController::lighton(){
-  this->ledp->setLedPWMVoltage(5);
-}
-
-void LightController::setT(double T){
-    //Periodo de chamada da accao do controlador
-    this->T = T;
-}
-
-void LightController::setY(double y){
-    this->y = y;
+    this->theta = 0;
 }
 
 void LightController::setRef(int ref){
@@ -37,18 +20,19 @@ void LightController::setU(double u){
     this->u[1] = u;
 }
 
-void LightController::setSaturation(double sat_up){
+void LightController::setSaturation(double sat_up, double sat_down){
     this->sat_up = sat_up;
+    this->sat_down = sat_down;
 }
 
-// Retorna o parametro K da plant (LED)
-double LightController::getK(){
-    return this->k;
+// Mete o parametro K da plant (LED)
+void LightController::setK(double *k){
+    this->k = k;
 }
 
-// Retorna o parâmetro Teta da plant (LED)
-double LightController::getTeta(){
-    return this->teta;
+// Mete o parâmetro Teta da plant (LED)
+void LightController::setTheta(double theta){
+    this->theta = theta;
 }
 
 // Retorna o periodo
@@ -73,6 +57,8 @@ double LightController::getAverageY(const int N){
 void LightController::_Setu(double u){
     return this->ledp->setLedPWMVoltage(u);
 }
+
+
 
 // Retorna o erro do ciclo "atual"
 double LightController::getError(){
@@ -155,6 +141,9 @@ void LightController::LEDInputControlVariable(){
     this->ledp->setLedPWMVoltage(this->u[1]);
 }
 
+void LightController::SetIndex(int index){
+    this->index = index;
+}
 
 LightController::~LightController(){
     //Free à memória
@@ -175,7 +164,7 @@ double LightController::calcErro(){
 double LightController::calcFeedForward(){
     double feedforward;
     
-    feedforward = (this->ref - this->teta)/this->k;
+    //feedforward = (this->ref - this->theta)/this->k[j];
     
     return feedforward;
 }

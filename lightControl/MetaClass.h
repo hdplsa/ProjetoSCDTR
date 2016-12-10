@@ -13,26 +13,19 @@
 
 class Meta{
     
-    //Parâmetros de calibracao
-    double K11 = 0;
-    double K12 = 0;
-    double K21 = 0;
-    double K22 = 0;
-    double theta1 = 0;
-    double theta2 = 0;
     //Parâmetros de calibração
     int Narduino;
     double *k;
     double theta;
     //Controlador PID
-    LightController *_lightcontroller = 0;
+    LightController *_lightcontroller = NULL;
     //String de comunicacao
     char rI2C[20];
     volatile bool sendflag = false;
     volatile bool recvflag = false;
     
 public:
-    Meta(int Narduino, double T,int ledPin,int sensorPin);
+    Meta(int Narduino,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
     void calibrateLumVoltageModel();
@@ -43,9 +36,9 @@ public:
     
 private:
     char *strAlloc(int len);
-    bool First();
     double *MinSquare(const int N, double *u, double *y);
     void Setu(double u);
+    void Setu_vec();
     double Gety(const int N);
     
 };
