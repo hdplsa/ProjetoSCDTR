@@ -6,6 +6,10 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 	//Inicialização dos arduinos
 	for(int i = 0; i < Narduino; i++){
 		arduino[i] = new Arduino(this->N, ports[i]);
+		//inicialização da callback periodica
+		realtimecallbacks[std::make_pair(i,'l')] = NULL;
+		realtimecallbacks[std::make_pair(i,'d')] = NULL;
+		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
 	}
 	//Modelo dos minimos quadrados
 	this->k11 = 0;
@@ -16,8 +20,46 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 	this->theta2 = 0;
 }
 
-void MainController::printMetrics(){
+void MainController::printMetrics(int i){
+
+	vector<char> comandos = {'l', 'd'};
+	std::function<void(string)> send = NULL;
+	double value = -100;
+
+	// Itera pelos comandos
+	for (std::vector<char>::iterator it = comandos.begin(); it != comandos.end(); ++it){
+		// Obtém o callback
+		send = realtimecallbacks[std::make_pair(i,*it)];
+		if(send != NULL){
+			//Obtém o valor que temos que mandar
+			switch(*it){
+				case 'l':
+					value = arduino.at(i)->getIlluminance();
+					break;	
+				case 'd':
+					value = arduino.at(i)->getDuty();
+					break;
+			}
+
+			boost::posix_time::ptime tempo= arduino.at(i)->getTime();
+			const boost::posix_time::time_duration td = tempo.time_of_day();
+
+			const long hours        = td.hours();
+			const long minutes      = td.minutes();
+			const long seconds      = td.seconds();
+			const long milliseconds = td.total_milliseconds() -
+									((hours * 3600 + minutes * 60 + seconds) * 1000);
+
+			char str[100];
+
+			sprintf(str, "c %c %i %f %02ld:%02ld:%02ld.%03ld\n", 
+				*it, i, value, hours, minutes, seconds, milliseconds);
+
+			send(string(str));
+
+	}
 	
+}
 }
 
 void MainController::get_clientRequest(string str, std::function<void(string)> callback){
@@ -72,7 +114,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 							value = arduino.at(i)->getComfortVariance();
 							break;
 						default:
-							callback("Unknown Command");
+							callback("Unknown Command\n");
 							return;
 							break;
 					}
@@ -91,7 +133,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 					
 				} catch (std::exception &e){
 					// Havendo erro ai em cima, é porque lançado pelo 'at' do arduino, o que indica que não há ess i
-					callback("invalid id");
+					callback("invalid id\n");
 					return;
 				}
 			} else {	// Neste caso, precisamos de ir a todos os arduinos
@@ -114,7 +156,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 								value += arduino.at(i)->getComfortVariance();
 								break;
 							default:
-								callback("Invalid command.");
+								callback("Invalid command.\n");
 								return;
 								break;
 						}
@@ -124,7 +166,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 					callback(send);
 				} catch(std::exception &e){
-					callback("Arduino not available");
+					callback("Arduino not available\n");
 					return;
 				}
 			}
@@ -143,7 +185,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 				callback("ack");
 			} catch (std::exception &e){
-				callback("Invalid id");
+				callback("Invalid id\n");
 				return;
 			}
 
@@ -161,7 +203,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 			callback("ack");
 		} catch (std::exception &e) {
 			cout << "Erro " << e.what() << endl;
-			callback("Unknown error occured");
+			callback("Unknown error occured\n");
 			return;
 		}
 
@@ -185,7 +227,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 						value = arduino.at(i)->getLastMinuteDuty();
 						break;
 					default:
-						callback("Invalid command");
+						callback("Invalid command\n");
 						return;
 				}
 
@@ -202,7 +244,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 				callback(value_str);
 
 			} catch(std::exception &e){
-				callback("Invalid id");
+				callback("Invalid id\n");
 				return;
 			}
 
@@ -211,9 +253,38 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 		case 'c':
 			/* Forma de obter timestamp em c/ milisegundos em http://stackoverflow.com/questions/16077299/how-to-print-current-time-with-milliseconds-using-c-c11
 			*/
+
+			i = get_id(str, callback, 4);
+
+			switch(str.c_str()[2]){
+					case 'l':
+						realtimecallbacks[std::make_pair(i,str.c_str()[2])] = callback;
+						break;
+					case 'd':
+						realtimecallbacks[std::make_pair(i,str.c_str()[2])] = callback;
+						break;
+					default:
+						callback("Invalid command\n");
+						return;
+			}
+
 		break;
 
 		case 'd':
+
+			i = get_id(str, callback, 4);
+
+			switch(str.c_str()[2]){
+					case 'l':
+						realtimecallbacks[std::make_pair(i,str.c_str()[2])] = NULL;
+						break;
+					case 'd':
+						realtimecallbacks[std::make_pair(i,str.c_str()[2])] = NULL;
+						break;
+					default:
+						callback("Invalid command\n");
+						return;
+			}
 
 		break;
 

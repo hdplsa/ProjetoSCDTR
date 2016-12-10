@@ -120,6 +120,10 @@ double Arduino::getPower(){
 	throw "Not implemented";
 }
 
+boost::posix_time::ptime Arduino::getTime(){
+	return t[K];
+}
+
 void Arduino::ledON(int pwm /* = 255 */){
 
 	string str;
