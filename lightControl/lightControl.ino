@@ -96,14 +96,7 @@ void get_Narduinos(char* str){
   }
 }
 
-void setup() {
-  // put your setup code here, to run once:
-  
-  SerialCom::Begin(115200);
-
-    //Inicialização do I2C
-  TWI::begin(EEPROM.read(0));
-  
+void countArduinos(){
   // O arduino 10 faz a contagem do numero de arduinos
   if(EEPROM.read(0) == 10){
       TWI::onSend(count_I2Csend);
@@ -129,7 +122,20 @@ void setup() {
     Serial.println(Narduinos);
     
   }
+}
+
+void setup() {
+  // put your setup code here, to run once:
   
+  SerialCom::Begin(115200);
+
+    //Inicialização do I2C
+  TWI::begin(EEPROM.read(0));
+
+  //Conta o numero de arduinos
+  countArduinos();
+
+  //Define funções callback
   TWI::onReceive(metaI2CString);
   TWI::onSend(sendI2CState);
 
@@ -137,7 +143,6 @@ void setup() {
   meta = new Meta(Narduinos,ledPin, sensorPin);
   controller = meta->getController();
   
-  delay(5000);
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
   //Inicialização completa
