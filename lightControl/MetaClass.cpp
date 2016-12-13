@@ -59,7 +59,6 @@ void Meta::calibrateLumVoltageModel(){
 
     Serial.println("START STATE MACHINE");
     for(j=10; j < 10+2; j++){
-        delay(2000);
         //choice of whos MASTER or SLAVE        
         if(j == EEPROM.read(0)){
             this->_lightcontroller->SetIndex(j);
@@ -81,19 +80,23 @@ void Meta::calibrateLumVoltageModel(){
                 //Global call para todos lerem y
                 TWI::send_msg(0,"SR",strlen("SR"));
                 //Esperar que os restantes leiam
-                Serial.println("WAITING FOR SR");
+                Serial.println("WAITING TO SR");
                 while(!this->sendflag){};
                 Serial.println("SEND SUCCESSFULL");
                 this->sendflag = false;
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
-                delay(10);
+                //Esperar pelo "RS"
+                /*do{
+                    while(!this->recvflag){};
+                    this->recvflag = false;
+                }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));*/
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
             TWI::send_msg(0,"MS",strlen("MS"));
             //Esperar que os restantes leiam
-            Serial.println("WAITING FOR MS");
+            Serial.println("WAITING TO MS");
             while(!this->sendflag){};
             Serial.println("SEND SUCCESSFULL");
             this->sendflag = false;
@@ -103,43 +106,31 @@ void Meta::calibrateLumVoltageModel(){
             theta_[j-10] = ms[1];
             delete ms;
             //Esperar pelos calculos
-            delay(20);
-            
-            STATE = CHOICE;
         break;
         //-----------------------------
         case SLAVE:
         Serial.println("AM SLAVE");
             //Caso de ser SLAVE
-            for(n = 0; n < dimU; n++){
-                //Esperar pelo "SR"
+            n = 0; bool slaveEnd = true;
+            while(slaveEnd){
                 while(!this->recvflag){};
                 this->recvflag = false;
-                //se recebeu a mensagem "SR"
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
                     Serial.print("SR = ");
                     //Leitura do próprio sensor
                     y[n] = this->Gety(N);
                     Serial.println(y[n],4);
+                    n++;
                 }
-            }
-            //Esperar pelo "MS"
-            Serial.println("SLAVE FOR MS");
-            Serial.print("rI2C: ");
-            Serial.println(rI2C);
-            while(!this->recvflag){};
-            Serial.println("GOT MS");
-            this->recvflag = false;
-            //se recebeu a mensagem "MS"
-            if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
-                Serial.println("MS ==");
-                //Determinar k_j, theta_j
-                ms = this->MinSquare(N, u, y);
-                this->k[j-10] = ms[0];
-                theta_[j-10] = ms[1];
-                delete ms;
-
-                STATE = CHOICE;
+                if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
+                    Serial.println("MS ==");
+                    //Determinar k_j, theta_j
+                    ms = this->MinSquare(N, u, y);
+                    this->k[j-10] = ms[0];
+                    theta_[j-10] = ms[1];
+                    delete ms;
+                    slaveEnd = false;
+                }
             }
         break;
         //-----------------------------
