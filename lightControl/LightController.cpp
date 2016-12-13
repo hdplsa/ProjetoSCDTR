@@ -29,6 +29,10 @@ void LightController::setZeroUvec(){
   }
 }
 
+void LightController::setUn(double Un, int n){
+  this->u[n] = Un;
+}
+
 void LightController::setU(double u){
     this->u[1] = u;
 }
@@ -65,6 +69,10 @@ double LightController::getY(){
 
 double LightController::getAverageY(const int N){
     return this->ls->getAverageLuminousIntensity(N);
+}
+
+double LightController::getOwnU(){
+  return this->u[this->index];
 }
 
 void LightController::_Setu(double u){

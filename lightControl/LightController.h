@@ -60,6 +60,7 @@ public:
     LightController(int Narduino, int ledPin, int sensorPin);
     void setRef(int ref);
     void setZeroUvec();
+    void setUn(double Un, int n);
     void setU(double u);
     void setSaturation(double sat_up, double sat_down);
     void setK(double *k);
@@ -68,6 +69,7 @@ public:
     double getControlVariable();
     double getY();
     double getAverageY(const int N);
+    double getOwnU();
     void _Setu(double u);
     double getError();
     double calcController();
