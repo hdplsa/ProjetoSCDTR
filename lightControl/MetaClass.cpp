@@ -67,8 +67,10 @@ void Meta::calibrateLumVoltageModel(){
             case CHOICE:
                 if(j == EEPROM.read(0)){
                     this->_lightcontroller->SetIndex(j);
+                    Serial.println("MASTER");
                     STATE = MASTER;
                 }else{
+                    Serial.println("SLAVE");
                     STATE = SLAVE;
                 }
             //-----------------------------
@@ -90,7 +92,9 @@ void Meta::calibrateLumVoltageModel(){
                 //Global call para todos fazer minSquare
                 TWI::send_msg(0,"MS",strlen("MS"));
                 //Esperar que os restantes leiam
+                Serial.println("Waiting");
                 while(!this->sendflag){};
+                Serial.println("Send Successfull");
                 this->sendflag = false;
                 //Determinar k_j, theta_j
                 ms = this->MinSquare(N, u, y);
