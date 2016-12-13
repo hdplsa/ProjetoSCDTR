@@ -58,94 +58,92 @@ void Meta::calibrateLumVoltageModel(){
         u[n] = n*(Umax/dimU);
     }
 
-    Serial.println("Maquina de estados comeca");
-    //-----------------------------------STATE MACHINE START---------------------------------------
+    Serial.println("START STATE MACHINE");
     for(j=10; j < 10+2; j++){
         delay(2000);
-        END = false;
-        while(!END){
-            switch(STATE){
-                //-----------------------------
-                case CHOICE:
-                    if(j == EEPROM.read(0)){
-                        this->_lightcontroller->SetIndex(j);
-                        Serial.println("MASTER");
-                        STATE = MASTER;
-                    }else{
-                        Serial.println("SLAVE");
-                        STATE = SLAVE;
-                    }
-                    break;
-                //-----------------------------
-                case MASTER:
-                Serial.println("Sou MASTER");
-                    for(n = 0; n < dimU; n++){
-                        //Valor de entrada no LED
-                        this->Setu(u[n]);
-                        Serial.println("MUDEI u");
-                        //Global call para todos lerem y
-                        TWI::send_msg(0,"SR",strlen("SR"));
-                        //Esperar que os restantes leiam
-                        Serial.println("Waiting");
-                        while(!this->sendflag){};
-                        Serial.println("Send Successfull");
-                        this->sendflag = false;
-                        //Leitura do próprio sensor
-                        y[n] = this->Gety(N);
-                        delay(10);
-                    }
-                    this->Setu(0); // lightoff
-                    //Global call para todos fazer minSquare
-                    TWI::send_msg(0,"MS",strlen("MS"));
-                    //Esperar que os restantes leiam
-                    while(!this->sendflag){};
-                    this->sendflag = false;
-                    //Determinar k_j, theta_j
-                    ms = this->MinSquare(N, u, y);
-                    this->k[j-10] = ms[0];
-                    theta_[j-10] = ms[1];
-                    delete ms;
-                    //Esperar pelos calculos
-                    delay(20);
-                    
-                    STATE = CHOICE;
-                    END = true;
-                break;
-                //-----------------------------
-                case SLAVE:
-                Serial.println("Sou SLAVE");
-                    //Caso de ser SLAVE
-                    for(n = 0; n < dimU; n++){
-                        //Esperar pelo "SR"
-                        while(!this->recvflag){};
-                        this->recvflag = false;
-                        //se recebeu a mensagem "SR"
-                        if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
-                            Serial.println("SR ==");
-                            //Leitura do próprio sensor
-                            y[n] = this->Gety(N);
-                        }
-                    }
-                    //Esperar pelo "MS"
-                    while(!this->recvflag){};
-                    this->recvflag = false;
-                    //se recebeu a mensagem "MS"
-                    if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
-                        Serial.println("MS ==");
-                        //Determinar k_j, theta_j
-                        ms = this->MinSquare(N, u, y);
-                        this->k[j-10] = ms[0];
-                        theta_[j-10] = ms[1];
-                        delete ms;
-
-                        STATE = CHOICE;
-                        END = true;
-                    }
-                break;
-                //-----------------------------
-            }
+        //choice of whos MASTER or SLAVE        
+        if(j == EEPROM.read(0)){
+            this->_lightcontroller->SetIndex(j);
+            Serial.println("MASTER");
+            STATE = MASTER;
+        }else{
+            Serial.println("SLAVE");
+            STATE = SLAVE;
         }
+        //-----------------------------------STATE MACHINE START---------------------------------------
+        switch(STATE){
+        //-----------------------------
+        case MASTER:
+        Serial.println("AM MASTER");
+            for(n = 0; n < dimU; n++){
+                //Valor de entrada no LED
+                this->Setu(u[n]);
+                Serial.println("CHANGED u");
+                //Global call para todos lerem y
+                TWI::send_msg(0,"SR",strlen("SR"));
+                //Esperar que os restantes leiam
+                Serial.println("WAITING FOR SR");
+                while(!this->sendflag){};
+                Serial.println("SEND SUCCESSFULL");
+                this->sendflag = false;
+                //Leitura do próprio sensor
+                y[n] = this->Gety(N);
+                delay(10);
+            }
+            this->Setu(0); // lightoff
+            //Global call para todos fazer minSquare
+            TWI::send_msg(0,"MS",strlen("MS"));
+            //Esperar que os restantes leiam
+            Serial.println("WAITING FOR MS");
+            while(!this->sendflag){};
+            Serial.println("SEND SUCCESSFULL");
+            this->sendflag = false;
+            //Determinar k_j, theta_j
+            ms = this->MinSquare(N, u, y);
+            this->k[j-10] = ms[0];
+            theta_[j-10] = ms[1];
+            delete ms;
+            //Esperar pelos calculos
+            delay(20);
+            
+            STATE = CHOICE;
+            END = true;
+        break;
+        //-----------------------------
+        case SLAVE:
+        Serial.println("AM SLAVE");
+            //Caso de ser SLAVE
+            for(n = 0; n < dimU; n++){
+                //Esperar pelo "SR"
+                while(!this->recvflag){};
+                this->recvflag = false;
+                //se recebeu a mensagem "SR"
+                if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
+                    Serial.println("SR ==");
+                    //Leitura do próprio sensor
+                    y[n] = this->Gety(N);
+                }
+            }
+            //Esperar pelo "MS"
+            Serial.println("SLAVE FOR MS");
+            while(!this->recvflag){};
+            Serial.println("GOT MS");
+            this->recvflag = false;
+            //se recebeu a mensagem "MS"
+            if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
+                Serial.println("MS ==");
+                //Determinar k_j, theta_j
+                ms = this->MinSquare(N, u, y);
+                this->k[j-10] = ms[0];
+                theta_[j-10] = ms[1];
+                delete ms;
 
+                STATE = CHOICE;
+                END = true;
+            }
+        break;
+        //-----------------------------
+        }
     }
     //-----------------------------------STATE MACHINE END-----------------------------------------
     //Valor final do offset
