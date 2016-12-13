@@ -133,7 +133,9 @@ void setup() {
   TWI::begin(EEPROM.read(0));
 
   //Conta o numero de arduinos
-  countArduinos();
+  //countArduinos();
+  //Serial.print("Narduinos: ");
+  //Serial.println(Narduinos);
 
   //Define funções callback
   TWI::onReceive(metaI2CString);
