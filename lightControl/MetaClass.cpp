@@ -49,7 +49,6 @@ void Meta::calibrateLumVoltageModel(){
     double u[dimU], y[dimU]; //vector de entrada (tensao) e de saida (luminancia)
     double *ms; //vector de resposta de minimos quadrados
     int j,n;
-    bool END;
     
     //STATE AND VARIABLE INIT
     this->Setu(0);
@@ -107,7 +106,6 @@ void Meta::calibrateLumVoltageModel(){
             delay(20);
             
             STATE = CHOICE;
-            END = true;
         break;
         //-----------------------------
         case SLAVE:
@@ -119,13 +117,16 @@ void Meta::calibrateLumVoltageModel(){
                 this->recvflag = false;
                 //se recebeu a mensagem "SR"
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
-                    Serial.println("SR ==");
+                    Serial.print("SR = ");
                     //Leitura do próprio sensor
                     y[n] = this->Gety(N);
+                    Serial.println(y[n],4);
                 }
             }
             //Esperar pelo "MS"
             Serial.println("SLAVE FOR MS");
+            Serial.print("rI2C: ");
+            Serial.println(rI2C);
             while(!this->recvflag){};
             Serial.println("GOT MS");
             this->recvflag = false;
@@ -139,7 +140,6 @@ void Meta::calibrateLumVoltageModel(){
                 delete ms;
 
                 STATE = CHOICE;
-                END = true;
             }
         break;
         //-----------------------------
