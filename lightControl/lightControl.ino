@@ -12,7 +12,7 @@ LightController * controller;
 
 // Numeros das portas usadas
 constexpr int ledPin = 11;
-constexpr int sensorPin = 5;
+constexpr int sensorPin = 1;
 
 constexpr uint8_t deviceID = 2;
 volatile int Narduinos = 0;
@@ -113,7 +113,6 @@ void setup() {
       char msg[4] = {'C', ' ', (char)Narduinos, '\0'};
 
       TWI::send_msg(0,msg,3);
-
       // Espera que a mensagem seja enviada
       while(send_success == false && send_error == false){}
 
@@ -123,7 +122,6 @@ void setup() {
   } else { // Os restantes arduinos têm que receber o Narduinos por TWI
 
     TWI::onReceive(get_Narduinos);
-
     // Espera para receber o Narduino
     while(!Narduinos){}
 

@@ -57,6 +57,7 @@ void Meta::calibrateLumVoltageModel(){
         u[n] = n*(Umax/dimU);
     }
 
+    Serial.println("Maquina de estados comeca");
     //-----------------------------------STATE MACHINE START---------------------------------------
     for(j=10; j < 10+this->Narduino; j++){
         Serial.println("MUDEI DE ARDUINO MASTER------------");
@@ -70,7 +71,6 @@ void Meta::calibrateLumVoltageModel(){
                 }else{
                     STATE = SLAVE;
                 }
-            break;
             //-----------------------------
             case MASTER:
                 for(n = 0; n < dimU; n++){
