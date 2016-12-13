@@ -61,16 +61,14 @@ public:
     void setRef(int ref);
     void setZeroUvec();
     void setUn(double Un, int n);
-    void setU(double u);
+    void setLedU(double u);
     void setSaturation(double sat_up, double sat_down);
     void setK(double *k);
     void setTheta(double theta);
     double getT();
-    double getControlVariable();
     double getY();
     double getAverageY(const int N);
     double getOwnU();
-    void _Setu(double u);
     double getError();
     double calcController();
     void LEDInputControlVariable();

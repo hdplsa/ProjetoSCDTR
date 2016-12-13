@@ -33,8 +33,8 @@ void LightController::setUn(double Un, int n){
   this->u[n] = Un;
 }
 
-void LightController::setU(double u){
-    this->u[1] = u;
+void LightController::setLedU(double u){
+    return this->ledp->setLedPWMVoltage(u);
 }
 
 void LightController::setSaturation(double sat_up, double sat_down){
@@ -57,11 +57,6 @@ double LightController::getT(){
     return this->T;
 }
 
-// Retorna o sinal de controlo a ser aplicado ao LED
-double LightController::getControlVariable(){
-    return this->u[1];
-}
-
 // Retorna o y guardado no objeto
 double LightController::getY(){
     return this->y;
@@ -74,12 +69,6 @@ double LightController::getAverageY(const int N){
 double LightController::getOwnU(){
   return this->u[this->index];
 }
-
-void LightController::_Setu(double u){
-    return this->ledp->setLedPWMVoltage(u);
-}
-
-
 
 // Retorna o erro do ciclo "atual"
 double LightController::getError(){

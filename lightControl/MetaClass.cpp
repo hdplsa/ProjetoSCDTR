@@ -202,7 +202,7 @@ double *Meta::MinSquare(const int N, double *u, double *y){
 }
 
 void Meta::Setu(double u){
-  this->_lightcontroller->_Setu(u);
+  this->_lightcontroller->setLedU(u);
   delay(50);
 }
 
