@@ -1,10 +1,16 @@
 #include "LightController.h"
 
 LightController::LightController(int Narduino,int ledPin, int sensorPin){
+
+    //Numero de arduinos
+    this->Narduino = Narduino;
     
     //Depêndencias do feedback
     this->ls = new LightSensor(sensorPin,5.0);
     this->ledp = new LedPWM(ledPin);
+    
+    //Alocação de vector de inputs
+    this-> u = new double[Narduino];
     
     //Variáveis do modelo tensão/lux (Voltam a ser inicializadas no calibrate)
     this->k = 0;
@@ -14,6 +20,13 @@ LightController::LightController(int Narduino,int ledPin, int sensorPin){
 void LightController::setRef(int ref){
     this->ref = (double)ref;
     this->ffflag = 1;
+}
+
+void LightController::setZeroUvec(){
+  int i;
+  for(i=0; i < this->Narduino; i++){
+    this->u[i] = 0;
+  }
 }
 
 void LightController::setU(double u){
@@ -149,6 +162,7 @@ LightController::~LightController(){
     //Free à memória
     delete this->ls;
     delete this->ledp;
+    delete this->u;
 }
 
 

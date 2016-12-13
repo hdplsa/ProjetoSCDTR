@@ -207,9 +207,10 @@ void Meta::Setu(double u){
 }
 
 void Meta::Setu_vec(){
-	
+	  int STATE, j;
     char *send;
-	STATE = SHUT;
+    
+	  STATE = SHUT;
 	
 	for(j=10; j < 10+this->Narduino; j++){
 		Serial.println("MUDEI DE ARDUINO MASTER------------");

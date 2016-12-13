@@ -30,7 +30,6 @@ class LightController{
     //Index do Arduino
     int index;
 
-
     //Parametros de Calibração
     double *k;
     double theta;
@@ -40,10 +39,11 @@ class LightController{
     double ref = 0;
     double e[2] = {0,0};
     double y = 0;
-    double u[Narduino];
+    double *u;
     double ui_ant = 0;
     double ud_ant = 0;
     double u_ant = 0;
+    double u_pid = 0;
     double sat_up = 5.0;
     double sat_down = 0;
     volatile int ffflag = 0;
@@ -59,6 +59,7 @@ class LightController{
 public:
     LightController(int Narduino, int ledPin, int sensorPin);
     void setRef(int ref);
+    void setZeroUvec();
     void setU(double u);
     void setSaturation(double sat_up, double sat_down);
     void setK(double *k);
