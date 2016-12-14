@@ -77,24 +77,24 @@ void Meta::calibrateLumVoltageModel(){
                 //Valor de entrada no LED
                 this->Setu(u[n]);
                 Serial.println("CHANGED u");
-                this->SyncComm("SR","RS");
+                //this->SyncComm("SR\0","RS\0");
                 //Global call para todos lerem y
-                /*TWI::send_msg(0,"SR",strlen("SR"));
+                TWI::send_msg(0,"SR",strlen("SR"));
                 //Esperar que os restantes leiam
                 Serial.println("WAITING TO SR");
                 while(!this->sendflag){};
                 Serial.println("SEND SUCCESSFULL");
-                this->sendflag = false;*/
+                this->sendflag = false;
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
                 //Esperar pelo "RS"
                 //Serial.println("WAITING for RS");
-                /*do{ 
+                do{ 
                     Serial.println("SHIT"); 
                     while(!this->recvflag){}
                     this->recvflag = false;
                 }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));
-                Serial.println("RS RECEIVED");*/
+                Serial.println("RS RECEIVED");
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
