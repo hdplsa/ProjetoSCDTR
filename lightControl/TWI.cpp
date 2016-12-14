@@ -120,7 +120,7 @@ int TWI::send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
     // Espera que acabem as transações talvez seja melhor
     // Não bloquear o programa, simplesmente dizer -1
     while(twi_status != 0){
-      Serial.print("Busy\n");
+      Serial.print("Busy "); Serial.print(twi_status); Serial.print('\n');
     }
 
     Serial.println(TWI::twi_status);
@@ -338,7 +338,7 @@ void TWI::Interrupt_ISR(){
 
             twi_status = 0;
             if(twi_buf[twi_ptr -1] != '\0'){
-              TWI::send_msg(0,"Error",strlen("Error");
+              Serial.println("RcvError");
             } else {
               data_received();
             }
