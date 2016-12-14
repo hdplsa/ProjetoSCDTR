@@ -95,6 +95,7 @@ void Meta::calibrateLumVoltageModel(){
                     this->recvflag = false;
                 }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));
                 Serial.println("RS RECEIVED");
+               delay(100);
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
