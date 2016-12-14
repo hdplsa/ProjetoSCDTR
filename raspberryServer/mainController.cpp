@@ -11,13 +11,6 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 		realtimecallbacks[std::make_pair(i,'d')] = NULL;
 		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
 	}
-	//Modelo dos minimos quadrados
-	this->k11 = 0;
-	this->k12 = 0;
-	this->k21 = 0;
-	this->k22 = 0;
-	this->theta1 = 0;
-	this->theta2 = 0;
 }
 
 void MainController::printMetrics(int i){

@@ -18,9 +18,6 @@ class MainController{
 	int Narduino;
 	//Arduinos
 	vector<Arduino*> arduino;
-	//Calibração minimos quadrados
-	double k11, k12, k21, k22;
-	double theta1, theta2;
 	
 	public:
 		MainController(int Narduino, vector<string> ports);

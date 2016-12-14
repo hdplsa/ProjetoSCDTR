@@ -25,13 +25,6 @@ void LedPWM::setLedPWMVoltage(double voltage){
   this->setPWMOutput(this->LedPin,(int)(voltage*(255.0/5.0)));
 }
 
-double LedPWM::calculateLedEnergyPeriod(){
-  double E;
-  //Calcula energia num ciclo (mJ)
-  E = 1000*PLed*(this->dutCycle/255.0)*this->TPWM;
-  return E;
-}
-
 LedPWM::~LedPWM(){
   
 }
