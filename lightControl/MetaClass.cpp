@@ -59,7 +59,7 @@ void Meta::calibrateLumVoltageModel(){
     }
 
     Serial.println("START STATE MACHINE");
-    for(j=10; j < 10+2; j++){
+    for(j=10; j < 10+this->Narduino; j++){
         //choice of whos MASTER or SLAVE        
         if(j == EEPROM.read(0)){
             this->_lightcontroller->SetIndex(j-10);
@@ -105,8 +105,8 @@ void Meta::calibrateLumVoltageModel(){
             this->sendflag = false;
             //Determinar k_j, theta_j
             ms = this->MinSquare(N, u, y);
-            //this->k[j-10] = ms[0];
-            //theta_[j-10] = ms[1];
+            this->k[j-10] = ms[0];
+            theta_[j-10] = ms[1];
             delete ms;
             //Esperar pelos calculos
         break;

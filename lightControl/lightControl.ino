@@ -15,7 +15,7 @@ constexpr int ledPin = 11;
 constexpr int sensorPin = 1;
 
 constexpr uint8_t deviceID = 2;
-volatile int Narduinos = 0;
+volatile int Narduinos = 2;
 
 void initTimer1(){
   cli();
