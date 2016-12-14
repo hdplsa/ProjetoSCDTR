@@ -312,7 +312,7 @@ void TWI::Interrupt_ISR(){
                   data_received();
                 }
                   
-                }
+             }
 
             // Avisa que os dados foram processados
             TWCR = (1<<TWINT)
@@ -354,7 +354,7 @@ void TWI::Interrupt_ISR(){
               Serial.print(TWSR, HEX);
               Serial.print('\n');
             }
-            TWCR = (1 << TWINT) //
+            TWCR = (1 << TWINT)
                  | (1 << TWSTO)
                  | (1 << TWEN)
                  | (1 << TWIE);
