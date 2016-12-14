@@ -119,9 +119,11 @@ int TWI::send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
     
     // Espera que acabem as transações talvez seja melhor
     // Não bloquear o programa, simplesmente dizer -1
-    //while(twi_busy()){
-    //  Serial.print("Busy\n");
-    //}
+    while(twi_status != 0){
+      Serial.print("Busy\n");
+    }
+
+    Serial.println(TWI::twi_status);
     
     // Este primeiro caracter corresponde ao SLA+W, por isso é que
     // fazemos OR 0, o +W é o bit menos significativo
@@ -333,7 +335,8 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEA)  // Enable aknowledge
                  | (1 << TWEN)  // TWI enable
                  | (1 << TWIE); // Enable interrupção
-            
+
+            twi_status = 0;
             data_received();
             break;
 

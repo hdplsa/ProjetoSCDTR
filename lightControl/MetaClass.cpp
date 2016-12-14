@@ -77,22 +77,24 @@ void Meta::calibrateLumVoltageModel(){
                 //Valor de entrada no LED
                 this->Setu(u[n]);
                 Serial.println("CHANGED u");
+                this->SyncComm("SR","RS");
                 //Global call para todos lerem y
-                TWI::send_msg(0,"SR",strlen("SR"));
+                /*TWI::send_msg(0,"SR",strlen("SR"));
                 //Esperar que os restantes leiam
                 Serial.println("WAITING TO SR");
                 while(!this->sendflag){};
                 Serial.println("SEND SUCCESSFULL");
-                this->sendflag = false;
+                this->sendflag = false;*/
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
                 //Esperar pelo "RS"
-                Serial.println("WAITING for RS");
-                do{ 
+                //Serial.println("WAITING for RS");
+                /*do{ 
                     Serial.println("SHIT"); 
                     while(!this->recvflag){}
                     this->recvflag = false;
                 }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));
+                Serial.println("RS RECEIVED");*/
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
@@ -116,7 +118,9 @@ void Meta::calibrateLumVoltageModel(){
             n = 0; bool slaveEnd = false;
             while(!slaveEnd){
                 //Espera comando do MASTER
-                while(!this->recvflag){Serial.print("rI2C "); Serial.println(rI2C);};
+                Serial.println("WAITING FOR SR");
+                while(!this->recvflag){};
+                Serial.println("SR RECEIVED");
                 this->recvflag = false;
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
                     Serial.print("SR = ");
@@ -260,5 +264,34 @@ void Meta::Setu_vec(){
 
 double Meta::Gety(const int N){
     return this->_lightcontroller->getAverageY(N);
+}
+
+void Meta::SyncComm(char *_send, char *_conf){
+    //check length of _send and _conf
+    int lnsend = strlen(_send);
+    int lnconf = strlen(_conf);
+    bool flag = false;
+
+    //Send _send
+    while(!flag){
+        TWI::send_msg(0,_send,lnsend);
+        //Wait until it send
+        while(!this->sendflag){};
+        this->sendflag = false; 
+        Serial.println("Passei aqui ou assim um merda qualquer");
+        //wait for confirmation
+        while(!this->recvflag){};
+        this->recvflag = false;
+        Serial.println("Tambem passei aqui");
+
+        //CONFIRMATION MUST BE A 2 CHAR STRING
+        //check if strings are the same length
+        if(lnconf == strlen(rI2C)){
+            //check if comm buffer is equal to _conf string
+            if((this->rI2C[0] == _conf[0])&&(this->rI2C[1] == _conf[1])){
+                flag = true;
+            }
+        }
+    }
 }
 

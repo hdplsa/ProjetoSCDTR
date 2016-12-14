@@ -40,6 +40,8 @@ private:
     void Setu(double u);
     void Setu_vec();
     double Gety(const int N);
+
+    void SyncComm(char *_send, char *_conf);
     
 };
 

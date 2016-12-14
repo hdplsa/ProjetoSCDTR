@@ -83,7 +83,8 @@ private:
     double calcDeadzone(double e);
     double calcPController();
     double calcPIController();
-    double calcPDController();   
+    double calcPDController();
+    double calSumOtherKus();   
 };
 
 #endif
