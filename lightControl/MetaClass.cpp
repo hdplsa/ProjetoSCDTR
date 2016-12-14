@@ -28,6 +28,9 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
       this->k[i] = 0;
     }
     this->theta = 0;
+
+    //Init vector de us
+    this->_lightcontroller->setZeroUvec();
 }
 
 LightController *Meta::getController(){
