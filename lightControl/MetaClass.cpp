@@ -158,6 +158,7 @@ void Meta::printModel(){
   Serial.print("[");
   for(i=0; i < this->Narduino; i++){
     Serial.print(this->k[i],4);
+    Serial.print(" ");
   }
   Serial.print("] ");
   Serial.println(this->theta,4);
