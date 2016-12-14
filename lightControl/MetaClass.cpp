@@ -79,7 +79,7 @@ void Meta::calibrateLumVoltageModel(){
                 Serial.println("CHANGED u");
                 this->rI2C[0] = '\0';
                 //Global call para todos lerem y
-                TWI::send_msg(0,"SR\0",strlen("SR")+1);
+                TWI::send_msg(0,"SR",strlen("SR"));
                 //Esperar que os restantes leiam
                 //Serial.println("WAITING TO SR");
                 while(!this->sendflag){};
@@ -90,7 +90,7 @@ void Meta::calibrateLumVoltageModel(){
                 Serial.println(y[n],4);
                 //Esperar pelo "RS"
                 //Serial.println("WAITING for RS");
-                while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S'))){};
+                //while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S'))){};
                 //Serial.println("RS RECEIVED");
                delay(100);
             }
@@ -128,12 +128,12 @@ void Meta::calibrateLumVoltageModel(){
                     Serial.println(y[n],4);
                     n++;
                     //Global call para enviar RS
-                    TWI::send_msg(0,"RS\0",strlen("RS")+1);
+                    //TWI::send_msg(0,"RS\0",strlen("RS")+1);
                     //Esperar que os restantes leiam
                     //Serial.println("WAITING TO RS");
-                    while(!this->sendflag){};
+                    //while(!this->sendflag){};
                     //Serial.println("SEND SUCCESSFULL");
-                    this->sendflag = false;
+                    //this->sendflag = false;
                 }
                 if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
                     //Serial.println("MS ==");
