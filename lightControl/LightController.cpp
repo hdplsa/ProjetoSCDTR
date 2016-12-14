@@ -172,10 +172,20 @@ double LightController::calcErro(){
     return this->ref-this->y;
 }
 
+double LightController::calSumOtherKus(){
+    int n, ans;
+    for(n=0,ans=0; n < this->Narduino; n++){
+        if(n != this->index){
+            ans = ans + this->k[n]*this->u[n];
+        }
+    }
+    return ans;
+}
+
 double LightController::calcFeedForward(){
     double feedforward;
     
-    //feedforward = (this->ref - this->theta)/this->k[j];
+    feedforward = (this->ref - this->calSumOtherKus() - this->theta)/this->k[this->index];
     
     return feedforward;
 }
