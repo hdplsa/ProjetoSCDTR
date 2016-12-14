@@ -23,6 +23,7 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
     }
     //Init do modelo feedforward
     this->Narduino = Narduino;
+    this->k = new double[Narduino];
     for(i = 0; i < this->Narduino; i++){
       this->k[i] = 0;
     }
@@ -61,7 +62,7 @@ void Meta::calibrateLumVoltageModel(){
     for(j=10; j < 10+2; j++){
         //choice of whos MASTER or SLAVE        
         if(j == EEPROM.read(0)){
-            this->_lightcontroller->SetIndex(j);
+            this->_lightcontroller->SetIndex(j-10);
             Serial.println("MASTER");
             STATE = MASTER;
         }else{
@@ -104,8 +105,8 @@ void Meta::calibrateLumVoltageModel(){
             this->sendflag = false;
             //Determinar k_j, theta_j
             ms = this->MinSquare(N, u, y);
-            this->k[j-10] = ms[0];
-            theta_[j-10] = ms[1];
+            //this->k[j-10] = ms[0];
+            //theta_[j-10] = ms[1];
             delete ms;
             //Esperar pelos calculos
         break;

@@ -254,13 +254,13 @@ void TWI::Interrupt_ISR(){
                      | (1 << TWEN)  // Enable ao TWI
                      | (1 << TWIE); // Enable interrupção
                 // Após uma escrita bem sucedida, ficamos em modo de espera
-                twi_status = 0;
                 if(TWI_DEBUG){
                   Serial.print("STOP\n");
                 }
 
                 set_slaveR(); // Retorna o arduino ao modo slave receiver
                 data_sent(); // chama o callback que avisa que os dados foram enviados
+                twi_status = 0;
             }
             break;
             
