@@ -89,7 +89,7 @@ void Meta::calibrateLumVoltageModel(){
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
                 Serial.println(y[n],4);
-               //delay(100);
+               delay(20);
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
