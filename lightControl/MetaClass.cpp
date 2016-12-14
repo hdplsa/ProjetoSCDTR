@@ -214,39 +214,56 @@ void Meta::Setu(double u){
 }
 
 void Meta::Setu_vec(){
-	  int STATE, j;
-    char *send;
-    
-	  STATE = SHUT;
+	int STATE, j, dc;
+    char send[32];
 	
 	for(j=10; j < 10+this->Narduino; j++){
-		Serial.println("MUDEI DE ARDUINO MASTER------------");
-		delay(2000);
+        //choice of whos MASTER or SLAVE        
+        if(j == EEPROM.read(0)){
+            this->_lightcontroller->SetIndex(j-10);
+            Serial.println("MASTER");
+            STATE = MASTER;
+        }else{
+            Serial.println("SLAVE");
+            STATE = SLAVE;
+        }
 		switch(STATE){
 			//-----------------------------
-			case SHUT:
-				if(j == EEPROM.read(0)){
-					STATE = TALK;
-				}else{
-					//recebe cenas;
-					if((this->rI2C[0] == 'U')&&(this->rI2C[1] == '=')){
-					Serial.println("SR ==");
-					//sscanf(rI2C,"%*s %4.1f",/*meter o valor no vector de tensão do Arduino*/);
-					}
-				}
-			break;
-			//-----------------------------
 			case TALK:
-				//Valor de entrada no LED
-				//sprintf(send,"U=%4.1f",/*meter o valor que está no vector de tensão do Arduino*/)
-				Serial.println("MANDEI U");
-				//Global call para todos lerem y
-				TWI::send_msg(0,send,strlen(send));
-				//Esperar que os restantes leiam
+                //Espera antes de falar
+                delay(20);
+				//Global call para enviar U
+				TWI::send_msg(0,"U",strlen("U"));
+				//Esperar mensagem enviada
 				while(!this->sendflag){};
 				this->sendflag = false;
-				delay(10);
-				STATE = SHUT;
+                //Valor de entrada no LED
+				Serial.println("Sent U");
+                //Get dutycycle
+                dc = getOwnDutyCycle();
+                //Envia valor
+                sprintf(send,"%d",dc);
+                //Espera antes de falar
+                delay(20);
+                //Global call para enviar valor de U
+                TWI::send_msg(0,send,strlen(send));
+                //Esperar mensagem enviada
+				while(!this->sendflag){};
+				this->sendflag = false;
+			break;
+            //-----------------------------
+			case SHUT:
+				while(!this->recvflag){};
+                this->recvflag = false;
+                //Esperar por U para receber valor
+                if(this->rI2C[0] == 'U'){
+                    while(!this->recvflag){};
+                    this->recvflag = false;
+                    //Obter duty cycle da mensagem
+                    sscanf(this->rI2C,"%d",&dc);
+                    //Set dutycycle
+                    setUnFromdc(dc, j-10);
+                }
 			break;
 			//-----------------------------
 		}

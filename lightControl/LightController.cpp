@@ -33,6 +33,10 @@ void LightController::setUn(double Un, int n){
   this->u[n] = Un;
 }
 
+void LightController::setUnFromdc(int dcn, int n){
+  this->u[n] = dcn*(5.0/255.0);
+}
+
 void LightController::setLedU(double u){
     return this->ledp->setLedPWMVoltage(u);
 }
