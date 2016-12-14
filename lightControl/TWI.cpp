@@ -307,11 +307,12 @@ void TWI::Interrupt_ISR(){
 
                 if(twi_buf[twi_ptr -1] != '\0'){
                   Serial.println("RcvError");
+                  twi_status = 0;
                 } else {
                   data_received();
                 }
                   
-                }
+             }
 
             // Avisa que os dados foram processados
             TWCR = (1<<TWINT)
@@ -353,7 +354,7 @@ void TWI::Interrupt_ISR(){
               Serial.print(TWSR, HEX);
               Serial.print('\n');
             }
-            TWCR = (1 << TWINT) //
+            TWCR = (1 << TWINT)
                  | (1 << TWSTO)
                  | (1 << TWEN)
                  | (1 << TWIE);
