@@ -337,7 +337,11 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWIE); // Enable interrupção
 
             twi_status = 0;
-            data_received();
+            if(twi_buf[twi_ptr -1] != '\0'){
+              TWI::send_msg(0,"Error",strlen("Error");
+            } else {
+              data_received();
+            }
             break;
 
         // Caso recebamos um comando não préprogramado
