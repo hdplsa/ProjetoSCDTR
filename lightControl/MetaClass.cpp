@@ -98,7 +98,7 @@ void Meta::calibrateLumVoltageModel(){
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
-            TWI::send_msg(0,"MS",strlen("MS"));
+            TWI::send_msg(0,"MS\0",strlen("MS")+1);
             //Esperar que os restantes leiam
             Serial.println("WAITING TO MS");
             while(!this->sendflag){};
@@ -124,6 +124,7 @@ void Meta::calibrateLumVoltageModel(){
                 this->recvflag = false;
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
                     Serial.print("SR = ");
+                    this->rI2C[0] = '\0';
                     //Leitura do próprio sensor
                     y[n] = this->Gety(N);
                     Serial.println(y[n],4);
@@ -138,6 +139,7 @@ void Meta::calibrateLumVoltageModel(){
                 }
                 if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
                     Serial.println("MS ==");
+                    this->rI2C[0] = '\0';
                     //Determinar k_j, theta_j
                     ms = this->MinSquare(N, u, y);
                     this->k[j-10] = ms[0];

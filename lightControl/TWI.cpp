@@ -307,6 +307,7 @@ void TWI::Interrupt_ISR(){
 
                 if(twi_buf[twi_ptr -1] != '\0'){
                   Serial.println("RcvError");
+                  twi_status = 0;
                 } else {
                   data_received();
                 }

@@ -147,6 +147,7 @@ void setup() {
   
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
+  meta->printModel();
   //Inicialização completa
   Serial.println((char*)"Ready");
   meta->printModel();
