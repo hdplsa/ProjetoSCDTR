@@ -38,6 +38,7 @@ void initTimer1(){
  * a class Meta
  */
 void metaI2CString(char *str){
+  Serial.println(str);
   meta->receivedI2C(str);
 }
 

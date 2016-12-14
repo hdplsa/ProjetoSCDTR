@@ -76,8 +76,7 @@ void Meta::calibrateLumVoltageModel(){
             for(n = 0; n < dimU; n++){
                 //Valor de entrada no LED
                 this->Setu(u[n]);
-                //Serial.println("CHANGED u");
-                //this->SyncComm("SR\0","RS\0");
+                Serial.println("CHANGED u");
                 this->rI2C[0] = '\0';
                 //Global call para todos lerem y
                 TWI::send_msg(0,"SR\0",strlen("SR")+1);
@@ -88,10 +87,10 @@ void Meta::calibrateLumVoltageModel(){
                 this->sendflag = false;
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
+                Serial.println(y[n],4);
                 //Esperar pelo "RS"
                 //Serial.println("WAITING for RS");
-                do{ 
-                }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));
+                while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S'))){};
                 //Serial.println("RS RECEIVED");
                delay(100);
             }

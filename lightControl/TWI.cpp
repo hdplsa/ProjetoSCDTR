@@ -122,8 +122,6 @@ int TWI::send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
     while(twi_status != 0){
       Serial.print("Busy "); Serial.print(twi_status); Serial.print('\n');
     }
-
-    Serial.println(TWI::twi_status);
     
     // Este primeiro caracter corresponde ao SLA+W, por isso é que
     // fazemos OR 0, o +W é o bit menos significativo
@@ -303,15 +301,7 @@ void TWI::Interrupt_ISR(){
                 twi_buf[twi_ptr] = TWDR;
                 
                 // Avança uma posição na string
-                twi_ptr++;
-
-                if(twi_buf[twi_ptr -1] != '\0'){
-                  Serial.println("RcvError");
-                  twi_status = 0;
-                } else {
-                  data_received();
-                }
-                  
+                twi_ptr++;                
              }
 
             // Avisa que os dados foram processados
@@ -344,6 +334,7 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEN)  // TWI enable
                  | (1 << TWIE); // Enable interrupção
 
+            data_received();
             twi_status = 0;
             break;
 
