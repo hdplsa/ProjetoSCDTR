@@ -185,16 +185,18 @@ void loop() {
     Serial.print("t = ");
     Serial.println(millis()); 
 
+    meta->Setu_vec();
+
     // Recebe mensagens 
-    SerialCom::receive_message();
+    //SerialCom::receive_message();
 
     // Obtem a referência da mensagem. è -1 se não houver ref nova.
-    new_ref = SerialCom::getRef();
+    ///new_ref = SerialCom::getRef();
 
-    if(new_ref != -1){
+    /*if(new_ref != -1){
       controller->setRef(new_ref);
       Serial.println("Mudada Ref");
-    }
+    }*/
 
     flag = 0;
   }
