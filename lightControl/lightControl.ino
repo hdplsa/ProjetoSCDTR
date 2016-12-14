@@ -169,7 +169,7 @@ ISR(TIMER1_COMPA_vect){
 void loop() {
   // put your main code here, to run repeatedly:
   
-  /*if(flag){
+  if(flag){
     
     // debug serial
     Serial.print("y = ");
@@ -196,5 +196,5 @@ void loop() {
     }
 
     flag = 0;
-  }*/
+  }
 }
