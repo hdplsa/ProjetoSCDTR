@@ -304,7 +304,14 @@ void TWI::Interrupt_ISR(){
                 
                 // Avança uma posição na string
                 twi_ptr++;
-            }
+
+                if(twi_buf[twi_ptr -1] != '\0'){
+                  Serial.println("RcvError");
+                } else {
+                  data_received();
+                }
+                  
+                }
 
             // Avisa que os dados foram processados
             TWCR = (1<<TWINT)
@@ -337,11 +344,6 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWIE); // Enable interrupção
 
             twi_status = 0;
-            if(twi_buf[twi_ptr -1] != '\0'){
-              Serial.println("RcvError");
-            } else {
-              data_received();
-            }
             break;
 
         // Caso recebamos um comando não préprogramado

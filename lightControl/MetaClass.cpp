@@ -79,7 +79,7 @@ void Meta::calibrateLumVoltageModel(){
                 Serial.println("CHANGED u");
                 //this->SyncComm("SR\0","RS\0");
                 //Global call para todos lerem y
-                TWI::send_msg(0,"SR",strlen("SR"));
+                TWI::send_msg(0,"SR\0",strlen("SR")+1);
                 //Esperar que os restantes leiam
                 Serial.println("WAITING TO SR");
                 while(!this->sendflag){};
@@ -129,7 +129,7 @@ void Meta::calibrateLumVoltageModel(){
                     Serial.println(y[n],4);
                     n++;
                     //Global call para enviar RS
-                    TWI::send_msg(0,"RS",strlen("RS"));
+                    TWI::send_msg(0,"RS\0",strlen("RS")+1);
                     //Esperar que os restantes leiam
                     Serial.println("WAITING TO RS");
                     while(!this->sendflag){};
