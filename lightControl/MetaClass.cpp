@@ -240,7 +240,7 @@ void Meta::Setu_vec(){
                 //Valor de entrada no LED
 				Serial.println("Sent U");
                 //Get dutycycle
-                dc = getOwnDutyCycle();
+                dc = _lightcontroller->getOwnDutyCycle();
                 //Envia valor
                 sprintf(send,"%d",dc);
                 //Espera antes de falar
@@ -262,7 +262,7 @@ void Meta::Setu_vec(){
                     //Obter duty cycle da mensagem
                     sscanf(this->rI2C,"%d",&dc);
                     //Set dutycycle
-                    setUnFromdc(dc, j-10);
+                    _lightcontroller->setUnFromdc(dc, j-10);
                 }
 			break;
 			//-----------------------------
