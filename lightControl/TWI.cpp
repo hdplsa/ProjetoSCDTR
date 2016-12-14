@@ -275,6 +275,7 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEN)  // Enable TWI
                  | (1 << TWIE); // Enable interrupção
 
+            twi_status = 0;
             data_errorSend();
             break;
             // Recebemos o General call address

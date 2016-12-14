@@ -68,7 +68,7 @@ int count_TWI(){
   int count = 1;
 
   // Itera sobre todos os endereços
-  for(int i = 10; i <= 120; i++){
+  for(int i = 11; i <= 120; i++){
 
     Serial.print(i);
     Serial.print('\n');
