@@ -179,7 +179,7 @@ void loop() {
     Serial.print(controller->getError(),4);
     Serial.print(';');
     Serial.print("u = ");
-    Serial.print(controller->getControlVariable(),4);
+    Serial.print(controller->getOwnU(),4);
     Serial.print(';');
     Serial.print("t = ");
     Serial.println(millis()); 
