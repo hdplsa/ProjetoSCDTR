@@ -72,38 +72,38 @@ void Meta::calibrateLumVoltageModel(){
         switch(STATE){
         //-----------------------------
         case MASTER:
-        Serial.println("AM MASTER");
+        //Serial.println("AM MASTER");
             for(n = 0; n < dimU; n++){
                 //Valor de entrada no LED
                 this->Setu(u[n]);
-                Serial.println("CHANGED u");
+                //Serial.println("CHANGED u");
                 //this->SyncComm("SR\0","RS\0");
                 //Global call para todos lerem y
                 TWI::send_msg(0,"SR\0",strlen("SR")+1);
                 //Esperar que os restantes leiam
-                Serial.println("WAITING TO SR");
+                //Serial.println("WAITING TO SR");
                 while(!this->sendflag){};
-                Serial.println("SEND SUCCESSFULL");
+                //Serial.println("SEND SUCCESSFULL");
                 this->sendflag = false;
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
                 //Esperar pelo "RS"
                 //Serial.println("WAITING for RS");
                 do{ 
-                    Serial.println("SHIT"); 
+                    //Serial.println("SHIT"); 
                     while(!this->recvflag){}
                     this->recvflag = false;
                 }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));
-                Serial.println("RS RECEIVED");
+                //Serial.println("RS RECEIVED");
                delay(100);
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
             TWI::send_msg(0,"MS\0",strlen("MS")+1);
             //Esperar que os restantes leiam
-            Serial.println("WAITING TO MS");
+            //Serial.println("WAITING TO MS");
             while(!this->sendflag){};
-            Serial.println("SEND SUCCESSFULL");
+            //Serial.println("SEND SUCCESSFULL");
             this->sendflag = false;
             //Determinar k_j, theta_j
             ms = this->MinSquare(N, u, y);
@@ -114,17 +114,17 @@ void Meta::calibrateLumVoltageModel(){
         break;
         //-----------------------------
         case SLAVE:
-        Serial.println("AM SLAVE");
+        //Serial.println("AM SLAVE");
             //Caso de ser SLAVE
             n = 0; bool slaveEnd = false;
             while(!slaveEnd){
                 //Espera comando do MASTER
-                Serial.println("WAITING FOR SR");
+                //Serial.println("WAITING FOR SR");
                 while(!this->recvflag){};
-                Serial.println("SR RECEIVED");
+                //Serial.println("SR RECEIVED");
                 this->recvflag = false;
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
-                    Serial.print("SR = ");
+                    //Serial.print("SR = ");
                     this->rI2C[0] = '\0';
                     //Leitura do próprio sensor
                     y[n] = this->Gety(N);
@@ -133,13 +133,13 @@ void Meta::calibrateLumVoltageModel(){
                     //Global call para enviar RS
                     TWI::send_msg(0,"RS\0",strlen("RS")+1);
                     //Esperar que os restantes leiam
-                    Serial.println("WAITING TO RS");
+                    //Serial.println("WAITING TO RS");
                     while(!this->sendflag){};
-                    Serial.println("SEND SUCCESSFULL");
+                    //Serial.println("SEND SUCCESSFULL");
                     this->sendflag = false;
                 }
                 if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
-                    Serial.println("MS ==");
+                    //Serial.println("MS ==");
                     this->rI2C[0] = '\0';
                     //Determinar k_j, theta_j
                     ms = this->MinSquare(N, u, y);
