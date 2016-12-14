@@ -128,6 +128,7 @@ void setup() {
 
     //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
+  Serial.println(EEPROM.read(0));
 
   //Conta o numero de arduinos
   countArduinos();
@@ -141,7 +142,7 @@ void setup() {
   //Inicializações do controlador
   meta = new Meta(Narduinos,ledPin, sensorPin);
   controller = meta->getController();
-  
+
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
   meta->printModel();
@@ -169,7 +170,7 @@ ISR(TIMER1_COMPA_vect){
 void loop() {
   // put your main code here, to run repeatedly:
   
-  /*if(flag){
+  if(flag){
     
     // debug serial
     Serial.print("y = ");
@@ -196,5 +197,5 @@ void loop() {
     }
 
     flag = 0;
-  }*/
+  }
 }
