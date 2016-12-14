@@ -15,7 +15,7 @@ constexpr int ledPin = 11;
 constexpr int sensorPin = 1;
 
 constexpr uint8_t deviceID = 2;
-volatile int Narduinos = 2;
+volatile int Narduinos = 0;
 
 void initTimer1(){
   cli();
@@ -118,10 +118,6 @@ void countArduinos(){
     TWI::onReceive(get_Narduinos);
     // Espera para receber o Narduino
     while(!Narduinos){}
-
-    Serial.print("Narduinos: ");
-    Serial.println(Narduinos);
-    
   }
 }
 
@@ -134,9 +130,9 @@ void setup() {
   TWI::begin(EEPROM.read(0));
 
   //Conta o numero de arduinos
-  //countArduinos();
-  //Serial.print("Narduinos: ");
-  //Serial.println(Narduinos);
+  countArduinos();
+  Serial.print("Narduinos: ");
+  Serial.println(Narduinos);
 
   //Define funções callback
   TWI::onReceive(metaI2CString);
