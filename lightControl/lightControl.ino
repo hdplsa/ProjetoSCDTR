@@ -184,8 +184,8 @@ void loop() {
     Serial.print(';');
     Serial.print("t = ");
     Serial.println(millis()); 
-
-    meta->Setu_vec();
+    //Actualiza vector para feedforward
+    meta->setu_vec();
 
     // Recebe mensagens 
     //SerialCom::receive_message();

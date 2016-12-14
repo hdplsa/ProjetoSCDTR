@@ -32,17 +32,14 @@ public:
     void printModel();
     void setSendFlag(bool sendflag);
     bool getSendFlag();
+    void setu_vec();
     ~Meta();
     
 private:
     char *strAlloc(int len);
     double *MinSquare(const int N, double *u, double *y);
     void Setu(double u);
-    void Setu_vec();
-    double Gety(const int N);
-
-    void SyncComm(char *_send, char *_conf);
-    
+    double Gety(const int N);    
 };
 
 #endif

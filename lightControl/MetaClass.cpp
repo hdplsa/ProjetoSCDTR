@@ -175,6 +175,63 @@ bool Meta::getSendFlag(){
   return this->sendflag;
 }
 
+void Meta::setu_vec(){
+  int STATE, j, dc;
+    char send[32];
+  
+  for(j=10; j < 10+this->Narduino; j++){
+        //choice of whos MASTER or SLAVE        
+        if(j == EEPROM.read(0)){
+            this->_lightcontroller->SetIndex(j-10);
+            Serial.println("MASTER");
+            STATE = MASTER;
+        }else{
+            Serial.println("SLAVE");
+            STATE = SLAVE;
+        }
+    switch(STATE){
+      //-----------------------------
+      case TALK:
+                //Espera antes de falar
+                delay(20);
+        //Global call para enviar U
+        TWI::send_msg(0,"U",strlen("U"));
+        //Esperar mensagem enviada
+        while(!this->sendflag){};
+        this->sendflag = false;
+                //Valor de entrada no LED
+        Serial.println("Sent U");
+                //Get dutycycle
+                dc = _lightcontroller->getOwnDutyCycle();
+                //Envia valor
+                sprintf(send,"%d",dc);
+                //Espera antes de falar
+                delay(20);
+                //Global call para enviar valor de U
+                TWI::send_msg(0,send,strlen(send));
+                //Esperar mensagem enviada
+        while(!this->sendflag){};
+        this->sendflag = false;
+      break;
+            //-----------------------------
+      case SHUT:
+        while(!this->recvflag){};
+                this->recvflag = false;
+                //Esperar por U para receber valor
+                if(this->rI2C[0] == 'U'){
+                    while(!this->recvflag){};
+                    this->recvflag = false;
+                    //Obter duty cycle da mensagem
+                    sscanf(this->rI2C,"%d",&dc);
+                    //Set dutycycle
+                    _lightcontroller->setUnFromdc(dc, j-10);
+                }
+      break;
+      //-----------------------------
+    }
+  }
+}
+
 Meta::~Meta(){
     delete this->_lightcontroller;
 }
@@ -216,93 +273,7 @@ void Meta::Setu(double u){
   delay(50);
 }
 
-void Meta::Setu_vec(){
-	int STATE, j, dc;
-    char send[32];
-	
-	for(j=10; j < 10+this->Narduino; j++){
-        //choice of whos MASTER or SLAVE        
-        if(j == EEPROM.read(0)){
-            this->_lightcontroller->SetIndex(j-10);
-            Serial.println("MASTER");
-            STATE = MASTER;
-        }else{
-            Serial.println("SLAVE");
-            STATE = SLAVE;
-        }
-		switch(STATE){
-			//-----------------------------
-			case TALK:
-                //Espera antes de falar
-                delay(20);
-				//Global call para enviar U
-				TWI::send_msg(0,"U",strlen("U"));
-				//Esperar mensagem enviada
-				while(!this->sendflag){};
-				this->sendflag = false;
-                //Valor de entrada no LED
-				Serial.println("Sent U");
-                //Get dutycycle
-                dc = _lightcontroller->getOwnDutyCycle();
-                //Envia valor
-                sprintf(send,"%d",dc);
-                //Espera antes de falar
-                delay(20);
-                //Global call para enviar valor de U
-                TWI::send_msg(0,send,strlen(send));
-                //Esperar mensagem enviada
-				while(!this->sendflag){};
-				this->sendflag = false;
-			break;
-            //-----------------------------
-			case SHUT:
-				while(!this->recvflag){};
-                this->recvflag = false;
-                //Esperar por U para receber valor
-                if(this->rI2C[0] == 'U'){
-                    while(!this->recvflag){};
-                    this->recvflag = false;
-                    //Obter duty cycle da mensagem
-                    sscanf(this->rI2C,"%d",&dc);
-                    //Set dutycycle
-                    _lightcontroller->setUnFromdc(dc, j-10);
-                }
-			break;
-			//-----------------------------
-		}
-	}
-}
 
 double Meta::Gety(const int N){
     return this->_lightcontroller->getAverageY(N);
 }
-
-void Meta::SyncComm(char *_send, char *_conf){
-    //check length of _send and _conf
-    int lnsend = strlen(_send);
-    int lnconf = strlen(_conf);
-    bool flag = false;
-
-    //Send _send
-    while(!flag){
-        TWI::send_msg(0,_send,lnsend);
-        //Wait until it send
-        while(!this->sendflag){};
-        this->sendflag = false; 
-        Serial.println("Passei aqui ou assim um merda qualquer");
-        //wait for confirmation
-        while(!this->recvflag){};
-        this->recvflag = false;
-        Serial.println("Tambem passei aqui");
-
-        //CONFIRMATION MUST BE A 2 CHAR STRING
-        //check if strings are the same length
-        if(lnconf == strlen(rI2C)){
-            //check if comm buffer is equal to _conf string
-            if((this->rI2C[0] == _conf[0])&&(this->rI2C[1] == _conf[1])){
-                flag = true;
-            }
-        }
-    }
-}
-
