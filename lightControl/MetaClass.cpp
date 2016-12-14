@@ -87,10 +87,12 @@ void Meta::calibrateLumVoltageModel(){
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
                 //Esperar pelo "RS"
-                /*do{
-                    while(!this->recvflag){};
+                Serial.println("WAITING for RS");
+                do{ 
+                    Serial.println("SHIT"); 
+                    while(!this->recvflag){}
                     this->recvflag = false;
-                }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));*/
+                }while(!((this->rI2C[0] == 'R')&&(this->rI2C[1] == 'S')));
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare
@@ -111,9 +113,10 @@ void Meta::calibrateLumVoltageModel(){
         case SLAVE:
         Serial.println("AM SLAVE");
             //Caso de ser SLAVE
-            n = 0; bool slaveEnd = true;
-            while(slaveEnd){
-                while(!this->recvflag){};
+            n = 0; bool slaveEnd = false;
+            while(!slaveEnd){
+                //Espera comando do MASTER
+                while(!this->recvflag){Serial.print("rI2C "); Serial.println(rI2C);};
                 this->recvflag = false;
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
                     Serial.print("SR = ");
@@ -121,6 +124,13 @@ void Meta::calibrateLumVoltageModel(){
                     y[n] = this->Gety(N);
                     Serial.println(y[n],4);
                     n++;
+                    //Global call para enviar RS
+                    TWI::send_msg(0,"RS",strlen("RS"));
+                    //Esperar que os restantes leiam
+                    Serial.println("WAITING TO RS");
+                    while(!this->sendflag){};
+                    Serial.println("SEND SUCCESSFULL");
+                    this->sendflag = false;
                 }
                 if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
                     Serial.println("MS ==");
@@ -129,7 +139,7 @@ void Meta::calibrateLumVoltageModel(){
                     this->k[j-10] = ms[0];
                     theta_[j-10] = ms[1];
                     delete ms;
-                    slaveEnd = false;
+                    slaveEnd = true;
                 }
             }
         break;
