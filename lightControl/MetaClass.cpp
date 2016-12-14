@@ -100,7 +100,7 @@ void Meta::calibrateLumVoltageModel(){
             //Serial.println("SEND SUCCESSFULL");
             this->sendflag = false;
             //Determinar k_j, theta_j
-            ms = this->MinSquare(N, u, y);
+            ms = this->MinSquare(dimU, u, y);
             this->k[j-10] = ms[0];
             theta_[j-10] = ms[1];
             delete ms;
@@ -129,7 +129,7 @@ void Meta::calibrateLumVoltageModel(){
                     //Serial.println("MS ==");
                     this->rI2C[0] = '\0';
                     //Determinar k_j, theta_j
-                    ms = this->MinSquare(N, u, y);
+                    ms = this->MinSquare(dimU, u, y);
                     this->k[j-10] = ms[0];
                     theta_[j-10] = ms[1];
                     delete ms;
