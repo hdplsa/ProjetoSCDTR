@@ -74,6 +74,10 @@ double LightController::getOwnU(){
   return this->u[this->index];
 }
 
+int LightController::getOwnDutyCycle(){
+    return (int)(this->u[this->index]*(255.0/5.0));
+}
+
 // Retorna o erro do ciclo "atual"
 double LightController::getError(){
     return this->e[1];

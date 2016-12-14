@@ -61,6 +61,7 @@ public:
     void setRef(int ref);
     void setZeroUvec();
     void setUn(double Un, int n);
+    void setUnFromdc(int dcn, int n);
     void setLedU(double u);
     void setSaturation(double sat_up, double sat_down);
     void setK(double *k);
@@ -69,6 +70,7 @@ public:
     double getY();
     double getAverageY(const int N);
     double getOwnU();
+    int getOwnDutyCycle();
     double getError();
     double calcController();
     void LEDInputControlVariable();
