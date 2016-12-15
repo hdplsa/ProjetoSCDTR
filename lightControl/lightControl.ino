@@ -202,7 +202,7 @@ void loop() {
     Serial.print(" ");
     Serial.print(controller->getY());
     Serial.print(" ");
-    Serial.print(controller->getError());
+    Serial.println(controller->getError());
     //Actualiza vector para feedforward
     meta->setu_vec();
 
