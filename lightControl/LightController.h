@@ -75,6 +75,7 @@ public:
     double getY();
     double getError();
     double getOwnU();
+    void printUvec();
     //Deconstructor
     ~LightController();
 

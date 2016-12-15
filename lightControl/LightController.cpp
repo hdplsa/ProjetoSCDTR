@@ -144,6 +144,17 @@ double LightController::getError(){
 double LightController::getOwnU(){
   return this->u[this->index];
 }
+
+void LightController::printUvec(){
+  int i;
+  Serial.print("[");
+  for(i=0; i < this->Narduino; i++){
+    Serial.print(this->u[i],4);
+    Serial.print(" ");
+  }
+  Serial.print("] ");
+}
+
 //DECONSTRUCTOR
 LightController::~LightController(){
     //Free à memória

@@ -184,10 +184,10 @@ void Meta::setu_vec(){
         if(j == EEPROM.read(0)){
             this->_lightcontroller->SetIndex(j-10);
             Serial.println("MASTER");
-            STATE = MASTER;
+            STATE = TALK;
         }else{
             Serial.println("SLAVE");
-            STATE = SLAVE;
+            STATE = SHUT;
         }
     switch(STATE){
       //-----------------------------

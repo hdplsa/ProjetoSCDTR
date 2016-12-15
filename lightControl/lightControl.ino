@@ -184,7 +184,8 @@ void loop() {
     Serial.print(controller->getError(),4);
     Serial.print(';');
     Serial.print("u = ");
-    Serial.println(controller->getOwnU(),4); 
+    //Serial.println(controller->getOwnU(),4); 
+    controller->printUvec();
     //Actualiza vector para feedforward
     meta->setu_vec();
 
