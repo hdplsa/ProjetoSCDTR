@@ -196,7 +196,7 @@ void TWI::Interrupt_ISR(){
     switch(TWSR){
         
         // Foi enviado o start e tem que ser enviado o SLA+R/W
-        case TWI_START:
+        case TWI_START: //Não deveria ser o mesmo  que o REP_start????
         case TWI_REP_START:
             if(TWI_DEBUG){ 
               Serial.print("START\n");
@@ -223,7 +223,7 @@ void TWI::Interrupt_ISR(){
             break;
             
             // Foi recebido um acknowledge do slave depois dum SLA+W
-        case TWI_MTX_ADR_ACK:
+        case TWI_MTX_ADR_ACK: //Não é necessário tomar acção no TWCR??? TWCR = (1 << TWINT);
             
             if(TWI_DEBUG){ 
               Serial.print("ACK\n");
@@ -265,7 +265,7 @@ void TWI::Interrupt_ISR(){
             break;
             
             // O slave lançou um NACK (ou não existe este slave)
-        case TWI_MTX_ADR_NACK:
+        case TWI_MTX_ADR_NACK: //não se mete em slave reciever quando não recebe ACK? 
             if(TWI_DEBUG){
               Serial.print("ADR NACK MTX\n");
             }
@@ -279,7 +279,7 @@ void TWI::Interrupt_ISR(){
             data_errorSend();
             break;
             // Recebemos o General call address
-        case TWI_SRX_GEN_ACK:
+        case TWI_SRX_GEN_ACK:  //MESMA coisa não devia ser so TWCR = (1 << TWINT);
             // Recebemos o SLA+W e enviámos o ACK
         case TWI_SRX_ADR_ACK:
             twi_status = 3; // Estado de a receber
