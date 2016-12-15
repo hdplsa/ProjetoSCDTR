@@ -10,7 +10,7 @@ class SerialCom{
   static char incoming[10]; //mensagens com 10 caractéres máximo, pode mudar.
 
   // Variáveis usadas na execução dos pedidos das mensagens
-  static int valorLed;
+  static int occupancy;
   static int currentLux;
   static int ref;
 
@@ -20,9 +20,9 @@ class SerialCom{
   public:
     static void Begin(long int Baudrate);
     static void receive_message();
-    static int get_valorLed();
     static void set_currentLux(int currentLux);
     static int getRef();
+    static int getOccupancy();
 
   private:
     static void process_request(char *message);

@@ -8,7 +8,7 @@
 
 int SerialCom::current_char = 0;
 char SerialCom::incoming[10];
-int SerialCom::valorLed = 0;
+int SerialCom::occupancy = 0;
 int SerialCom::currentLux = 0;
 int SerialCom::ref = -1;
 volatile bool SerialCom::new_ref = 0;
@@ -53,41 +53,34 @@ void SerialCom::receive_message(){
 // Esta função recebe a string do computador e decifra o seu comando
 void SerialCom::process_request(char *message){
 
-  int tipo, valor;
+  int valor;
+  char tipo;
   char text[10];
   
-  sscanf(message,"%i %i",&tipo, &valor);
+  sscanf(message,"%c %i",&tipo, &valor);
 
   switch(tipo){
-    // Muda o valor do LED PWM
-    case 0:
-      valorLed = valor;
+    // Restard do Arduino (DESCOBRIR MÉTODO)
+    case 'r':
+        //Restart do ARDUINO <<<<<<<<--------------------------------------------------
       break;
-    // Envia os valores do LDR em lux
-    case 1:
-      sprintf(text, "%i", currentLux);
-      Serial.println(text);
+    // Valor de ocupação do Arduino
+    case 'o':
+      occupancy = valor;
       break;
     // Caso em que queremos mudar a referência local
-    case 2:
+    case 'l':
       ref = valor;
-      break;
-    // Significado da vida, a board fica tão à toa que faz reboot
-    case 42:
-      // faz reset
       break;
     // Caso o tipo de comando seja desconhecido
     default:
       Serial.println((char*)"Wrong Command");
     break;
-  }
-  
+  } 
 }
 
-int SerialCom::get_valorLed(){
-
-  return valorLed;
-  
+int SerialCom::getOccupancy(){
+  return occupancy;
 }
 
 void SerialCom::set_currentLux(int currentLux){

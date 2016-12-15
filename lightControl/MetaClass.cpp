@@ -232,6 +232,14 @@ void Meta::setu_vec(){
   }
 }
 
+bool Meta::getOccupancy(){
+  return this->o;
+}
+
+void Meta::setOccupancy(bool o){
+  this->o = o;
+}
+
 Meta::~Meta(){
     delete this->_lightcontroller;
 }
