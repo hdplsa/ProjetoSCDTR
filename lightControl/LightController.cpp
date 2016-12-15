@@ -50,7 +50,7 @@ void LightController::setTheta(double theta){
     this->theta = theta;
 }
 //GET FUNCTIONS
-double getRef(){
+double LightController::getRef(){
     return this->ref;
 }
 double LightController::getT(){
