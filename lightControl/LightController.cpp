@@ -96,6 +96,8 @@ double LightController::calcController(){
         this->u[this->index] = this->calcFeedForward();
         // Liga o PID
         this->ffflag = 0;
+        // Coloca o sinal de comando no LED
+        LEDInputControlVariable();
     } else {
         // Avanço do tempo das samples dos sinais
         this->y = this->getSensorY();
