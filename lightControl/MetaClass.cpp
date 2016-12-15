@@ -242,7 +242,7 @@ void Meta::setOccupancy(int o){
   if (this->o){
     this->_lightcontroller->setRef(50.0);
   } else {
-    this->_lightcontroller->setRef(10.0);
+    this->_lightcontroller->setRef(0.0);
   }
 }
 

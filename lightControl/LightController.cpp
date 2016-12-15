@@ -83,6 +83,15 @@ double LightController::calcController(){
     if(this->ffflag == 1){
         // Primeiro ciclo só com feedforward
         this->u[this->index] = this->calcFeedForward();
+        // Saturação na variável de controlo
+        if (this->sat_up >= this->sat_down){
+            if (this->u[this->index] < this->sat_down){
+                this->u[this->index] = this->sat_down;
+            }
+            if (this->u[this->index] > this->sat_up){
+                this->u[this->index] = this->sat_up;
+            }
+        }
         // Liga o PID
         this->ffflag = 0;
         // Coloca o sinal de comando no LED
