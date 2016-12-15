@@ -176,7 +176,7 @@ void loop() {
   if(flag){
     
     // debug serial
-    Serial.print(controller->getRef());
+    Serial.print(controller->calcSumOtherKus());
     Serial.print("y = ");
     Serial.print(controller->getY(),4);
     Serial.print(';');
