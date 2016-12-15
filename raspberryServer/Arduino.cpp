@@ -285,6 +285,7 @@ vector<double> Arduino::get_minute(vector<double> vec){
 }
 
 void Arduino::reset(){
+	th.interrupt();
 	serial->Close();
 }
 

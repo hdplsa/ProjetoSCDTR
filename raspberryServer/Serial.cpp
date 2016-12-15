@@ -8,7 +8,7 @@ Serial::Serial(){
 
 void Serial::Begin(long baudrate, const char* port){
 
-    arduino = open("/dev/ttyACM0", O_RDWR| O_NOCTTY );
+    arduino = open(port, O_RDWR| O_NOCTTY );
 
     if(arduino == -1){
         throw std::runtime_error("Erro a criar a porta Serial.");

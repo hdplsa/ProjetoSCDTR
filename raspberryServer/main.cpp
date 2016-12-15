@@ -20,7 +20,7 @@ void print_received(string str)
 
 void test_serial(){
 
-    Arduino *arduino = new Arduino(1000, "/dev/ttyUSB0");
+    Arduino *arduino = new Arduino(1000, "/dev/ttyUSB1");
 
     arduino->ledON();
 
