@@ -90,6 +90,8 @@ void Serial::set_Writecallback(std::function<void(void)> fcn){
 void Serial::Close(){
 
     close(arduino);
+    cout << "Fechei" << endl;
+    usleep(5000);
 
 }
 

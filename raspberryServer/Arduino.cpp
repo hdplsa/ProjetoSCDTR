@@ -181,19 +181,20 @@ void Arduino::receiveInformation(string info){
 	float u;
 
 	// Extrai os dados da string
-	sscanf(info.c_str(), "y = %f;e = %f; u = %f", &y, &e, &u);
+	int i = sscanf(info.c_str(), "y = %f;e = %f; u = %f", &y, &e, &u);
+	if(i == 3){
+		// Guarda os dados no objeto
+		this->y[K] = y;
+		this->e[K] = e;
+		this->u[K] = u;
+		this->t[K] = boost::posix_time::microsec_clock::local_time();
+		
+		//Avança da o instante seguinte
+		this->K = this->getkNext(this->K);
+		this->cycle = this->cycle + 1;
 
-	// Guarda os dados no objeto
-	this->y[K] = y;
-	this->e[K] = e;
-	this->u[K] = u;
-	this->t[K] = boost::posix_time::microsec_clock::local_time();
-	
-	//Avança da o instante seguinte
-	this->K = this->getkNext(this->K);
-	this->cycle = this->cycle + 1;
-
-	if(newInformationCallback != NULL) newInformationCallback();
+		if(newInformationCallback != NULL) newInformationCallback();
+	}
 
 	// Manda ler a próxima linha
 	serial->read_ln();
@@ -284,7 +285,7 @@ vector<double> Arduino::get_minute(vector<double> vec){
 }
 
 void Arduino::reset(){
-	throw "Not implemented";
+	serial->Close();
 }
 
 
