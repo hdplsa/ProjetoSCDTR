@@ -37,13 +37,16 @@ class LightController{
     //Input/Output
     double T = 0.02;
     double ref = 0;
+    //Valores de erro em dois instantes temporais
     double e[2] = {0,0};
     double y = 0;
     double *u;
+    double u_ant = 0;
+    //Valores de input do PID
+    double u_pid = 0;
     double ui_ant = 0;
     double ud_ant = 0;
-    double u_ant = 0;
-    double u_pid = 0;
+    //Valores de saturação
     double sat_up = 5.0;
     double sat_down = 0;
     volatile int ffflag = 0;

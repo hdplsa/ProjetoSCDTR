@@ -105,14 +105,14 @@ double LightController::calcController(){
     
     if(this->ffflag == 1){
         // Primeiro ciclo só com feedforward
-        this->u[1] = this->calcFeedForward();
+        this->u[this->index] = this->calcFeedForward();
         // Liga o PID
         this->ffflag = 0;
     } else {
         // Avanço do tempo das samples dos sinais
         this->y = this->getSensorY();
         
-        this->u[0] = this->u[1];
+        this->u_ant = this->u[this->index];
         this->e[0] = this->e[1];
         this->windup[0] = this->windup[1];
         
@@ -130,33 +130,35 @@ double LightController::calcController(){
         this->ud_ant = ud;
         
         // Gera o sinal de controlo
-        this->u[1] = up + ui + ud + ff;
+        this->u_pid = up + ui + ud;
+        this->u[this->index] = this->u_pid + ff;
         
-        u_antes_sat = this->u[1];
+        //Valor util no windup
+        u_antes_sat = this->u[this->index];
         
         // Saturação na variável de controlo
         if (this->sat_up >= this->sat_down){
-            if (this->u[1] < this->sat_down){
-                this->u[1] = this->sat_down;
+            if (this->u[this->index] < this->sat_down){
+                this->u[this->index] = this->sat_down;
             }
-            if (this->u[1] > this->sat_up){
-                this->u[1] = this->sat_up;
+            if (this->u[this->index] > this->sat_up){
+                this->u[this->index] = this->sat_up;
             }
         }
         
         // Calcula o novo valor do windup
-        this->windup[1] = this->u[1] - u_antes_sat;
+        this->windup[1] = this->u[this->index] - u_antes_sat;
         
         // Coloca o sinal de comando no LED
         LEDInputControlVariable();
     }
     
-    return this->u[1];
+    return this->u[this->index];
 }
 
 void LightController::LEDInputControlVariable(){
     //Impõe sinal de comando calculado no LED
-    this->ledp->setLedPWMVoltage(this->u[1]);
+    this->ledp->setLedPWMVoltage(this->u[this->index]);
 }
 
 void LightController::SetIndex(int index){
