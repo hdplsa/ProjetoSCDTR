@@ -1,5 +1,6 @@
 #include "LightController.h"
 
+/*----------------------CONSTRUCTOR--------------------------------------*/
 LightController::LightController(int Narduino,int ledPin, int sensorPin){
 
     //Numero de arduinos
@@ -17,72 +18,61 @@ LightController::LightController(int Narduino,int ledPin, int sensorPin){
     this->theta = 0;
 }
 
+/*----------------------PUBLIC FUNCTIONS---------------------------------*/
+//SETFUNCTIONS
+void LightController::SetIndex(int index){
+    this->index = index;
+}
 void LightController::setRef(int ref){
     this->ref = (double)ref;
     this->ffflag = 1;
 }
-
 void LightController::setZeroUvec(){
   int i;
   for(i=0; i < this->Narduino; i++){
     this->u[i] = 0;
   }
 }
-
-void LightController::setUn(double Un, int n){
-  this->u[n] = Un;
-}
-
 void LightController::setUnFromdc(int dcn, int n){
   this->u[n] = dcn*(5.0/255.0);
 }
-
 void LightController::setLedU(double u){
     return this->ledp->setLedPWMVoltage(u);
 }
-
 void LightController::setSaturation(double sat_up, double sat_down){
     this->sat_up = sat_up;
     this->sat_down = sat_down;
 }
-
-// Mete o parametro K da plant (LED)
 void LightController::setK(double *k){
     this->k = k;
 }
-
-// Mete o parâmetro Teta da plant (LED)
 void LightController::setTheta(double theta){
     this->theta = theta;
 }
-
-// Retorna o periodo
+//GET FUNCTIONS
+double getRef(){
+    return this->ref;
+}
 double LightController::getT(){
     return this->T;
 }
-
-// Retorna o y guardado no objeto
 double LightController::getY(){
     return this->y;
 }
-
 double LightController::getAverageY(const int N){
     return this->ls->getAverageLuminousIntensity(N);
 }
-
 double LightController::getOwnU(){
   return this->u[this->index];
 }
-
 int LightController::getOwnDutyCycle(){
     return (int)(this->u[this->index]*(255.0/5.0));
 }
-
-// Retorna o erro do ciclo "atual"
 double LightController::getError(){
     return this->e[1];
 }
-
+//CALCFUNCTIONS
+double LightController::calcController(){
 /* Legenda dos sinais:
  * e[1] -> sinal de erro no ciclo atual
  * e[0] -> sinal de erro no ciclo -1
@@ -99,8 +89,6 @@ double LightController::getError(){
  * u_antes_sat -> corresponde ao sinal de entrada antes da saturação, que
  * é utilizado para calcular o anti-windup.
  */
-
-double LightController::calcController(){
     double up, ui, ud, u_antes_sat, ff;
     
     if(this->ffflag == 1){
@@ -155,33 +143,24 @@ double LightController::calcController(){
     
     return this->u[this->index];
 }
-
-void LightController::LEDInputControlVariable(){
-    //Impõe sinal de comando calculado no LED
-    this->ledp->setLedPWMVoltage(this->u[this->index]);
-}
-
-void LightController::SetIndex(int index){
-    this->index = index;
-}
-
+//DECONSTRUCTOR
 LightController::~LightController(){
     //Free à memória
     delete this->ls;
     delete this->ledp;
     delete this->u;
 }
-
-
+/*-----------------------------------------------------------------------*/
+/*----------------------PRIVATE------------------------------------------*/
+//GETFUNCTIONS
 double LightController::getSensorY(){
     return ls->getLuminousIntensity();
 }
-
+//CALCFUNCTIONS
 double LightController::calcErro(){
     //Cálcula erro de entrada no Controlador
     return this->ref-this->y;
 }
-
 double LightController::calSumOtherKus(){
     int n, ans;
     for(n=0,ans=0; n < this->Narduino; n++){
@@ -191,7 +170,6 @@ double LightController::calSumOtherKus(){
     }
     return ans;
 }
-
 double LightController::calcFeedForward(){
     double feedforward;
     
@@ -199,7 +177,6 @@ double LightController::calcFeedForward(){
     
     return feedforward;
 }
-
 double LightController::calcDeadzone(double e){
     
     double error = e;
@@ -217,22 +194,24 @@ double LightController::calcDeadzone(double e){
     return error;
     
 }
-
 double LightController::calcPController(){
     //Retorno do controlo proporcional
     return this->Kp*this->e[1];
 }
-
 double LightController::calcPIController(){
     double u;
     //Controlo proporcional integral
     u = this->Ki*(this->T*0.5)*(this->e[1]+this->e[0]) + (this->T*0.5)*this->Kw*(this->windup[1]+this->windup[0]) + this->ui_ant;
     return u;
 }
-
 double LightController::calcPDController(){
     double u;
     //Controlo proporcional diferencial
     u = this->Kd*((2/this->T)*(this->e[1]-this->e[0])) - this->ud_ant;
     return u;
+}
+//OTHER
+void LightController::LEDInputControlVariable(){
+    //Impõe sinal de comando calculado no LED
+    this->ledp->setLedPWMVoltage(this->u[this->index]);
 }
