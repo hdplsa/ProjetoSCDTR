@@ -125,7 +125,17 @@ void Arduino::send(string str){
 }
 
 double Arduino::getPower(){
-	throw "Not implemented";
+	
+	int prevK = getkPrevious(this->K);
+	double deltaE;
+	boost::posix_time::time_duration td;
+
+	deltaE = E[K] - E[prevK];
+	
+	td = t[K] - t[prevK];
+
+	return deltaE/(td.total_milliseconds()*1000);
+
 }
 
 boost::posix_time::ptime Arduino::getTime(){
@@ -169,10 +179,9 @@ void Arduino::receiveInformation(string info){
 	float y;
 	float e;
 	float u;
-	long t_; // Está aqui para ser removido <----------
 
-	// Estrai os dados da string
-	sscanf(info.c_str(), "y = %f;e = %f; u = %f; t = %ld\n", &y, &e, &u, &t_);
+	// Extrai os dados da string
+	sscanf(info.c_str(), "y = %f;e = %f; u = %f", &y, &e, &u);
 
 	// Guarda os dados no objeto
 	this->y[K] = y;
