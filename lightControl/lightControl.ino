@@ -128,6 +128,8 @@ void setup() {
   
   SerialCom::Begin(115200);
 
+  Serial.println("Inicio do programa!");
+
     //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   //EEPROM.write(0,11);

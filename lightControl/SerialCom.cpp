@@ -63,7 +63,8 @@ void SerialCom::process_request(char *message){
   switch(tipo){
     // Restard do Arduino (DESCOBRIR MÉTODO)
     case 'r':
-        //Restart do ARDUINO <<<<<<<<--------------------------------------------------
+        //Código assembly para fazer reset ao Arduino
+        asm volatile ("  jmp 0");  
       break;
     // Valor de ocupação do Arduino
     case 'o':
