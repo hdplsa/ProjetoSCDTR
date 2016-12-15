@@ -238,6 +238,12 @@ bool Meta::getOccupancy(){
 
 void Meta::setOccupancy(bool o){
   this->o = o;
+  //Coloca referencia em função do estado de ocupação
+  if (this->o){
+    this->_lightcontroller->setRef(25);
+  } else {
+    this->_lightcontroller->setRef(50);
+  }
 }
 
 Meta::~Meta(){
