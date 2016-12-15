@@ -1,6 +1,7 @@
 #include "mainController.h"
 
 MainController::MainController(int Narduino, vector<string> ports) : arduino(Narduino,NULL) {
+	this->Narduino = Narduino;
 	this->t = 0;
 	this->k = 0;
 	//Inicialização dos arduinos

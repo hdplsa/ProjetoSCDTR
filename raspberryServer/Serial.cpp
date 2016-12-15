@@ -23,8 +23,8 @@ void Serial::Begin(long baudrate, const char* port){
     }
 
     /* Set Baud Rate */
-    cfsetospeed (&tty, (speed_t)baudrate);
-    cfsetispeed (&tty, (speed_t)baudrate);
+    cfsetospeed (&tty, (speed_t)B115200);
+    cfsetispeed (&tty, (speed_t)B115200);
 
     /* Setting other Port Stuff */
     tty.c_cflag     &=  ~PARENB;            // Make 8n1
