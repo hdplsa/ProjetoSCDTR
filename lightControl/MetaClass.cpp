@@ -29,6 +29,7 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
     }
     this->theta = 0;
     //Init vector de us
+    this->initEnderecos();
     this->_lightcontroller->setZeroUvec();
 }
 
@@ -64,7 +65,6 @@ void Meta::calibrateLumVoltageModel(){
     for(j=10; j < 10+this->Narduino; j++){
         //choice of whos MASTER or SLAVE        
         if(j == EEPROM.read(0)){
-            this->_lightcontroller->SetIndex(j-10);
             Serial.println("MASTER");
             STATE = MASTER;
         }else{
@@ -250,6 +250,12 @@ void Meta::setOccupancy(int o){
 
 Meta::~Meta(){
     delete this->_lightcontroller;
+}
+
+void Meta::initEnderecos(){
+  double valor;
+  valor = EEPROM.read(0);
+  this->_lightcontroller->SetIndex(valor-10);
 }
 
 char *strAlloc(int len){
