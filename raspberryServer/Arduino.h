@@ -41,6 +41,8 @@ class Arduino{
 	vector<double> Verror;
 	//Estado de ocupação
 	bool o;
+	//Lower bound
+	double Llow;
 	
 	public:
 		Arduino(int N_, string port);

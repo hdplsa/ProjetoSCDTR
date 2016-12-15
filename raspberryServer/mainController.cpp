@@ -50,9 +50,8 @@ void MainController::printMetrics(int i){
 
 			send(string(str));
 
+		}
 	}
-	
-}
 }
 
 void MainController::get_clientRequest(string str, std::function<void(string)> callback){
@@ -287,9 +286,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		break;
 
-
 	}
-
 }
 
 int MainController::get_id(string str, std::function<void(string)> callback, int start /* = 4*/){
