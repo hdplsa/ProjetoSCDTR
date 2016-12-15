@@ -17,6 +17,8 @@ constexpr int sensorPin = 1;
 constexpr uint8_t deviceID = 2;
 volatile int Narduinos = 0;
 
+char datastr[32];
+
 void initTimer1(){
   cli();
   TCCR1A = 0;// clear register
@@ -178,7 +180,7 @@ void loop() {
   if(flag){
     
     // debug serial
-    Serial.print("ref = ");
+    /*Serial.print("ref = ");
     Serial.print(controller->getRef());
     Serial.print(';');
     Serial.print("y = ");
@@ -189,7 +191,10 @@ void loop() {
     Serial.print(';');
     Serial.print("u = ");
     //Serial.println(controller->getOwnU(),4); 
-    controller->printUvec();
+    controller->printUvec();*/
+    //String de dados: data ref dutycycle lum 
+    sprintf (datastr, "data %d %d %0.4f, %0.4f", (int)controller->getRef(),controller->getOwnDutyCycle(),controller->getY(),controller->getError());
+    Serial.println(datastr);
     //Actualiza vector para feedforward
     meta->setu_vec();
 

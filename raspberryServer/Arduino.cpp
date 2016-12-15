@@ -175,18 +175,20 @@ void Arduino::ledOFF(){
 /* Função chamada ciclicamente para receber e guardar dados
  * vindos dos Arduinos */
 void Arduino::receiveInformation(string info){
-
+	int ref;
+	int dc;
 	float y;
 	float e;
 	float u;
 
 	// Extrai os dados da string
-	int i = sscanf(info.c_str(), "y = %f;e = %f; u = %f", &y, &e, &u);
-	if(i == 3){
+	int i = sscanf(info.c_str(), "data %d %d %0.4f, %0.4f", &ref, &dt, &y, &e);
+	if(i == 4){
 		// Guarda os dados no objeto
+		this->ref[K] = ref;
+		this->d[K] = dc;
 		this->y[K] = y;
 		this->e[K] = e;
-		this->u[K] = u;
 		this->t[K] = boost::posix_time::microsec_clock::local_time();
 		
 		//Avança da o instante seguinte

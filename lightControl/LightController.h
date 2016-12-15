@@ -68,7 +68,7 @@ public:
     //GetFunctions
     double getRef();
     double getAverageY(const int N);
-       int getOwnDutyCycle();
+    int getOwnDutyCycle();
     //CalcFunctions
     double calcController();
     //PrintFunctions
