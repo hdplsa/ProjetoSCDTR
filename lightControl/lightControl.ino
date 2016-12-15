@@ -183,18 +183,15 @@ void loop() {
     Serial.print(controller->getError(),4);
     Serial.print(';');
     Serial.print("u = ");
-    Serial.print(controller->getOwnU(),4);
-    Serial.print(';');
-    Serial.print("t = ");
-    Serial.println(millis()); 
+    Serial.println(controller->getOwnU(),4); 
     //Actualiza vector para feedforward
     meta->setu_vec();
 
     // Recebe mensagens 
-    //SerialCom::receive_message();
+    SerialCom::receive_message();
 
     // Obtem a referência da mensagem. è -1 se não houver ref nova.
-    ///new_ref = SerialCom::getRef();
+    meta->setOccupancy((bool)SerialCom::getOccupancy());
 
     /*if(new_ref != -1){
       controller->setRef(new_ref);

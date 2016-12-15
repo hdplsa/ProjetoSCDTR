@@ -23,6 +23,8 @@ class Meta{
     volatile char rI2C[32];
     volatile bool sendflag = false;
     volatile bool recvflag = false;
+    //Occupancy
+    bool o = false;
     
 public:
     Meta(int Narduino,int ledPin,int sensorPin);
@@ -33,6 +35,8 @@ public:
     void setSendFlag(bool sendflag);
     bool getSendFlag();
     void setu_vec();
+    bool getOccupancy();
+    void setOccupancy(bool o);
     ~Meta();
     
 private:
