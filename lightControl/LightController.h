@@ -31,7 +31,7 @@ class LightController{
     double theta;
     //Input/Output
     double T = 0.02;
-    double ref = 0;
+    double ref = 0.0;
     //Valores de erro em dois instantes temporais
     double e[2] = {0,0};
     double y = 0;
@@ -58,7 +58,7 @@ public:
     LightController(int Narduino, int ledPin, int sensorPin);
     //SetFunctions
     void SetIndex(int index);
-    void setRef(int ref);
+    void setRef(double ref);
     void setZeroUvec();
     void setUnFromdc(int dcn, int n);
     void setLedU(double u);

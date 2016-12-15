@@ -23,7 +23,7 @@ LightController::LightController(int Narduino,int ledPin, int sensorPin){
 void LightController::SetIndex(int index){
     this->index = index;
 }
-void LightController::setRef(int ref){
+void LightController::setRef(double ref){
     this->ref = (double)ref;
     this->ffflag = 1;
 }

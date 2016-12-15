@@ -15,7 +15,7 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
     int i;
     //Inicializacao do controlador PID
     this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
-    this->_lightcontroller->setRef(50);
+    this->_lightcontroller->setRef(50.0);
     this->_lightcontroller->setSaturation(5,0);
     //Init da string
     for(i = 0; i < 32; i++){
@@ -240,9 +240,9 @@ void Meta::setOccupancy(bool o){
   this->o = o;
   //Coloca referencia em função do estado de ocupação
   if (this->o){
-    this->_lightcontroller->setRef(25);
+    this->_lightcontroller->setRef(25.0);
   } else {
-    this->_lightcontroller->setRef(50);
+    this->_lightcontroller->setRef(50.0);
   }
 }
 
