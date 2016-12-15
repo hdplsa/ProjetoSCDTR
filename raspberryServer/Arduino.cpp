@@ -45,6 +45,10 @@ int Arduino::getkPrevious(int k){
 	return 0;
 }
 
+double Arduino::getReference(){
+	return this->ref[this->K];
+}
+
 double Arduino::getEnergy(){
 	return this->E[this->K];
 }
@@ -100,6 +104,10 @@ vector<double> Arduino::getLastMinuteDuty(){
 
 bool Arduino::getOccupancy(){
 	return this->o;
+}
+
+double Arduino::getLowerBoundIlluminance(){
+	return this->LowBound;
 }
 
 void Arduino::setOccupancy(bool value){

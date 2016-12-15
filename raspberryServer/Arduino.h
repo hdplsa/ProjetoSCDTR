@@ -42,12 +42,13 @@ class Arduino{
 	//Estado de ocupação
 	bool o;
 	//Lower bound
-	double Llow;
+	double LowBound;
 	
 	public:
 		Arduino(int N_, string port);
 		int getkNext(int k);
 		int getkPrevious(int k);
+		double getReference();
 		double getEnergy();
 		double getEnergy(int k);
 		double getComfortError();
@@ -61,6 +62,7 @@ class Arduino{
 		double getDuty(int k);
 		vector<double> getLastMinuteDuty();
 		bool getOccupancy();
+		double getLowerBoundIlluminance();
 		void setOccupancy(bool value);
 		double getRef();
 		double getPower(); // Nâo implementada
