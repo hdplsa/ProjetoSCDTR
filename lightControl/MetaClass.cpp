@@ -76,7 +76,9 @@ void Meta::calibrateLumVoltageModel(){
         //-----------------------------
         case MASTER:
         //Serial.println("AM MASTER");
+            delay(1000);
             for(n = 0; n < dimU; n++){
+                 delay(20);
                 //Valor de entrada no LED
                 this->Setu(u[n]);
                 Serial.println("CHANGED u");
@@ -91,7 +93,6 @@ void Meta::calibrateLumVoltageModel(){
                 //Leitura do próprio sensor
                 y[n] = this->Gety(N);
                 Serial.println(y[n],4);
-               delay(20);
             }
             this->Setu(0); // lightoff
             //Global call para todos fazer minSquare

@@ -130,12 +130,13 @@ void setup() {
 
     //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
-  //Serial.println(EEPROM.read(0));
+  //EEPROM.write(0,11);
+  Serial.println(EEPROM.read(0));
 
   //Conta o numero de arduinos
   countArduinos();
-  //Serial.print("Narduinos: ");
-  //Serial.println(Narduinos);
+  Serial.print("Narduinos: ");
+  Serial.println(Narduinos);
 
   //Define funções callback
   TWI::onReceive(metaI2CString);
