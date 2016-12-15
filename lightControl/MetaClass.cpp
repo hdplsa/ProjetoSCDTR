@@ -223,6 +223,8 @@ void Meta::setu_vec(){
                     this->recvflag = false;
                     //Obter duty cycle da mensagem
                     sscanf(this->rI2C,"%d",&dc);
+                    Serial.print("dutycycle = ");
+                    Serial.println(dc);
                     //Set dutycycle
                     _lightcontroller->setUnFromdc(dc, j-10);
                 }
