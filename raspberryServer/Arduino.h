@@ -18,9 +18,9 @@ class Arduino{
 	//Numero de pontos guardados
 	int N;
 	//Numero de ciclos desde o inicio
-	long cycle = 0;
+	long cycle = 1;
 	//Periodo do ciclo de controlo
-	double T;
+	double T = 0.02;
 	//Valores do sistema fisico
 	vector<double> ref;
 	//Valores de erro do sistema
