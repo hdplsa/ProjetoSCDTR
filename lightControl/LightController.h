@@ -67,19 +67,23 @@ public:
     void setTheta(double theta);
     //GetFunctions
     double getRef();
+    double getT();
+    double getY();
     double getAverageY(const int N);
+    double getOwnU();
        int getOwnDutyCycle();
+    double getError();
     //CalcFunctions
     double calcController();
-    //PrintFunctions
-    double getY();
-    double getError();
-    double getOwnU();
     //Deconstructor
     ~LightController();
+
+
+    double calSumOtherKus();
     
 private:
     //GetFunctions
+    double getMax(double d1, double d2);
     double getSensorY();
     //CalcFunctions
     double calcErro();
@@ -88,7 +92,7 @@ private:
     double calcPController();
     double calcPIController();
     double calcPDController();
-    double calcSumOtherKus();
+    //double calSumOtherKus();
     //Other
     void LEDInputControlVariable();
 };
