@@ -193,8 +193,16 @@ void loop() {
     //Serial.println(controller->getOwnU(),4); 
     controller->printUvec();*/
     //String de dados: data ref dutycycle lum 
-    sprintf (datastr, "data %d %d %f %f", (int)controller->getRef(),controller->getOwnDutyCycle(),controller->getY(),controller->getError());
-    Serial.println(datastr);
+    //sprintf (datastr, "data %d %d %f %f", (int)controller->getRef(),controller->getOwnDutyCycle(),controller->getY(),controller->getError());
+    //Serial.println(datastr);
+    Serial.print("data ");
+    Serial.print((int)controller->getRef());
+    Serial.print(" ");
+    Serial.print(controller->getOwnDutyCycle());
+    Serial.print(" ");
+    Serial.print(controller->getY());
+    Serial.print(" ");
+    Serial.print(controller->getError());
     //Actualiza vector para feedforward
     meta->setu_vec();
 
