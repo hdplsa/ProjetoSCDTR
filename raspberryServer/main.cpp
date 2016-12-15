@@ -37,11 +37,11 @@ int main(){
         // Inicia o mailController
     	// Portas dos arduinos
 	const string port1 = "/dev/ttyACM0";
-	const string port2 = "/dev/ttyUSB1";
+	const string port2 = "/dev/ttyACM1";
 
-    vector<string> ports = {port1};
+    vector<string> ports = {port1,port2};
 
-    MainController controller(1, ports);
+    MainController controller(2, ports);
 
     const string host("127.0.0.1");
     const string port("4444");
