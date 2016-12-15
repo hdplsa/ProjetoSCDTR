@@ -20,7 +20,7 @@ class Meta{
     //Controlador PID
     LightController *_lightcontroller = NULL;
     //String de comunicacao
-    volatile char rI2C[20];
+    volatile char rI2C[32];
     volatile bool sendflag = false;
     volatile bool recvflag = false;
     

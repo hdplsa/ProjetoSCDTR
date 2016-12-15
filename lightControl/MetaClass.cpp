@@ -17,18 +17,17 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
     this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
     this->_lightcontroller->setRef(50);
     this->_lightcontroller->setSaturation(5,0);
-
-    for(i = 0; i < 20; i++){
+    //Init da string
+    for(i = 0; i < 32; i++){
       this->rI2C[i] = '\0';
     }
     //Init do modelo feedforward
     this->Narduino = Narduino;
-    this->k = new double[Narduino];
+    this->k = new double[this->Narduino];
     for(i = 0; i < this->Narduino; i++){
       this->k[i] = 0;
     }
     this->theta = 0;
-
     //Init vector de us
     this->_lightcontroller->setZeroUvec();
 }

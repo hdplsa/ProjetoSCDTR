@@ -100,12 +100,14 @@ void get_Narduinos(char* str){
 void countArduinos(){
   // O arduino 10 faz a contagem do numero de arduinos
   if(EEPROM.read(0) == 10){
+      //O MASTER deve esperar pelos restantes
+      delay(2000);
+      //Funções callback durante a contagem
       TWI::onSend(count_I2Csend);
       TWI::onSendError(count_I2CsendError);
       Narduinos = count_TWI();
-
+      //Envio de numero de arduinos para os restantes
       char msg[4] = {'C', ' ', (char)Narduinos, '\0'};
-
       TWI::send_msg(0,msg,3);
       // Espera que a mensagem seja enviada
       while(send_success == false && send_error == false){}
@@ -128,12 +130,12 @@ void setup() {
 
     //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
-  Serial.println(EEPROM.read(0));
+  //Serial.println(EEPROM.read(0));
 
   //Conta o numero de arduinos
   countArduinos();
-  Serial.print("Narduinos: ");
-  Serial.println(Narduinos);
+  //Serial.print("Narduinos: ");
+  //Serial.println(Narduinos);
 
   //Define funções callback
   TWI::onReceive(metaI2CString);
