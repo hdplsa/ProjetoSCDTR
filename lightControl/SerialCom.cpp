@@ -13,6 +13,8 @@ int SerialCom::currentLux = 0;
 int SerialCom::ref = -1;
 volatile bool SerialCom::new_o = false;
 volatile bool SerialCom::new_ref = 0;
+void (*SerialCom::reset_fcn)(void) = 0;
+
 
 void SerialCom::Begin(long int Baudrate){
 
@@ -63,8 +65,6 @@ void SerialCom::process_request(char *message){
   switch(tipo){
     // Restard do Arduino (DESCOBRIR MÉTODO)
     case 'r':
-        //Código assembly para fazer reset ao Arduino
-        asm volatile ("  jmp 0");  
       break;
     // Valor de ocupação do Arduino
     case 'o':

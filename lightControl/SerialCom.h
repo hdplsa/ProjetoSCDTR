@@ -28,6 +28,7 @@ class SerialCom{
 
   private:
     static void process_request(char *message);
+    static void (*reset_fcn)(void);
 
 };
 

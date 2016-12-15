@@ -69,7 +69,7 @@ class Arduino{
 		boost::posix_time::ptime getTime();
 		void send(string str);
 		void ledON(int pwm = 255);
-		void ledON(float V);
+		void ledON(double V);
 		void ledOFF();
 		void receiveInformation(string info);
 		void setNewInformationCallback(std::function<void(void)> fcn);

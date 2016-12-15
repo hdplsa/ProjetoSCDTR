@@ -158,9 +158,9 @@ void Arduino::ledON(int pwm /* = 255 */){
 
 }
 
-void Arduino::ledON(float V){
+void Arduino::ledON(double V){
 
-	int valor = (int)(V*255/5);
+	int valor = (int)(V*255.0/5.0);
 
 	ledON(valor);
 
