@@ -53,24 +53,13 @@ void LightController::setTheta(double theta){
 double LightController::getRef(){
     return this->ref;
 }
-double LightController::getT(){
-    return this->T;
-}
-double LightController::getY(){
-    return this->y;
-}
 double LightController::getAverageY(const int N){
     return this->ls->getAverageLuminousIntensity(N);
-}
-double LightController::getOwnU(){
-  return this->u[this->index];
 }
 int LightController::getOwnDutyCycle(){
     return (int)(this->u[this->index]*(255.0/5.0));
 }
-double LightController::getError(){
-    return this->e[1];
-}
+
 //CALCFUNCTIONS
 double LightController::calcController(){
 /* Legenda dos sinais:
@@ -145,6 +134,16 @@ double LightController::calcController(){
     
     return this->u[this->index];
 }
+//PRINTFUNCTION
+double LightController::getY(){
+    return this->y;
+}
+double LightController::getError(){
+    return this->e[1];
+}
+double LightController::getOwnU(){
+  return this->u[this->index];
+}
 //DECONSTRUCTOR
 LightController::~LightController(){
     //Free à memória
@@ -163,7 +162,7 @@ double LightController::calcErro(){
     //Cálcula erro de entrada no Controlador
     return this->ref-this->y;
 }
-double LightController::calSumOtherKus(){
+double LightController::calcSumOtherKus(){
     int n, ans;
     for(n=0,ans=0; n < this->Narduino; n++){
         if(n != this->index){
@@ -175,7 +174,7 @@ double LightController::calSumOtherKus(){
 double LightController::calcFeedForward(){
     double feedforward;
     
-    feedforward = (this->ref - this->calSumOtherKus() - this->theta)/this->k[this->index];
+    feedforward = (this->ref - this->calcSumOtherKus() - this->theta)/this->k[this->index];
     
     return feedforward;
 }
