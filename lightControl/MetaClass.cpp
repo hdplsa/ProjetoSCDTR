@@ -240,9 +240,9 @@ void Meta::setOccupancy(int o){
   this->o = o;
   //Coloca referencia em função do estado de ocupação
   if (this->o){
-    this->_lightcontroller->setRef(25.0);
-  } else {
     this->_lightcontroller->setRef(50.0);
+  } else {
+    this->_lightcontroller->setRef(40.0);
   }
 }
 
