@@ -16,6 +16,7 @@ class SerialCom{
 
   // Booleanos que dizem se há valores novos
   static volatile bool new_ref;
+  static volatile bool new_o;
   
   public:
     static void Begin(long int Baudrate);
@@ -23,6 +24,7 @@ class SerialCom{
     static void set_currentLux(int currentLux);
     static int getRef();
     static int getOccupancy();
+    static bool new_oc();
 
   private:
     static void process_request(char *message);

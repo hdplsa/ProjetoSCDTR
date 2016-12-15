@@ -11,6 +11,7 @@ char SerialCom::incoming[10];
 int SerialCom::occupancy = 1;
 int SerialCom::currentLux = 0;
 int SerialCom::ref = -1;
+volatile bool SerialCom::new_o = false;
 volatile bool SerialCom::new_ref = 0;
 
 void SerialCom::Begin(long int Baudrate){
@@ -66,6 +67,7 @@ void SerialCom::process_request(char *message){
       break;
     // Valor de ocupação do Arduino
     case 'o':
+      new_o = true;
       occupancy = valor;
       break;
     // Caso em que queremos mudar a referência local
@@ -80,7 +82,12 @@ void SerialCom::process_request(char *message){
 }
 
 int SerialCom::getOccupancy(){
+  new_o = false;
   return occupancy;
+}
+
+bool SerialCom::new_oc(){
+  return new_o;
 }
 
 void SerialCom::set_currentLux(int currentLux){
