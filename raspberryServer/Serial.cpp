@@ -50,15 +50,13 @@ void Serial::Begin(long baudrate, const char* port){
 
 void Serial::Write(string str){
 
-    int n = 0;
-
     if(str[str.length()-1] != '\n'){
         str += '\n';
         cout << str[str.length()];
     }
 
     for(unsigned int i = 0; i < str.length(); i++){
-        n = write(arduino, &str[i], 1);
+        write(arduino, &str[i], 1);
     }
 
 }

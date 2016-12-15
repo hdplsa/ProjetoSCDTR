@@ -179,10 +179,9 @@ void Arduino::receiveInformation(string info){
 	int dc;
 	float y;
 	float e;
-	float u;
 
 	// Extrai os dados da string
-	int i = sscanf(info.c_str(), "data %d %d %f, %f", &ref, &dc, &y, &e);
+	int i = sscanf(info.c_str(), "data %d %d %f %f", &ref, &dc, &y, &e);
 	if(i == 4){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
@@ -190,7 +189,11 @@ void Arduino::receiveInformation(string info){
 		this->y[K] = y;
 		this->e[K] = e;
 		this->t[K] = boost::posix_time::microsec_clock::local_time();
-		
+
+		//Cálculo de novas métricas
+		this->calcEnergy();
+		this->calcComfortError();
+		this->calcComfortVariance();
 		//Avança da o instante seguinte
 		this->K = this->getkNext(this->K);
 		this->cycle = this->cycle + 1;
