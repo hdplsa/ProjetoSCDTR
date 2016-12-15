@@ -182,7 +182,7 @@ void Arduino::receiveInformation(string info){
 	float u;
 
 	// Extrai os dados da string
-	int i = sscanf(info.c_str(), "data %d %d %0.4f, %0.4f", &ref, &dt, &y, &e);
+	int i = sscanf(info.c_str(), "data %d %d %0.4f, %0.4f", &ref, &dc, &y, &e);
 	if(i == 4){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
