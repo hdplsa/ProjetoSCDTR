@@ -236,7 +236,7 @@ bool Meta::getOccupancy(){
   return this->o;
 }
 
-void Meta::setOccupancy(bool o){
+void Meta::setOccupancy(int o){
   this->o = o;
   //Coloca referencia em função do estado de ocupação
   if (this->o){

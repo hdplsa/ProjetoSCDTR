@@ -8,7 +8,7 @@
 
 int SerialCom::current_char = 0;
 char SerialCom::incoming[10];
-int SerialCom::occupancy = 0;
+int SerialCom::occupancy = 1;
 int SerialCom::currentLux = 0;
 int SerialCom::ref = -1;
 volatile bool SerialCom::new_ref = 0;

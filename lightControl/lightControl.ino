@@ -192,7 +192,7 @@ void loop() {
     SerialCom::receive_message();
 
     // Obtem a referência da mensagem. è -1 se não houver ref nova.
-    meta->setOccupancy((bool)SerialCom::getOccupancy());
+    meta->setOccupancy(SerialCom::getOccupancy());
 
     /*if(new_ref != -1){
       controller->setRef(new_ref);
