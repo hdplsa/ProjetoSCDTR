@@ -112,7 +112,11 @@ double Arduino::getLowerBoundIlluminance(){
 }
 
 void Arduino::setOccupancy(bool value){
+	string send = "o ";
+	send += to_string(value);
+	this->serial->Write(send);
 	this->o = value;
+	
 }
 
 double Arduino::getRef(){
