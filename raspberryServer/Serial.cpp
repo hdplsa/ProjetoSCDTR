@@ -63,21 +63,29 @@ void Serial::Write(string str){
 
 void Serial::read_ln(){
 
-    int n = 0;
-    string str;
+    int n = 0, i = 0;
+    char *str;
     char buffer = '\0';
-    do {
-        n = read(arduino, &buffer, 1);
-        str += buffer;
-    } while(buffer != '\n' && n > 0 && n < 10);
-    
-    cout << str;
+    str = new char[100];
+    while(1){
+        n = 0; i = 0;
+        do {
+            n = read(arduino, &buffer, 1);
+            str[i] = buffer;
+            i++;
+        } while(buffer != '\n' && n > 0 && n < 10);
+        str[i] = '\0';   
+        
+        cout << str;
 
-    if(onRead != NULL) onRead(str);
+        if(onRead != NULL) onRead(str);
+    }
+
+    delete str;
 
 }
 
-void Serial::set_Readcallback(std::function<void(string)> fcn){
+void Serial::set_Readcallback(std::function<void(char*)> fcn){
     onRead = fcn;
 }
 

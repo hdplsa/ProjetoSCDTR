@@ -28,13 +28,13 @@ public:
     void Close();
     ~Serial();
 
-    void set_Readcallback(std::function<void(string)> fcn);
+    void set_Readcallback(std::function<void(char*)> fcn);
     void set_Writecallback(std::function<void(void)> fcn);
     
 private:
 
     // Callbacks
-    std::function<void(string)> onRead = NULL;
+    std::function<void(char*)> onRead = NULL;
     std::function<void(void)> onWrite = NULL;
 
 

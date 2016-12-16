@@ -1,10 +1,10 @@
 #include "Arduino.h"
 
-Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), time(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
+Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
 
 	//Valores iniciais
 	this->K = 0;
-	this->o = false;
+	this->o = true;
 	this->LowBound = 10; // <------------------------- Verficar
 
 	// Abre a porta serial
@@ -25,9 +25,9 @@ Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), time(N_), ref(N_,0), e(N
 int Arduino::getkNext(int k){
 	if(k >= 0){
 		if(k < this->N){
-			k = 0;
-		} else {
 			k = k + 1;
+		} else {
+			k = 0;
 		}
 		return k;
 	}
@@ -179,14 +179,14 @@ void Arduino::ledOFF(){
 
 /* Função chamada ciclicamente para receber e guardar dados
  * vindos dos Arduinos */
-void Arduino::receiveInformation(string info){
+void Arduino::receiveInformation(char *info){
 	int ref;
 	int dc;
 	float y;
 	float e;
 
 	// Extrai os dados da string
-	int i = sscanf(info.c_str(), "data %d %d %f %f", &ref, &dc, &y, &e);
+	int i = sscanf(info, "data %d %d %f %f", &ref, &dc, &y, &e);
 	if(i == 4){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
@@ -194,16 +194,19 @@ void Arduino::receiveInformation(string info){
 		this->y[K] = y;
 		this->e[K] = e;	
 		//Tempos entre mensagens no serial
-		std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+		/*std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
     	auto duration = now.time_since_epoch();
 		long millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-		this->t[K] = millis;	
+		this->t[K] = millis;
 		
 
 		this->time[K] = std::chrono::system_clock::now();	
 		
 
-		cout << "millis = " << std::chrono::duration_cast<std::chrono::milliseconds>(this->time[K]-this->time[K-1]).count() << "\n";
+		cout << "millis = " << std::chrono::duration_cast<std::chrono::milliseconds>(this->time[K]-this->time[K-1]).count() << "\n";*/
+
+		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
+		cout << "tempo = " << this->t[K] << endl;
 
 		//Cálculo de novas métricas
 		this->calcEnergy();
@@ -217,7 +220,7 @@ void Arduino::receiveInformation(string info){
 	}
 
 	// Manda ler a próxima linha
-	serial->read_ln();
+	//serial->read_ln();
 }
 
 void Arduino::setNewInformationCallback(std::function<void(void)> fcn){

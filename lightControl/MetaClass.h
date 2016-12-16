@@ -24,7 +24,7 @@ class Meta{
     volatile bool sendflag = false;
     volatile bool recvflag = false;
     //Occupancy
-    int o = 0;
+    int o = 1;
     
 public:
     Meta(int Narduino,int ledPin,int sensorPin);

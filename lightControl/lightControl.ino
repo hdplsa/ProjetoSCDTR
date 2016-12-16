@@ -153,6 +153,10 @@ void setup() {
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
   meta->printModel();
+  
+  //Coloca ocupação inicial
+  meta->setOccupancy(1);
+  
   //Inicialização completa
   Serial.println((char*)"Ready");
   meta->printModel();

@@ -22,8 +22,9 @@ class Arduino{
 	//Periodo do ciclo de controlo
 	double T = 0.02;
 	//Valores de t do sistema fisico
-	vector<long> t;
-	vector<std::chrono::time_point<std::chrono::system_clock>> time;
+	//vector<long> t;
+	//vector<std::chrono::time_point<std::chrono::system_clock>> time;
+	vector<double> t;
 	//Valores de referencia do sistema fisico
 	vector<double> ref;
 	//Valores de erro do sistema
@@ -72,7 +73,7 @@ class Arduino{
 		void ledON(int pwm = 255);
 		void ledON(double V);
 		void ledOFF();
-		void receiveInformation(string info);
+		void receiveInformation(char *info);
 		void setNewInformationCallback(std::function<void(void)> fcn);
 		vector<double> get_minute(vector<double> vec);
 		void reset();
