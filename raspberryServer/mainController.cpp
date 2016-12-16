@@ -1,17 +1,7 @@
 #include "mainController.h"
 
-MainController::MainController(int Narduino, vector<string> ports) : arduino(Narduino,NULL) {
+MainController::MainController(int Narduino, vector<string> ports_) : arduino(Narduino,NULL), ports(ports_) {
 	this->Narduino = Narduino;
-	/*this->t = 0;
-	this->k = 0;
-	//Inicialização dos arduinos
-	for(int i = 0; i < Narduino; i++){
-		arduino[i] = new Arduino(this->N, ports[i]);
-		//inicialização da callback periodica
-		realtimecallbacks[std::make_pair(i,'l')] = NULL;
-		realtimecallbacks[std::make_pair(i,'d')] = NULL;
-		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
-	}*/
 	this->Init();
 }
 
@@ -176,7 +166,27 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 			i = get_id(str, callback, 2);
 
 			try{
-				bool value = str.c_str()[str.length()-1] - '0';
+
+				string sub = str.substr(2,str.length());
+				bool value = stoi(sub);
+
+				arduino.at(i)->setRef(value);
+
+				cout << "Set occupancy " << value << endl;
+
+				callback("ack");
+			} catch (std::exception &e){
+				callback("Invalid id\n");
+				return;
+			}
+
+		break;
+
+		case 'a':
+			i = get_id(str, callback, 2);
+
+			try{
+				int value = str.c_str()[str.length()-1] - '0';
 
 				arduino.at(i)->setOccupancy(value);
 

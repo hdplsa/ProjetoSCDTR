@@ -69,6 +69,7 @@ class Arduino{
 		bool getOccupancy();
 		double getLowerBoundIlluminance();
 		void setOccupancy(bool value);
+		void setRef(int ref);
 		double getRef();
 		double getPower(); // Nâo implementada
 		double getTime();
