@@ -17,8 +17,6 @@ constexpr int sensorPin = 1;
 constexpr uint8_t deviceID = 2;
 volatile int Narduinos = 0;
 
-char datastr[32];
-
 void initTimer1(){
   cli();
   TCCR1A = 0;// clear register
@@ -178,27 +176,7 @@ ISR(TIMER1_COMPA_vect){
  
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  
-  if(flag){
-    
-    // debug serial
-    /*Serial.print("ref = ");
-    Serial.print(controller->getRef());
-    Serial.print(';');
-    Serial.print("y = ");
-    Serial.print(controller->getY(),4);
-    Serial.print(';');
-    Serial.print("e = ");
-    Serial.print(controller->getError(),4);
-    Serial.print(';');
-    Serial.print("u = ");
-    //Serial.println(controller->getOwnU(),4); 
-    controller->printUvec();*/
-    //String de dados: data ref dutycycle lum 
-    //sprintf (datastr, "data %d %d %f %f", (int)controller->getRef(),controller->getOwnDutyCycle(),controller->getY(),controller->getError());
-    //Serial.println(datastr);
+void sendPI(){
     Serial.print("data ");
     Serial.print((int)controller->getRef());
     Serial.print(" ");
@@ -206,7 +184,17 @@ void loop() {
     Serial.print(" ");
     Serial.print(controller->getY());
     Serial.print(" ");
-    Serial.println(controller->getError());
+    Serial.print(controller->getError());
+    Serial.print(" ");
+    Serial.println(meta->getTheta());
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  
+  if(flag){
+    sendPI();
+    
     //Actualiza vector para feedforward
     meta->setu_vec();
 

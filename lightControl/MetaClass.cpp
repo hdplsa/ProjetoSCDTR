@@ -236,6 +236,10 @@ bool Meta::getOccupancy(){
   return this->o;
 }
 
+double Meta::getTheta(){
+    return this->theta;
+}
+
 void Meta::setOccupancy(int o){
   this->o = o;
   //Coloca referencia em função do estado de ocupação

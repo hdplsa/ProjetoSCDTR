@@ -36,6 +36,7 @@ public:
     bool getSendFlag();
     void setu_vec();
     bool getOccupancy();
+    double getTheta();
     void setOccupancy(int o);
     ~Meta();
     
