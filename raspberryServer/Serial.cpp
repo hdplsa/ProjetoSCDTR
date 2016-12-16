@@ -75,8 +75,6 @@ void Serial::read_ln(){
             i++;
         } while(buffer != '\n' && n > 0 && n < 10);
         str[i] = '\0';   
-        
-        cout << str;
 
         if(onRead != NULL) onRead(str);
     }

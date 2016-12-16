@@ -216,6 +216,8 @@ void Arduino::receiveInformation(char *info){
 		this->K = this->getkNext(this->K);
 		this->cycle = this->cycle + 1;
 
+		cout << info << endl;
+
 		if(newInformationCallback != NULL) newInformationCallback();
 	}
 
@@ -230,7 +232,7 @@ void Arduino::setNewInformationCallback(std::function<void(void)> fcn){
 /* Retorna o valor máximo entre d1 e d2
  * Caso d1 = d2, retorna 0 */
 double Arduino::getMax(double d1, double d2){
-	if (d1 > d2){
+	if (d1 >= d2){
 		return d1;
 	}
 	if (d2 > d1){
@@ -267,7 +269,8 @@ void Arduino::calcComfortError(){
 	if ((K >= 0) && (K < this->N)){
 		// O comfort error acumulado é (N-1)/N*C(k-1) + 1/N*C(k)
 		this->Cerror[this->K] = ((this->cycle-1)/this->cycle)*this->Cerror[getkPrevious(this->K)]
-							  + 1/cycle*getMax(this->e[this->K],0);
+							  + 1/(double)cycle*getMax(this->e[this->K],0);
+		
 	}
 }
 
