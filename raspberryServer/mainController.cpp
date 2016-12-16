@@ -19,6 +19,7 @@ void MainController::printMetrics(int i){
 	vector<char> comandos = {'l', 'd'};
 	std::function<void(string)> send = NULL;
 	double value = -100;
+	string str = "c ";
 
 	// Itera pelos comandos
 	for (std::vector<char>::iterator it = comandos.begin(); it != comandos.end(); ++it){
@@ -34,6 +35,12 @@ void MainController::printMetrics(int i){
 					value = arduino.at(i)->getDuty();
 					break;
 			}
+
+			str += *it; str += ' '; str += to_string(i); str += ' ';
+			str += to_string(value); str += ' '; 
+			str += arduino.at(i)->getTime(); str += '\n';
+
+			send(str);
 		}
 	}
 }
