@@ -5,7 +5,7 @@ Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_
 	//Valores iniciais
 	this->K = 0;
 	this->o = false;
-	this->LowBound = 10;
+	this->LowBound = 10; // <------------------------- Verficar
 
 	// Abre a porta serial
 	serial = new Serial();
@@ -127,15 +127,15 @@ void Arduino::send(string str){
 
 double Arduino::getPower(){
 	
-	/*int prevK = getkPrevious(this->K);
+	int prevK = getkPrevious(this->K);
 	double deltaE;
-	boost::posix_time::time_duration td;
+	long deltat;
 
 	deltaE = E[K] - E[prevK];
 	
-	td = t[K] - t[prevK];
+	deltat = t[K] - t[prevK];
 
-	return deltaE/(td.total_milliseconds()*1000);*/
+	return deltaE/((double)(deltat*1000));
 
 }
 
