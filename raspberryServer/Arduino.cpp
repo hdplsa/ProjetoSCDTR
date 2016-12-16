@@ -249,7 +249,8 @@ void Arduino::calcError(){
 /* Calculo da energia gasta nos LEDs */
 void Arduino::calcEnergy(){
 	if ((K >= 0) && (K < this->N)){
-		this->E[this->K] = this->E[this->getkPrevious(this->K)] + this->d[this->getkPrevious(this->K)]*this->t[this->K];
+		this->E[this->K] = this->E[this->getkPrevious(this->K)] 
+						 + this->d[this->getkPrevious(this->K)]*(this->t[this->K]-this->t[getkPrevious(this->K)]);;
 	}
 }
 
@@ -272,6 +273,7 @@ void Arduino::calcComfortVariance(){
 		// O erro da variância acumulada é (N-1)/N*V(k-1) + 1/N*V(k)
 		this->Verror[this->K] = ((cycle-1)/cycle)*this->Verror[getkPrevious(this->K)] 
 							  + 1/cycle*sum/(this->T*this->T);
+		this->Verror[this->K] = this->t[K] - this->t[getkPrevious(this->K)]; //APAGAR ---------------------------------------------
 	}
 
 	
