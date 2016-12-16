@@ -123,6 +123,12 @@ void Arduino::setOccupancy(bool value){
 	
 }
 
+void Arduino::setRef(int ref){
+	string send = "r ";
+	send += to_string(ref);
+	this->serial->Write(send);
+}
+
 double Arduino::getRef(){
 	return this->ref[K];
 }
@@ -279,7 +285,6 @@ void Arduino::calcComfortVariance(){
 		// O erro da variância acumulada é (N-1)/N*V(k-1) + 1/N*V(k)
 		this->Verror[this->K] = ((cycle-1)/cycle)*this->Verror[getkPrevious(this->K)] 
 							  + 1/cycle*sum/(this->T*this->T);
-		this->Verror[this->K] = this->t[K] - this->t[getkPrevious(this->K)]; //APAGAR ---------------------------------------------
 	}
 
 	

@@ -18,14 +18,16 @@ class MainController{
 	int Narduino;
 	//Arduinos
 	vector<Arduino*> arduino;
+	vector<string> ports;
 	
 	public:
-		MainController(int Narduino, vector<string> ports);
+		MainController(int Narduino, vector<string> ports_);
 		void get_clientRequest(string str, std::function<void(string)> callback);
 		void printMetrics(int Arduino);
 		~MainController();
 		
 	private:
+		void Init();
 		int get_id(string str, std::function<void(string)> callback, int start = 4);
 		string compose_string(string param1, string param2, double val);
 		std::map<std::pair<int, char>, std::function<void(string)>> realtimecallbacks;
