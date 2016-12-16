@@ -290,7 +290,7 @@ vector<double> Arduino::get_minute(vector<double> vec){
 		new_vec.push_back(vec.at(n));
 		ciclos++;
 		n = getkPrevious(this->K);
-	}while(millis > t[n] + 60*100);
+	}while(millis > t[n] + 60*100 && cycle < N);
 
 	return new_vec;
 
