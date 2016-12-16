@@ -184,27 +184,18 @@ void Arduino::receiveInformation(char *info){
 	int dc;
 	float y;
 	float e;
+	float theta;
 
 	// Extrai os dados da string
-	int i = sscanf(info, "data %d %d %f %f", &ref, &dc, &y, &e);
-	if(i == 4){
+	int i = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta);
+	if(i == 5){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
 		this->d[K] = dc;
 		this->y[K] = y;
 		this->e[K] = e;	
-		//Tempos entre mensagens no serial
-		/*std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-    	auto duration = now.time_since_epoch();
-		long millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-		this->t[K] = millis;
+		this->theta = theta;
 		
-
-		this->time[K] = std::chrono::system_clock::now();	
-		
-
-		cout << "millis = " << std::chrono::duration_cast<std::chrono::milliseconds>(this->time[K]-this->time[K-1]).count() << "\n";*/
-
 		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
 		cout << "tempo = " << this->t[K] << endl;
 
@@ -294,7 +285,7 @@ vector<double> Arduino::get_minute(vector<double> vec){
 	int n = K;
 	int ciclos = 0;
 	vector<double> new_vec(N);	
-	millis = t[n];
+	double millis = t[n];
 
 	do{
 		new_vec.push_back(vec.at(n));

@@ -43,6 +43,8 @@ class Arduino{
 	vector<double> Verror;
 	//Estado de ocupação
 	bool o;
+	//External Illuminance
+	double theta;
 	//Lower bound
 	double LowBound;
 	
