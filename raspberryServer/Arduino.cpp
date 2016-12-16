@@ -1,6 +1,6 @@
 #include "Arduino.h"
 
-Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0), time(N_,0) {
+Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), time(N_), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
 
 	//Valores iniciais
 	this->K = 0;
@@ -200,7 +200,7 @@ void Arduino::receiveInformation(string info){
 		this->t[K] = millis;	
 		
 
-		this->time[K] = now.time_since_epoch();		
+		this->time[K] = std::chrono::system_clock::now();	
 		
 
 		cout << "millis = " << std::chrono::duration_cast<std::chrono::milliseconds>(this->time[K]-this->time[K-1]).count() << "\n";

@@ -23,7 +23,7 @@ class Arduino{
 	double T = 0.02;
 	//Valores de t do sistema fisico
 	vector<long> t;
-	vector<auto> time;
+	vector<std::chrono::time_point<std::chrono::system_clock>> time;
 	//Valores de referencia do sistema fisico
 	vector<double> ref;
 	//Valores de erro do sistema
