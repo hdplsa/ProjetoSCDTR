@@ -138,9 +138,9 @@ double Arduino::getPower(){
 
 }
 
-/*boost::posix_time::ptime Arduino::getTime(){
+long Arduino::getTime(){
 	return t[K];
-}*/
+}
 
 void Arduino::ledON(int pwm /* = 255 */){
 
@@ -243,10 +243,7 @@ void Arduino::calcError(){
 
 /* Calculo da energia gasta nos LEDs */
 void Arduino::calcEnergy(){
-	boost::posix_time::time_duration td;
 	if ((K >= 0) && (K < this->N)){
-		//td = this->t[K] - this->t[getkPrevious(K)];
-		//this->E[this->K] = this->E[this->getkPrevious(this->K)] + this->d[this->getkPrevious(this->K)]*td.total_milliseconds()*1e-3;
 		this->E[this->K] = this->E[this->getkPrevious(this->K)] + this->d[this->getkPrevious(this->K)]*this->t[this->K];
 	}
 }
@@ -276,21 +273,6 @@ void Arduino::calcComfortVariance(){
 }
 
 vector<double> Arduino::get_minute(vector<double> vec){
-	/*int n = K;
-	int ciclos = 0;
-	vector<double> new_vec(N);
-
-	boost::posix_time::time_duration td;
-
-	do{
-		td = t[K] - t[getkPrevious(n)];
-		new_vec.push_back(vec.at(n));
-		n = getkPrevious(n);
-		ciclos++;
-
-	} while(td.total_seconds() < 60 && ciclos < N);
-
-	return new_vec;*/
 
 }
 

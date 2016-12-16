@@ -66,7 +66,7 @@ class Arduino{
 		void setOccupancy(bool value);
 		double getRef();
 		double getPower(); // Nâo implementada
-		boost::posix_time::ptime getTime();
+		long getTime();
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(double V);
