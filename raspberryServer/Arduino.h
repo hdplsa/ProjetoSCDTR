@@ -23,6 +23,7 @@ class Arduino{
 	double T = 0.02;
 	//Valores de t do sistema fisico
 	vector<long> t;
+	vector<auto> time;
 	//Valores de referencia do sistema fisico
 	vector<double> ref;
 	//Valores de erro do sistema
