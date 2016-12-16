@@ -61,6 +61,7 @@ class Arduino{
 		double getComfortVariance(int k);
 		double getIlluminance();
 		double getIlluminance(int k);
+		double getExternalIlluminance();
 		vector<double> getLastMinuteIlluminance();
 		double getDuty();
 		double getDuty(int k);

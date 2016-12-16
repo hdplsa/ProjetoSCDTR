@@ -82,6 +82,10 @@ double Arduino::getIlluminance(int k){
 	return this->y[k];
 }
 
+double Arduino::getExternalIlluminance(){
+	return this->theta;
+}
+
 vector<double> Arduino::getLastMinuteIlluminance(){
 	vector<double> sum = get_minute(y);
 

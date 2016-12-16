@@ -79,7 +79,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 							value = arduino.at(i)->getLowerBoundIlluminance();
 							break;
 						case 'O':
-							throw "Not implemented";
+							value = arduino.at(i)->getExternalIlluminance();
 							break;
 						case 'r':
 							value = arduino.at(i)->getRef();
