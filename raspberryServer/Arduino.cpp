@@ -139,7 +139,7 @@ double Arduino::getPower(){
 	
 	deltat = t[K] - t[prevK];
 
-	return deltaE/((double)(deltat*1000));
+	return deltaE/((double)((double)deltat/1000.0));
 
 }
 
