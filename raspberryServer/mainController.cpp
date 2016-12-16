@@ -145,7 +145,9 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 						}
 					}
 
-					string send = compose_string(to_string(str.c_str()[2]), "T", value);
+					string param1(1,str.c_str()[2]);
+
+					string send = compose_string(param1, "T", value);
 
 					callback(send);
 				} catch(std::exception &e){

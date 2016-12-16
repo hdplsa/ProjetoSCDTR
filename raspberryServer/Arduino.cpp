@@ -147,7 +147,7 @@ double Arduino::getPower(){
 
 }
 
-long Arduino::getTime(){
+double Arduino::getTime(){
 	return t[K];
 }
 
