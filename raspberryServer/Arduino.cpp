@@ -290,17 +290,14 @@ void Arduino::calcComfortVariance(){
 vector<double> Arduino::get_minute(vector<double> vec){
 	int n = K;
 	int ciclos = 0;
-	vector<double> new_vec(N);
-
-	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-    auto duration = now.time_since_epoch();
-	long millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();	
+	vector<double> new_vec(N);	
+	millis = t[n];
 
 	do{
 		new_vec.push_back(vec.at(n));
 		ciclos++;
 		n = getkPrevious(this->K);
-	}while(millis > t[n] + 60*100 && cycle <= N);
+	}while(millis < t[n] + 100 && cycle <= N);
 
 	return new_vec;
 
