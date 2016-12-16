@@ -2,6 +2,20 @@
 
 MainController::MainController(int Narduino, vector<string> ports) : arduino(Narduino,NULL) {
 	this->Narduino = Narduino;
+	/*this->t = 0;
+	this->k = 0;
+	//Inicialização dos arduinos
+	for(int i = 0; i < Narduino; i++){
+		arduino[i] = new Arduino(this->N, ports[i]);
+		//inicialização da callback periodica
+		realtimecallbacks[std::make_pair(i,'l')] = NULL;
+		realtimecallbacks[std::make_pair(i,'d')] = NULL;
+		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
+	}*/
+	this->Init();
+}
+
+void MainController::Init(){
 	this->t = 0;
 	this->k = 0;
 	//Inicialização dos arduinos
@@ -182,10 +196,12 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		try{
 			for(int i = 0; i < Narduino; i++){
-				arduino.at(i)->reset();
+				delete arduino.at(i);
 			}
 
-			callback("ack");
+			this->Init();
+
+			callback("ack\n");
 		} catch (std::exception &e) {
 			cout << "Erro " << e.what() << endl;
 			callback("Unknown error occured\n");

@@ -308,5 +308,5 @@ void Arduino::reset(){
 
 
 Arduino::~Arduino(){
-	
+	reset();
 }
