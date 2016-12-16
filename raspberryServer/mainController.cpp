@@ -69,7 +69,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 							occupancy = arduino.at(i)->getOccupancy();
 							break;
 						case 'L':
-							throw "Not implemented";
+							value = arduino.at(i)->getLowerBoundIlluminance();
 							break;
 						case 'O':
 							throw "Not implemented";

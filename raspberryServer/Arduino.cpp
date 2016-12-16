@@ -5,6 +5,7 @@ Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_
 	//Valores iniciais
 	this->K = 0;
 	this->o = false;
+	this->LowBound = 10;
 
 	// Abre a porta serial
 	serial = new Serial();
