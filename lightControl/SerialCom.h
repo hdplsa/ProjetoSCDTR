@@ -25,6 +25,7 @@ class SerialCom{
     static int getRef();
     static int getOccupancy();
     static bool new_oc();
+    static bool new_r();
 
   private:
     static void process_request(char *message);

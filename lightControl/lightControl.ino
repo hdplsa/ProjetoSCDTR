@@ -206,10 +206,10 @@ void loop() {
       meta->setOccupancy(SerialCom::getOccupancy());
     }
     
-    /*if(new_ref != -1){
-      controller->setRef(new_ref);
-      Serial.println("Mudada Ref");
-    }*/
+    //if(SerialCom::new_r()){
+    //  controller->setRef(SerialCom::getRef());
+    //  Serial.println("Mudada Ref");
+    //}
 
     flag = 0;
   }

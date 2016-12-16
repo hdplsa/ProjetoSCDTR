@@ -12,7 +12,7 @@ int SerialCom::occupancy = 1;
 int SerialCom::currentLux = 0;
 int SerialCom::ref = -1;
 volatile bool SerialCom::new_o = false;
-volatile bool SerialCom::new_ref = 0;
+volatile bool SerialCom::new_ref = false;
 void (*SerialCom::reset_fcn)(void) = 0;
 
 
@@ -65,6 +65,8 @@ void SerialCom::process_request(char *message){
   switch(tipo){
     // Restard do Arduino (DESCOBRIR MÉTODO)
     case 'r':
+      ref = valor;
+      new_ref = true;
       break;
     // Valor de ocupação do Arduino
     case 'o':
@@ -87,6 +89,10 @@ int SerialCom::getOccupancy(){
   return occupancy;
 }
 
+bool SerialCom::new_r(){
+  return new_ref;
+}
+
 bool SerialCom::new_oc(){
   return new_o;
 }
@@ -101,6 +107,7 @@ int SerialCom::getRef(){
 
   int ref2 = ref;
   ref = -1;
+  new_ref = false;
   
   return ref2;
 }
