@@ -35,7 +35,7 @@ void MainController::printMetrics(int i){
 					break;
 			}
 
-			boost::posix_time::ptime tempo= arduino.at(i)->getTime();
+			/*boost::posix_time::ptime tempo= arduino.at(i)->getTime();
 			const boost::posix_time::time_duration td = tempo.time_of_day();
 
 			const long hours        = td.hours();
@@ -49,7 +49,7 @@ void MainController::printMetrics(int i){
 			sprintf(str, "c %c %i %f %02ld:%02ld:%02ld.%03ld\n", 
 				*it, i, value, hours, minutes, seconds, milliseconds);
 
-			send(string(str));
+			send(string(str));*/
 
 		}
 	}

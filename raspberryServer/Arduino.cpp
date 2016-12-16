@@ -126,7 +126,7 @@ void Arduino::send(string str){
 
 double Arduino::getPower(){
 	
-	int prevK = getkPrevious(this->K);
+	/*int prevK = getkPrevious(this->K);
 	double deltaE;
 	boost::posix_time::time_duration td;
 
@@ -134,13 +134,13 @@ double Arduino::getPower(){
 	
 	td = t[K] - t[prevK];
 
-	return deltaE/(td.total_milliseconds()*1000);
+	return deltaE/(td.total_milliseconds()*1000);*/
 
 }
 
-boost::posix_time::ptime Arduino::getTime(){
+/*boost::posix_time::ptime Arduino::getTime(){
 	return t[K];
-}
+}*/
 
 void Arduino::ledON(int pwm /* = 255 */){
 
@@ -187,8 +187,13 @@ void Arduino::receiveInformation(string info){
 		this->ref[K] = ref;
 		this->d[K] = dc;
 		this->y[K] = y;
-		this->e[K] = e;
-		this->t[K] = boost::posix_time::microsec_clock::local_time();
+		this->e[K] = e;	
+		//Tempos entre mensagens no serial
+		std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+    	auto duration = now.time_since_epoch();
+		long millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+		this->t[K] = millis;	
+		cout << "millis = " << millis << "\n";
 
 		//Cálculo de novas métricas
 		this->calcEnergy();
@@ -240,9 +245,9 @@ void Arduino::calcError(){
 void Arduino::calcEnergy(){
 	boost::posix_time::time_duration td;
 	if ((K >= 0) && (K < this->N)){
-		td = this->t[K] - this->t[getkPrevious(K)];
-		this->E[this->K] = this->E[this->getkPrevious(this->K)] 
-			             + this->d[this->getkPrevious(this->K)]*td.total_milliseconds()*1e-3;
+		//td = this->t[K] - this->t[getkPrevious(K)];
+		//this->E[this->K] = this->E[this->getkPrevious(this->K)] + this->d[this->getkPrevious(this->K)]*td.total_milliseconds()*1e-3;
+		this->E[this->K] = this->E[this->getkPrevious(this->K)] + this->d[this->getkPrevious(this->K)]*this->t[this->K];
 	}
 }
 
@@ -271,7 +276,7 @@ void Arduino::calcComfortVariance(){
 }
 
 vector<double> Arduino::get_minute(vector<double> vec){
-	int n = K;
+	/*int n = K;
 	int ciclos = 0;
 	vector<double> new_vec(N);
 
@@ -285,7 +290,7 @@ vector<double> Arduino::get_minute(vector<double> vec){
 
 	} while(td.total_seconds() < 60 && ciclos < N);
 
-	return new_vec;
+	return new_vec;*/
 
 }
 

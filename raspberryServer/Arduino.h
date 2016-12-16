@@ -4,13 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <cstdio>
+#include <chrono>
+#include <ctime>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
-
 #include "Serial.h"
 using namespace std;
-using namespace boost::posix_time;
+//using namespace boost::posix_time;
 
 class Arduino{
 	//Variável que guarda a posição actual nos vectores
@@ -21,7 +21,9 @@ class Arduino{
 	long cycle = 1;
 	//Periodo do ciclo de controlo
 	double T = 0.02;
-	//Valores do sistema fisico
+	//Valores de t do sistema fisico
+	vector<long> t;
+	//Valores de referencia do sistema fisico
 	vector<double> ref;
 	//Valores de erro do sistema
 	vector<double> e;
@@ -31,8 +33,6 @@ class Arduino{
 	vector<double> y;
 	//Valores do duty cycle do sistema
 	vector<double> d;
-	//Valores do tempo (do pi) em que recebemos cada valor
-	vector<boost::posix_time::ptime> t;
 	//Valores de consumo de energia
 	vector<double> E;
 	//Valores de erro de comforto
