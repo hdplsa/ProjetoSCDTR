@@ -197,7 +197,6 @@ void Arduino::receiveInformation(char *info){
 		this->theta = theta;
 		
 		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
-		cout << "tempo = " << this->t[K] << endl;
 
 		//Cálculo de novas métricas
 		this->calcEnergy();
@@ -207,13 +206,14 @@ void Arduino::receiveInformation(char *info){
 		this->K = this->getkNext(this->K);
 		this->cycle = this->cycle + 1;
 
-		cout << info << endl;
+		if (ARDUINODEBUG){
+			cout << "Ciclo = " << cycle << endl;
+			cout << "data " << ref << " " << dc << " " << e << " " << theta << endl;
+			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
+		}
 
 		if(newInformationCallback != NULL) newInformationCallback();
 	}
-
-	// Manda ler a próxima linha
-	//serial->read_ln();
 }
 
 void Arduino::setNewInformationCallback(std::function<void(void)> fcn){
@@ -275,10 +275,7 @@ void Arduino::calcComfortVariance(){
 		// O erro da variância acumulada é (N-1)/N*V(k-1) + 1/N*V(k)
 		this->Verror[this->K] = ((cycle-1)/cycle)*this->Verror[getkPrevious(this->K)] 
 							  + 1/cycle*sum/(this->T*this->T);
-		this->Verror[this->K] = this->t[K] - this->t[getkPrevious(this->K)]; //APAGAR ---------------------------------------------
-	}
-
-	
+	}	
 }
 
 vector<double> Arduino::get_minute(vector<double> vec){

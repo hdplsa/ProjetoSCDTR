@@ -10,7 +10,8 @@
 #include <boost/thread.hpp>
 #include "Serial.h"
 using namespace std;
-//using namespace boost::posix_time;
+
+#define ARDUINODEBUG 1
 
 class Arduino{
 	//Variável que guarda a posição actual nos vectores
