@@ -24,9 +24,7 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
     //Init do modelo feedforward
     this->Narduino = Narduino;
     this->k = new double[this->Narduino];
-    for(i = 0; i < this->Narduino; i++){
-      this->k[i] = 0;
-    }
+    this->initAllVector(this->k, this->Narduino);
     this->theta = 0;
     //Init vector de us
     this->initEnderecos();
@@ -139,15 +137,14 @@ void Meta::calibrateLumVoltageModel(){
         }
     }
     //-----------------------------------STATE MACHINE END-----------------------------------------
-    //Valor final do offset
+    //Valor final do offset, theta do modelo
     this->theta = this->calcVectorAverage(theta_, this->Narduino);
-
     //Meter os valores dentro da classe do controlador (LightController)
     this->_lightcontroller->setK(k);
     this->_lightcontroller->setTheta(theta);
 }
 
-
+//Imprime matriz [K] e [Theta] do modelo
 void Meta::printModel(){
   int i;
   Serial.print("[");
@@ -244,6 +241,7 @@ Meta::~Meta(){
     delete this->_lightcontroller;
 }
 
+//Inicializa Controlador com endereço correcto
 void Meta::initEnderecos(){
   double valor;
   valor = EEPROM.read(0);
@@ -252,6 +250,13 @@ void Meta::initEnderecos(){
 
 char *Meta::strAlloc(int len){
   return new char[len+1];
+}
+
+void Meta::initAllVector(double *v, int dim){
+    int i;
+    for(i=0; i < dim; i++){
+        v[i] = 0;
+    }
 }
 
 //Calcula a media de um vector v de dimensão dim de doubles
@@ -266,6 +271,7 @@ double Meta::calcVectorAverage(double *v, int dim){
     return av;
 }
 
+//Inicializa string I2C com string vazia
 void Meta::resetI2CString(){
     this->rI2C[0] = '\0';
 }
@@ -291,7 +297,7 @@ double *Meta::MinSquare(const int N, double *u, double *y){
     det = 1/(N*sumsquare - sum*sum);
     m = det*(N*sumyu - sum*sumy);
     b = det*(-sum*sumyu + sumsquare*sumy);
-
+    //Cria variável de retorno
     ans = new double[2];
     ans[0] = m;
     ans[1] = b;

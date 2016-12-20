@@ -43,6 +43,7 @@ public:
 private:
     void initEnderecos();
     char *strAlloc(int len);
+    void initAllVector(double *v, int dim);
     double calcVectorAverage(double *v, int dim);
     void resetI2CString();
     double *MinSquare(const int N, double *u, double *y);
