@@ -82,10 +82,6 @@ double Arduino::getIlluminance(int k){
 	return this->y[k];
 }
 
-double Arduino::getExternalIlluminance(){
-	return this->theta;
-}
-
 vector<double> Arduino::getLastMinuteIlluminance(){
 	vector<double> sum = get_minute(y);
 
@@ -123,12 +119,6 @@ void Arduino::setOccupancy(bool value){
 	
 }
 
-void Arduino::setRef(int ref){
-	string send = "r ";
-	send += to_string(ref);
-	this->serial->Write(send);
-}
-
 double Arduino::getRef(){
 	return this->ref[K];
 }
@@ -153,7 +143,7 @@ double Arduino::getPower(){
 
 }
 
-double Arduino::getTime(){
+long Arduino::getTime(){
 	return t[K];
 }
 
@@ -285,6 +275,7 @@ void Arduino::calcComfortVariance(){
 		// O erro da variância acumulada é (N-1)/N*V(k-1) + 1/N*V(k)
 		this->Verror[this->K] = ((cycle-1)/cycle)*this->Verror[getkPrevious(this->K)] 
 							  + 1/cycle*sum/(this->T*this->T);
+		this->Verror[this->K] = this->t[K] - this->t[getkPrevious(this->K)]; //APAGAR ---------------------------------------------
 	}
 
 	
@@ -313,5 +304,5 @@ void Arduino::reset(){
 
 
 Arduino::~Arduino(){
-	reset();
+	
 }

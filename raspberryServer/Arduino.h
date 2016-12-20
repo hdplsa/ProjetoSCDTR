@@ -61,7 +61,6 @@ class Arduino{
 		double getComfortVariance(int k);
 		double getIlluminance();
 		double getIlluminance(int k);
-		double getExternalIlluminance();
 		vector<double> getLastMinuteIlluminance();
 		double getDuty();
 		double getDuty(int k);
@@ -69,10 +68,9 @@ class Arduino{
 		bool getOccupancy();
 		double getLowerBoundIlluminance();
 		void setOccupancy(bool value);
-		void setRef(int ref);
 		double getRef();
 		double getPower(); // Nâo implementada
-		double getTime();
+		long getTime();
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(double V);

@@ -1,11 +1,7 @@
 #include "mainController.h"
 
-MainController::MainController(int Narduino, vector<string> ports_) : arduino(Narduino,NULL), ports(ports_) {
+MainController::MainController(int Narduino, vector<string> ports) : arduino(Narduino,NULL) {
 	this->Narduino = Narduino;
-	this->Init();
-}
-
-void MainController::Init(){
 	this->t = 0;
 	this->k = 0;
 	//Inicialização dos arduinos
@@ -83,7 +79,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 							value = arduino.at(i)->getLowerBoundIlluminance();
 							break;
 						case 'O':
-							value = arduino.at(i)->getExternalIlluminance();
+							throw "Not implemented";
 							break;
 						case 'r':
 							value = arduino.at(i)->getRef();
@@ -149,9 +145,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 						}
 					}
 
-					string param1(1,str.c_str()[2]);
-
-					string send = compose_string(param1, "T", value);
+					string send = compose_string(to_string(str.c_str()[2]), "T", value);
 
 					callback(send);
 				} catch(std::exception &e){
@@ -166,27 +160,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 			i = get_id(str, callback, 2);
 
 			try{
-
-				string sub = str.substr(2,str.length());
-				bool value = stoi(sub);
-
-				arduino.at(i)->setRef(value);
-
-				cout << "Set occupancy " << value << endl;
-
-				callback("ack");
-			} catch (std::exception &e){
-				callback("Invalid id\n");
-				return;
-			}
-
-		break;
-
-		case 'a':
-			i = get_id(str, callback, 2);
-
-			try{
-				int value = str.c_str()[str.length()-1] - '0';
+				bool value = str.c_str()[str.length()-1] - '0';
 
 				arduino.at(i)->setOccupancy(value);
 
@@ -206,12 +180,10 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		try{
 			for(int i = 0; i < Narduino; i++){
-				delete arduino.at(i);
+				arduino.at(i)->reset();
 			}
 
-			this->Init();
-
-			callback("ack\n");
+			callback("ack");
 		} catch (std::exception &e) {
 			cout << "Erro " << e.what() << endl;
 			callback("Unknown error occured\n");
