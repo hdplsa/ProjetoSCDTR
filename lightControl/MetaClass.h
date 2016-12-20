@@ -7,9 +7,9 @@
 #include "LightController.h"
 #include "TWI.h"
 
+#define METADEBUG 0
+
 // Meta class que encapsula os modulos (classes) necessarios que cada arduino
-
-
 
 class Meta{
     
@@ -43,8 +43,10 @@ public:
 private:
     void initEnderecos();
     char *strAlloc(int len);
+    double calcVectorAverage(double *v, int dim);
+    void resetI2CString();
     double *MinSquare(const int N, double *u, double *y);
-    void Setu(double u);
+    void setLedU(double u);
     double Gety(const int N);    
 };
 
