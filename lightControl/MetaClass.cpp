@@ -7,6 +7,9 @@
 #define SHUT 	4
 #define TALK	5
 
+#define OCCUPIEDLUM 50.0
+#define NOTOCCUPIEDLUM 10.0
+
 
 const double Umax = 5.0;
 
@@ -202,7 +205,7 @@ void Meta::setu_vec(){
       break;
             //-----------------------------
       case SHUT:
-        while(!this->recvflag){};
+                while(!this->recvflag){};
                 this->recvflag = false;
                 //Esperar por U para receber valor
                 if(this->rI2C[0] == 'U'){
@@ -231,13 +234,15 @@ void Meta::setOccupancy(int o){
   this->o = o;
   //Coloca referencia em função do estado de ocupação
   if (this->o){
-    this->_lightcontroller->setRef(50.0);
+    this->_lightcontroller->setRef(OCCUPIEDLUM);
   } else {
-    this->_lightcontroller->setRef(0.0);
+    this->_lightcontroller->setRef(NOTOCCUPIEDLUM);
   }
 }
 
 Meta::~Meta(){
+    //Frees do programa no final
+    delete this->k;
     delete this->_lightcontroller;
 }
 

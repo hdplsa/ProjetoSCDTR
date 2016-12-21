@@ -147,13 +147,16 @@ double LightController::calcController(){
 double LightController::getY(){
     return this->y;
 }
+
 double LightController::getError(){
     return this->e[1];
 }
+
 double LightController::getOwnU(){
   return this->u[this->index];
 }
 
+//Print do vector de us para debug
 void LightController::printUvec(){
   int i;
   Serial.print("[");
