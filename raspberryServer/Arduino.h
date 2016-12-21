@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <chrono>
 #include <ctime>
+#include <fstream>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include "Serial.h"
@@ -80,6 +81,7 @@ class Arduino{
 		void setNewInformationCallback(std::function<void(void)> fcn);
 		vector<double> get_minute(vector<double> vec);
 		void reset();
+		bool saveVectorsCSV(int i);
 		~Arduino();
 	
 	private:
@@ -89,6 +91,8 @@ class Arduino{
 		void calcEnergy();
 		void calcComfortError();
 		void calcComfortVariance();
+		bool savetoCSV(vector<double> vec, string filename);
+
 		Serial *serial;
 
 		boost::thread th;

@@ -84,18 +84,11 @@ double LightController::calcController(){
         // Primeiro ciclo só com feedforward
         this->u[this->index] = this->calcFeedForward();
         // Saturação na variável de controlo
-        if (this->sat_up >= this->sat_down){
-            if (this->u[this->index] < this->sat_down){
-                this->u[this->index] = this->sat_down;
-            }
-            if (this->u[this->index] > this->sat_up){
-                this->u[this->index] = this->sat_up;
-            }
-        }
-        // Liga o PID
-        this->ffflag = 0;
+        this->u[this->index] = this->applySaturation(this->u[this->index]);
         // Coloca o sinal de comando no LED
         LEDInputControlVariable();
+        // Liga o PID
+        this->ffflag = 0;
     } else {
         // Avanço do tempo das samples dos sinais
         this->y = this->getSensorY();
@@ -125,14 +118,7 @@ double LightController::calcController(){
         u_antes_sat = this->u[this->index];
         
         // Saturação na variável de controlo
-        if (this->sat_up >= this->sat_down){
-            if (this->u[this->index] < this->sat_down){
-                this->u[this->index] = this->sat_down;
-            }
-            if (this->u[this->index] > this->sat_up){
-                this->u[this->index] = this->sat_up;
-            }
-        }
+        this->u[this->index] = this->applySaturation(this->u[this->index]);
         
         // Calcula o novo valor do windup
         this->windup[1] = this->u[this->index] - u_antes_sat;
@@ -147,13 +133,16 @@ double LightController::calcController(){
 double LightController::getY(){
     return this->y;
 }
+
 double LightController::getError(){
     return this->e[1];
 }
+
 double LightController::getOwnU(){
   return this->u[this->index];
 }
 
+//Print do vector de us para debug
 void LightController::printUvec(){
   int i;
   Serial.print("[");
@@ -231,6 +220,24 @@ double LightController::calcPDController(){
     u = this->Kd*((2/this->T)*(this->e[1]-this->e[0])) - this->ud_ant;
     return u;
 }
+
+double LightController::applySaturation(double u){
+    //Verifica consistencia de valores
+    if (this->sat_up >= this->sat_down){
+        //Aplica saturacao inferior
+        if (u < this->sat_down){
+            u = this->sat_down;
+        }
+        //Aplica saturacao superior
+        if (u > this->sat_up){
+            u = this->sat_up;
+        }
+    } else {
+        //CODIGO DE ERRO FUNCIONAL
+    }
+    return u;
+}
+
 //OTHER
 void LightController::LEDInputControlVariable(){
     //Impõe sinal de comando calculado no LED
