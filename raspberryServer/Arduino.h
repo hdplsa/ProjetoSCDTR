@@ -12,6 +12,7 @@
 #include "Serial.h"
 using namespace std;
 
+#define ARDUINOSIM	 1
 #define ARDUINODEBUG 1
 
 class Arduino{
@@ -52,6 +53,7 @@ class Arduino{
 	
 	public:
 		Arduino(int N_, string port);
+		void ArduinoSim();
 		int getkNext(int k);
 		int getkPrevious(int k);
 		double getReference();

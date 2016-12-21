@@ -7,16 +7,69 @@ Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_
 	this->o = true;
 	this->LowBound = 10; // <------------------------- Verficar
 
-	// Abre a porta serial
-	serial = new Serial();
-	serial->Begin(115200, port.c_str());
+	if(ARDUINOSIM){
 
-	// Atribui os callbacks
-	serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
+		th = boost::thread(boost::bind(&Arduino::ArduinoSim,this));
 
-	// Começa a leitura do serial
-	th = boost::thread(boost::bind(&Serial::read_ln,serial));
+	} else {
+
+		// Abre a porta serial
+		serial = new Serial();
+		serial->Begin(115200, port.c_str());
+
+		// Atribui os callbacks
+		serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
+
+		// Começa a leitura do serial
+		th = boost::thread(boost::bind(&Serial::read_ln,serial));
+
+	}
 	
+}
+
+void Arduino::ArduinoSim(){
+
+	while(1){
+
+		// Guarda os dados no objeto
+		if(o){
+			this->ref[K] = 50.0;
+		} else {
+			this->ref[K] = 10.0;
+		}
+
+		this->d[K] = 100;
+		this->y[K] = 100;
+		this->e[K] = 10;	
+		this->theta = theta;
+		//Calculo o vector de tempo
+		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
+		//Cálculo de novas métricas
+		this->calcEnergy();
+		this->calcComfortError();
+		this->calcComfortVariance();
+		//Avança da o instante seguinte
+		this->K = this->getkNext(this->K);
+		this->cycle ++;
+
+		if (ARDUINODEBUG){
+			cout << "Ciclo = " << to_string(cycle) << endl;
+			cout << "Ref " << this->ref[K] << endl;
+			cout << "Duty " << this->d[K] << endl;
+			cout << "Error " << this->e[K] << endl;
+			cout << "Theta " << this->theta << endl;
+			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
+			cout << "Cerror = " << this->Cerror[this->getkPrevious(K)] << endl;
+			cout << "Verror = " << this->Verror[this->getkPrevious(K)] << endl;
+			cout << endl;
+		}
+		//Chama função callback
+		if(newInformationCallback != NULL) newInformationCallback();
+
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+
+	}
+
 }
 
 /* Implementação dos indices do vector em anel
@@ -114,9 +167,12 @@ double Arduino::getLowerBoundIlluminance(){
 void Arduino::setOccupancy(bool value){
 	string send = "o ";
 	send += to_string(value);
-	this->serial->Write(send);
 	this->o = value;
 	
+	if(!ARDUINOSIM){
+		this->serial->Write(send);
+	}
+
 }
 
 double Arduino::getRef(){
@@ -125,8 +181,10 @@ double Arduino::getRef(){
 
 void Arduino::send(string str){
 
-	serial->Write(str);
-
+	if(!ARDUINOSIM){
+		serial->Write(str);
+	}
+	
 }
 
 double Arduino::getPower(){
@@ -205,7 +263,7 @@ void Arduino::receiveInformation(char *info){
 		this->cycle = this->cycle + 1;
 
 		if (ARDUINODEBUG){
-			cout << "Ciclo = " << cycle << endl;
+			cout << "Ciclo = " << to_string(cycle) << endl;
 			cout << "data " << ref << " " << dc << " " << e << " " << theta << endl;
 			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
 			cout << "Cerror = " << this->Cerror[this->getkPrevious(K)] << endl;

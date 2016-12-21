@@ -38,7 +38,7 @@ void MainController::printMetrics(int i){
 
 			str += *it; str += ' '; str += to_string(i); str += ' ';
 			str += to_string(value); str += ' '; 
-			str += arduino.at(i)->getTime(); str += '\n';
+			str += to_string(arduino.at(i)->getTime()); str += '\n';
 
 			send(str);
 		}
@@ -280,7 +280,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		default:
 
-			// Enviar invalid command
+			callback("Invalid command\n");
 
 		break;
 
