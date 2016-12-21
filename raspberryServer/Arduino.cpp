@@ -187,17 +187,15 @@ void Arduino::receiveInformation(char *info){
 	float theta;
 
 	// Extrai os dados da string
-	int i = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta);
-	if(i == 5){
+	if(int dataN = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta) == 5){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
 		this->d[K] = dc;
 		this->y[K] = y;
 		this->e[K] = e;	
 		this->theta = theta;
-		
+		//Calculo o vector de tempo
 		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
-
 		//Cálculo de novas métricas
 		this->calcEnergy();
 		this->calcComfortError();
@@ -210,9 +208,17 @@ void Arduino::receiveInformation(char *info){
 			cout << "Ciclo = " << cycle << endl;
 			cout << "data " << ref << " " << dc << " " << e << " " << theta << endl;
 			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
+			cout << "Cerror = " << this->Cerror[this->getkPrevious(K)] << endl;
+			cout << "Verror = " << this->Verror[this->getkPrevious(K)] << endl;
 		}
-
+		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
+	} else {
+		if (ARDUINODEBUG){
+			if(dataN > 0){
+				cout << "Erro de comunicação, menos dados" << endl;
+			}
+		}
 	}
 }
 
@@ -251,7 +257,7 @@ void Arduino::calcError(){
 void Arduino::calcEnergy(){
 	if ((K >= 0) && (K < this->N)){
 		this->E[this->K] = this->E[this->getkPrevious(this->K)] 
-						 + this->d[this->getkPrevious(this->K)]*(this->t[this->K]-this->t[getkPrevious(this->K)]);;
+						 + this->d[this->getkPrevious(this->K)]*(this->t[this->K]-this->t[getkPrevious(this->K)]);
 	}
 }
 
@@ -299,6 +305,7 @@ void Arduino::reset(){
 	serial->Close();
 }
 
+//Cria ficheiros csv que podem ser lidos no MATLAB para fazer gráficos do relatório
 bool Arduino::saveVectorsCSV(int i){
 	bool ret[7];
 	ret[0] = savetoCSV(this->t, "time" + to_string(i) + ".csv");
@@ -308,6 +315,7 @@ bool Arduino::saveVectorsCSV(int i){
 	ret[4] = savetoCSV(this->E, "Energy" + to_string(i) + ".csv");
 	ret[5] = savetoCSV(this->Cerror, "Cerror" + to_string(i) + ".csv");
 	ret[6] = savetoCSV(this->Verror, "Verror" + to_string(i) + ".csv");
+	//Cria strings adequadas ao ficheiro
 	for(int i = 0; i < 7; i++){
 		cout << to_string(ret[i]) << endl;
 	}

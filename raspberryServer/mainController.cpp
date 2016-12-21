@@ -274,7 +274,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 		case 'm':
 				cout << "Print CSV" << endl;
 				for(i=0; i < this->Narduino; i++){
-					this->arduino[i]->saveVectorsCSV();
+					this->arduino[i]->saveVectorsCSV(i);
 				}
 		break;
 
