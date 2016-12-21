@@ -82,7 +82,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 							value = arduino.at(i)->getLowerBoundIlluminance();
 							break;
 						case 'O':
-							throw "Not implemented";
+							value = arduino.at(i)->getExternalIlluminance();
 							break;
 						case 'r':
 							value = arduino.at(i)->getRef();
@@ -147,9 +147,10 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 								break;
 						}
 					}
+					// Compõe a string final a ser enviada
+					string send = compose_string(string(1,str.c_str()[2]), "T", value);
 
-					string send = compose_string(to_string(str.c_str()[2]), "T", value);
-
+					// Envia a string
 					callback(send);
 				} catch(std::exception &e){
 					callback("Arduino not available\n");

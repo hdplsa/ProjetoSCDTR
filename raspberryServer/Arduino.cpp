@@ -41,7 +41,7 @@ void Arduino::ArduinoSim(){
 		this->d[K] = 100;
 		this->y[K] = 100;
 		this->e[K] = 10;	
-		this->theta = theta;
+		this->theta = 20;
 		//Calculo o vector de tempo
 		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
 		//Cálculo de novas métricas
@@ -202,6 +202,10 @@ double Arduino::getPower(){
 
 long Arduino::getTime(){
 	return t[K];
+}
+
+double Arduino::getExternalIlluminance(){
+	return this->theta;
 }
 
 void Arduino::ledON(int pwm /* = 255 */){

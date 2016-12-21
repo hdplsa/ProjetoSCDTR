@@ -77,6 +77,7 @@ class Arduino{
 		double getRef();
 		double getPower(); // Nâo implementada
 		long getTime();
+		double getExternalIlluminance();
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(double V);
