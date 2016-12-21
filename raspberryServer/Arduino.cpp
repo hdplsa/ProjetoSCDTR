@@ -324,7 +324,16 @@ bool Arduino::saveVectorsCSV(int i){
 
 
 Arduino::~Arduino(){
-	
+	//Free dos vectores alocados
+	this->t.clear();
+	this->ref.clear();
+	this->e.clear();
+	this->u.clear();
+	this->y.clear();
+	this->d.clear();
+	this->E.clear();
+	this->Cerror.clear();
+	this->Verror.clear();
 }
 
 bool Arduino::savetoCSV(vector<double> vec, string filename){
