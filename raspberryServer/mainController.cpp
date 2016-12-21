@@ -272,11 +272,10 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 		break;
 
 		case 'm':
-			if(MATLAB){
+				cout << "Print CSV" << endl;
 				for(i=0; i < this->Narduino; i++){
 					this->arduino[i]->saveVectorsCSV();
 				}
-			}
 		break;
 
 		default:
