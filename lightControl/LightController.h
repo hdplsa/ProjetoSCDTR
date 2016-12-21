@@ -91,6 +91,7 @@ private:
     double calcPIController();
     double calcPDController();
     double calcSumOtherKus();
+    double applySaturation(double u);
     //Other
     void LEDInputControlVariable();
 };
