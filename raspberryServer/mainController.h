@@ -5,6 +5,11 @@
 #include <iostream>
 #include "Arduino.h"
 
+#if defined __unix__
+	//https://www.mathworks.com/help/matlab/mex-library.html
+	#define MATLAB true
+#endif
+
 using namespace std;
 
 class MainController{
@@ -13,7 +18,7 @@ class MainController{
 	//Variável de instante actual no vector
 	int k;
 	//Numero de pontos guardados
-	int N = 100;
+	int N = 1000;
 	// Numero de arduinos
 	int Narduino;
 	//Arduinos

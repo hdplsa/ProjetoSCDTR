@@ -302,7 +302,36 @@ void Arduino::reset(){
 	serial->Close();
 }
 
+bool Arduino::saveVectorsCSV(){
+	bool ret[7];
+	ret[0] = savetoCSV(this->t, "time.csv");
+	ret[1] = savetoCSV(this->ref, "ref.csv");
+	ret[2] = savetoCSV(this->y, "luminous.csv");
+	ret[3] = savetoCSV(this->d, "duty.csv");
+	ret[4] = savetoCSV(this->E, "Energy.csv");
+	ret[5] = savetoCSV(this->Cerror, "Cerror.csv");
+	ret[6] = savetoCSV(this->Verror, "Verror.csv");
+	return ret[0] || ret[1] || ret[2] || ret[3] || ret[4] || ret[5] || ret[6];
+}
+
 
 Arduino::~Arduino(){
 	
+}
+
+bool savetoCSV(vector<double> vec, string filename){
+	ofstream file;
+	string filepath;
+	int i;
+	//Open file
+	filepath = "./data/" + filename;
+	file.open(filepath);
+	if(file.is_open()){
+		for(i=0; i < vec.size(); i++){
+			file << to_string(vec.at(i)) << endl;
+		}
+		file.close();
+		return true;
+	}
+	return false;
 }
