@@ -4,9 +4,12 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 	this->Narduino = Narduino;
 	this->t = 0;
 	this->k = 0;
+
+	mutex = shared_mutex(new boost::mutex());
+
 	//Inicialização dos arduinos
 	for(int i = 0; i < Narduino; i++){
-		arduino[i] = new Arduino(this->N, ports[i]);
+		arduino[i] = new Arduino(this->N, ports[i], mutex);
 		//inicialização da callback periodica
 		realtimecallbacks[std::make_pair(i,'l')] = NULL;
 		realtimecallbacks[std::make_pair(i,'d')] = NULL;

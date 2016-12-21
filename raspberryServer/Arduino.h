@@ -12,8 +12,10 @@
 #include "Serial.h"
 using namespace std;
 
-#define ARDUINOSIM	 1
-#define ARDUINODEBUG 1
+#define ARDUINOSIM	 1		// Flag que diz se estamos ou não em modo de simulação (sem arduinos)
+#define ARDUINODEBUG 1 		// Flag que exibe as mensagens de debug no terminal
+
+typedef boost::shared_ptr<boost::mutex> shared_mutex;
 
 class Arduino{
 	//Variável que guarda a posição actual nos vectores
@@ -52,7 +54,7 @@ class Arduino{
 	double LowBound;
 	
 	public:
-		Arduino(int N_, string port);
+		Arduino(int N_, string port, shared_mutex mutex_);
 		void ArduinoSim();
 		int getkNext(int k);
 		int getkPrevious(int k);
@@ -95,11 +97,17 @@ class Arduino{
 		void calcComfortVariance();
 		bool savetoCSV(vector<double> vec, string filename);
 
+		// Objeto de serial que vai receber e enviar informações para os arduinos
 		Serial *serial;
 
+		// Thread onde corre o serial read e serial write
 		boost::thread th;
 
+		// Callback que torna possivel aqueles envios de informação em real time
 		std::function<void(void)> newInformationCallback = NULL;
+
+		// Objeto de mutex que nos diz se podemos ou não usar o buffer de saída
+		shared_mutex mutex;
 
 		enum sendcodes { Ref = 0 };
 };

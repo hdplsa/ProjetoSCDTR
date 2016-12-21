@@ -1,6 +1,6 @@
 #include "Arduino.h"
 
-Arduino::Arduino(int N_, string port) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0) {
+Arduino::Arduino(int N_, string port, shared_mutex mutex_) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0), mutex(mutex_) {
 
 	//Valores iniciais
 	this->K = 0;
@@ -53,15 +53,14 @@ void Arduino::ArduinoSim(){
 		this->cycle ++;
 
 		if (ARDUINODEBUG){
+			mutex->lock();
 			cout << "Ciclo = " << to_string(cycle) << endl;
-			cout << "Ref " << this->ref[K] << endl;
-			cout << "Duty " << this->d[K] << endl;
-			cout << "Error " << this->e[K] << endl;
-			cout << "Theta " << this->theta << endl;
+			cout << "data " << this->ref[K] << " " << this->d[K] << " " << this->e[K] << " " << this->theta << endl;
 			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
 			cout << "Cerror = " << this->Cerror[this->getkPrevious(K)] << endl;
 			cout << "Verror = " << this->Verror[this->getkPrevious(K)] << endl;
 			cout << endl;
+			mutex->unlock();
 		}
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
@@ -100,11 +99,11 @@ int Arduino::getkPrevious(int k){
 }
 
 double Arduino::getReference(){
-	return this->ref[this->K];
+	return this->ref[getkPrevious(this->K)];
 }
 
 double Arduino::getEnergy(){
-	return this->E[this->K];
+	return this->E[getkPrevious(this->K)];
 }
 
 double Arduino::getEnergy(int k){
@@ -112,7 +111,7 @@ double Arduino::getEnergy(int k){
 }
 
 double Arduino::getComfortError(){
-	return this->Cerror[this->K];
+	return this->Cerror[getkPrevious(this->K)];
 }
 
 double Arduino::getComfortError(int k){
@@ -120,7 +119,7 @@ double Arduino::getComfortError(int k){
 }
 
 double Arduino::getComfortVariance(){
-	return this->Verror[this->K];
+	return this->Verror[getkPrevious(this->K)];
 }
 
 double Arduino::getComfortVariance(int k){
@@ -128,7 +127,7 @@ double Arduino::getComfortVariance(int k){
 }
 
 double Arduino::getIlluminance(){
-	return this->y[this->K];
+	return this->y[getkPrevious(this->K)];
 }
 
 double Arduino::getIlluminance(int k){
@@ -142,7 +141,7 @@ vector<double> Arduino::getLastMinuteIlluminance(){
 }
 
 double Arduino::getDuty(){
-	return this->d[this->K];
+	return this->d[getkPrevious(this->K)];
 }
 
 double Arduino::getDuty(int k){
@@ -168,7 +167,7 @@ void Arduino::setOccupancy(bool value){
 	string send = "o ";
 	send += to_string(value);
 	this->o = value;
-	
+
 	if(!ARDUINOSIM){
 		this->serial->Write(send);
 	}
@@ -176,7 +175,7 @@ void Arduino::setOccupancy(bool value){
 }
 
 double Arduino::getRef(){
-	return this->ref[K];
+	return this->ref[getkPrevious(K)];
 }
 
 void Arduino::send(string str){
@@ -263,11 +262,14 @@ void Arduino::receiveInformation(char *info){
 		this->cycle = this->cycle + 1;
 
 		if (ARDUINODEBUG){
+			mutex->lock();
 			cout << "Ciclo = " << to_string(cycle) << endl;
-			cout << "data " << ref << " " << dc << " " << e << " " << theta << endl;
+			cout << "data " << this->ref[K] << " " << this->d[K] << " " << this->e[K] << " " << this->theta << endl;
 			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
 			cout << "Cerror = " << this->Cerror[this->getkPrevious(K)] << endl;
 			cout << "Verror = " << this->Verror[this->getkPrevious(K)] << endl;
+			cout << endl;
+			mutex->unlock();
 		}
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
