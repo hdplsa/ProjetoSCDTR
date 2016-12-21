@@ -170,7 +170,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 				cout << "Set occupancy " << value << endl;
 
-				callback("ack");
+				callback("ack\n");
 			} catch (std::exception &e){
 				callback("Invalid id\n");
 				return;
@@ -187,7 +187,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 				arduino.at(i)->reset();
 			}
 
-			callback("ack");
+			callback("ack\n");
 		} catch (std::exception &e) {
 			cout << "Erro " << e.what() << endl;
 			callback("Unknown error occured\n");
@@ -220,6 +220,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 				string value_str = "b ";
 				value_str += str[2];
+				value_str += str[4];
 
 				for(vector<double>::iterator it = value.begin(); it != value.end(); it++){
 					value_str += to_string(*it);

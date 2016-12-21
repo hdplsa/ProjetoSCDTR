@@ -352,13 +352,15 @@ vector<double> Arduino::get_minute(vector<double> vec){
 	int n = K;
 	int ciclos = 0;
 	vector<double> new_vec(N);	
-	double millis = t[n];
+	double millis = t[n]*100;
 
 	do{
-		new_vec.push_back(vec.at(n));
+		new_vec[ciclos] = vec.at(n);
 		ciclos++;
 		n = getkPrevious(this->K);
-	}while(millis < t[n] + 100 && cycle <= N);
+	}while(millis < t[n]*100 + 100 && ciclos <= N);
+
+	new_vec.resize(ciclos);
 
 	return new_vec;
 
