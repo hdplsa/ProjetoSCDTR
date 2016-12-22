@@ -9,6 +9,7 @@
 #include <fstream>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <boost/chrono.hpp>
 #include "Serial.h"
 using namespace std;
 
@@ -76,7 +77,7 @@ class Arduino{
 		void setOccupancy(bool value);
 		double getRef();
 		double getPower(); // Nâo implementada
-		long getTime();
+		double getTime();
 		double getExternalIlluminance();
 		void send(string str);
 		void ledON(int pwm = 255);

@@ -48,10 +48,14 @@ void MainController::printMetrics(int i){
 	}
 }
 
+// Esta função processa o input que o cliente manda para o server e responde
+// com a informação que o cliente pediu. A resposta é feita para o callback
+// que esta função recebe.
 void MainController::get_clientRequest(string str, std::function<void(string)> callback){
 
 	int i;
 
+	// Verifica o primeiro caracter
 	switch(str.c_str()[0]){
 		case 'g': // Get de valores
 
@@ -219,13 +223,14 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 				}
 
 				string value_str = "b ";
-				value_str += str[2];
-				value_str += str[4];
+				value_str += str[2]; value_str += " ";
+				value_str += str[4]; value_str += " ";
 
-				for(vector<double>::iterator it = value.begin(); it != value.end(); it++){
-					value_str += to_string(*it);
+				for(unsigned int i = 0; i < value.size() - 1; i++){
+					value_str += to_string(value.at(i));
 					value_str += ",";
 				}
+				value_str += to_string(value.at(i+1));
 
 				value_str += "\n";
 

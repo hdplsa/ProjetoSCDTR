@@ -29,7 +29,9 @@ Arduino::Arduino(int N_, string port, shared_mutex mutex_) : N(N_), t(N_,0), ref
 
 void Arduino::ArduinoSim(){
 
-	while(1){
+	// Set de valores iniciais
+
+	while(1){ //Continua a enviar valores até se fechar o programa
 
 		// Guarda os dados no objeto
 		if(o){
@@ -43,7 +45,10 @@ void Arduino::ArduinoSim(){
 		this->e[K] = 10;	
 		this->theta = 20;
 		//Calculo o vector de tempo
-		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
+		auto time_epoch = boost::chrono::steady_clock::now().time_since_epoch();
+		double time_millis = boost::chrono::duration_cast<boost::chrono::milliseconds>(time_epoch).count();
+		double time_sec = boost::chrono::duration_cast<boost::chrono::seconds>(time_epoch).count();
+		this->t[K] = time_millis;
 		//Cálculo de novas métricas
 		this->calcEnergy();
 		this->calcComfortError();
@@ -52,6 +57,7 @@ void Arduino::ArduinoSim(){
 		this->K = this->getkNext(this->K);
 		this->cycle ++;
 
+		// Envia os dados para o cout
 		if (ARDUINODEBUG){
 			mutex->lock();
 			cout << "Ciclo = " << to_string(cycle) << endl;
@@ -59,13 +65,16 @@ void Arduino::ArduinoSim(){
 			cout << "Energy = " << this->E[this->getkPrevious(K)] << endl;
 			cout << "Cerror = " << this->Cerror[this->getkPrevious(K)] << endl;
 			cout << "Verror = " << this->Verror[this->getkPrevious(K)] << endl;
+			cout << "T " << to_string(this->t[getkPrevious(K)]) << endl;
+			cout << "BoostT " << to_string(time_sec) << " " << to_string(time_millis) << endl;
 			cout << endl;
 			mutex->unlock();
 		}
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
 
-		boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+		// Faz esta threda dormir X milisegundos, assim simula o comportamento do arduino
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
 
 	}
 
@@ -189,19 +198,20 @@ void Arduino::send(string str){
 double Arduino::getPower(){
 	
 	int prevK = getkPrevious(this->K);
+	int prevK2 = getkPrevious(prevK);
 	double deltaE;
 	long deltat;
 
-	deltaE = E[K] - E[prevK];
+	deltaE = E[prevK] - E[prevK2];
 	
-	deltat = t[K] - t[prevK];
+	deltat = t[prevK] - t[prevK2];
 
 	return deltaE/((double)((double)deltat/1000.0));
 
 }
 
-long Arduino::getTime(){
-	return t[K];
+double Arduino::getTime(){
+	return t[getkPrevious(this->K)];
 }
 
 double Arduino::getExternalIlluminance(){
@@ -255,6 +265,9 @@ void Arduino::receiveInformation(char *info){
 		this->y[K] = y;
 		this->e[K] = e;	
 		this->theta = theta;
+		// Obtem o tempo do boost::chrono
+		auto time_epoch = boost::chrono::steady_clock::now().time_since_epoch();
+		double time_millis = boost::chrono::duration_cast<boost::chrono::milliseconds>(time_epoch).count();
 		//Calculo o vector de tempo
 		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
 		//Cálculo de novas métricas
@@ -349,18 +362,18 @@ void Arduino::calcComfortVariance(){
 }
 
 vector<double> Arduino::get_minute(vector<double> vec){
-	int n = K;
+	int n = getkPrevious(K);
 	int ciclos = 0;
 	vector<double> new_vec(N);	
-	double millis = t[n]*100;
+	double millis = t[n];
 
 	do{
 		new_vec[ciclos] = vec.at(n);
 		ciclos++;
-		n = getkPrevious(this->K);
-	}while(millis < t[n]*100 + 100 && ciclos <= N);
+		n = getkPrevious(n);
+	}while(millis <= t[n] + 1000 && ciclos <= N);
 
-	new_vec.resize(ciclos);
+	new_vec.resize(ciclos+1);
 
 	return new_vec;
 

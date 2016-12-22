@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-std=c++11 -c -g -Wall
-LFLAGS=-lboost_system -lboost_thread -lpthread
+LFLAGS=-lboost_system -lboost_thread -lboost_chrono -lpthread
 
 all: main.o mainController.o Arduino.o tcpServer.o Serial.o session.o app
 
