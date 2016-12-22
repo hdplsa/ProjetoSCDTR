@@ -25,11 +25,14 @@ class MainController{
 	int Narduino;
 	//Arduinos
 	vector<Arduino*> arduino;
+	//Flag de calibração
+	bool systemCalibration;
 	
 	public:
 		MainController(int Narduino, vector<string> ports);
 		void get_clientRequest(string str, std::function<void(string)> callback);
 		void printMetrics(int Arduino);
+		bool isCalibrated();
 		~MainController();
 		
 	private:

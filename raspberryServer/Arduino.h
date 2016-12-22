@@ -13,7 +13,7 @@
 #include "Serial.h"
 using namespace std;
 
-#define ARDUINOSIM	 1		// Flag que diz se estamos ou não em modo de simulação (sem arduinos)
+#define ARDUINOSIM	 0		// Flag que diz se estamos ou não em modo de simulação (sem arduinos)
 #define ARDUINODEBUG 1 		// Flag que exibe as mensagens de debug no terminal
 
 typedef boost::shared_ptr<boost::mutex> shared_mutex;
@@ -28,8 +28,6 @@ class Arduino{
 	//Periodo do ciclo de controlo
 	double T = 0.02;
 	//Valores de t do sistema fisico
-	//vector<long> t;
-	//vector<std::chrono::time_point<std::chrono::system_clock>> time;
 	vector<double> t;
 	//Valores de referencia do sistema fisico
 	vector<double> ref;
@@ -53,6 +51,8 @@ class Arduino{
 	double theta;
 	//Lower bound
 	double LowBound;
+	//Flag de calibração
+	bool calibration = false;
 	
 	public:
 		Arduino(int N_, string port, shared_mutex mutex_);
@@ -88,6 +88,7 @@ class Arduino{
 		vector<double> get_minute(vector<double> vec);
 		void reset();
 		bool saveVectorsCSV(int i);
+		bool isCalibration();
 		~Arduino();
 	
 	private:

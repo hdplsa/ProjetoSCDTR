@@ -156,8 +156,8 @@ void setup() {
   meta->setOccupancy(1);
   
   //Inicialização completa
-  Serial.println((char*)"Ready");
-  meta->printModel();
+  //meta->printModel();
+  Serial.println("Ready");
   //Init interrupções
   initTimer1();
 }

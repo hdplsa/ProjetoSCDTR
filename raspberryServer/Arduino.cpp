@@ -256,9 +256,10 @@ void Arduino::receiveInformation(char *info){
 	float y;
 	float e;
 	float theta;
+	int dataN;
 
 	// Extrai os dados da string
-	if(int dataN = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta) == 5){
+	if(dataN = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta) == 5){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
 		this->d[K] = dc;
@@ -291,9 +292,14 @@ void Arduino::receiveInformation(char *info){
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
 	} else {
-		if (ARDUINODEBUG){
-			if(dataN > 0){
-				cout << "Erro de comunicação, menos dados" << endl;
+		//Calibração terminou
+		if(strcmp(info, "Ready") == 0){
+			calibration = true;
+		} else {
+			if (ARDUINODEBUG){
+				if(dataN > 0){
+					cout << "Erro de comunicação, menos dados" << endl;
+				}
 			}
 		}
 	}
@@ -399,6 +405,10 @@ bool Arduino::saveVectorsCSV(int i){
 		cout << to_string(ret[i]) << endl;
 	}
 	return ret[0] || ret[1] || ret[2] || ret[3] || ret[4] || ret[5] || ret[6];
+}
+
+bool Arduino::isCalibration(){
+	return this->calibration;
 }
 
 

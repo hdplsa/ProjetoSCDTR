@@ -322,6 +322,15 @@ string MainController::compose_string(string param1, string param2, double val){
 
 }
 
+bool MainController::isCalibrated(){
+	int i;
+	double ret;
+	for(i=0,ret=0; i < this->Narduino; i++){
+		ret = ret*this->arduino->isCalibration();
+	}
+	return ret;
+}
+
 MainController::~MainController(){
 	//Desalocação dos arduinos
 	for(int i = 0; i < Narduino; i ++){
