@@ -43,7 +43,7 @@ public:
 private:
     void initEnderecos();
     char *strAlloc(int len);
-    double *MinSquare(const int N, double *u, double *y);
+    double *LeastSquare(const int N, double *u, double *y);
     void Setu(double u);
     double Gety(const int N);    
 };

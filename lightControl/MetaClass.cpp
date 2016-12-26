@@ -95,7 +95,7 @@ void Meta::calibrateLumVoltageModel(){
                 Serial.println(y[n],4);
             }
             this->Setu(0); // lightoff
-            //Global call para todos fazer minSquare
+            //Global call para todos fazer LeastSquare
             TWI::send_msg(0,"MS\0",strlen("MS")+1);
             //Esperar que os restantes leiam
             //Serial.println("WAITING TO MS");
@@ -103,7 +103,7 @@ void Meta::calibrateLumVoltageModel(){
             //Serial.println("SEND SUCCESSFULL");
             this->sendflag = false;
             //Determinar k_j, theta_j
-            ms = this->MinSquare(dimU, u, y);
+            ms = this->LeastSquare(dimU, u, y);
             this->k[j-10] = ms[0];
             theta_[j-10] = ms[1];
             delete ms;
@@ -132,7 +132,7 @@ void Meta::calibrateLumVoltageModel(){
                     //Serial.println("MS ==");
                     this->rI2C[0] = '\0';
                     //Determinar k_j, theta_j
-                    ms = this->MinSquare(dimU, u, y);
+                    ms = this->LeastSquare(dimU, u, y);
                     this->k[j-10] = ms[0];
                     theta_[j-10] = ms[1];
                     delete ms;
@@ -264,7 +264,7 @@ char *strAlloc(int len){
   return new char[len+1];
 }
 
-double *Meta::MinSquare(const int N, double *u, double *y){
+double *Meta::LeastSquare(const int N, double *u, double *y){
     double sum = 0;
     double usquare[N];
     double sumsquare = 0;
