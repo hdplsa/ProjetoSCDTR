@@ -7,6 +7,9 @@
 #define SHUT 	4
 #define TALK	5
 
+#define OCCUPIEDLUM 50.0
+#define NOTOCCUPIEDLUM 10.0
+
 
 const double Umax = 5.0;
 
@@ -24,9 +27,7 @@ Meta::Meta(int Narduino,int ledPin,int sensorPin){
     //Init do modelo feedforward
     this->Narduino = Narduino;
     this->k = new double[this->Narduino];
-    for(i = 0; i < this->Narduino; i++){
-      this->k[i] = 0;
-    }
+    this->initAllVector(this->k, this->Narduino);
     this->theta = 0;
     //Init vector de us
     this->initEnderecos();
@@ -55,11 +56,12 @@ void Meta::calibrateLumVoltageModel(){
     int j,n;
     
     //STATE AND VARIABLE INIT
-    this->Setu(0);
+    this->setLedU(0);
     int STATE = CHOICE;
     for(n = 0; n < dimU; n++){
         u[n] = n*(Umax/dimU);
     }
+    
 
     Serial.println("START STATE MACHINE");
     for(j=10; j < 10+this->Narduino; j++){
@@ -73,6 +75,7 @@ void Meta::calibrateLumVoltageModel(){
         }
         //-----------------------------------STATE MACHINE START---------------------------------------
         switch(STATE){
+<<<<<<< HEAD
         //-----------------------------
         case MASTER:
         //Serial.println("AM MASTER");
@@ -123,11 +126,28 @@ void Meta::calibrateLumVoltageModel(){
                 if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
                     //Serial.print("SR = ");
                     this->rI2C[0] = '\0';
+=======
+            //-----------------------------
+            case MASTER:
+                //Serial.println("AM MASTER");
+                delay(1000);
+                for(n = 0; n < dimU; n++){
+                    delay(20);
+                    //Valor de entrada no LED
+                    this->setLedU(u[n]);
+                    //Inicializa a string de novo
+                    this->resetI2CString();
+                    //Global call para todos lerem y
+                    TWI::send_msg(0,"SR",strlen("SR"));
+                    //Esperar que os restantes leiam
+                    while(!this->sendflag){};
+                    this->sendflag = false;
+>>>>>>> origin/master
                     //Leitura do próprio sensor
                     y[n] = this->Gety(N);
                     Serial.println(y[n],4);
-                    n++;
                 }
+<<<<<<< HEAD
                 if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
                     //Serial.println("MS ==");
                     this->rI2C[0] = '\0';
@@ -137,25 +157,62 @@ void Meta::calibrateLumVoltageModel(){
                     theta_[j-10] = ms[1];
                     delete ms;
                     slaveEnd = true;
+=======
+                this->setLedU(0); // lightoff
+                //Global call para todos fazer minSquare
+                TWI::send_msg(0,"MS",strlen("MS"));
+                //Esperar que os restantes leiam
+                while(!this->sendflag){};
+                this->sendflag = false;
+                //Determinar k_j, theta_j
+                ms = this->MinSquare(dimU, u, y);
+                this->k[j-10] = ms[0];
+                theta_[j-10] = ms[1];
+                delete ms;
+                //Esperar pelos calculos
+            break;
+            //-----------------------------
+            case SLAVE:
+                //Serial.println("AM SLAVE");
+                //Caso de ser SLAVE
+                n = 0; bool slaveEnd = false;
+                while(!slaveEnd){
+                    //Espera comando do MASTER
+                    while(!this->recvflag){};
+                    this->recvflag = false;
+                    if((this->rI2C[0] == 'S')&&(this->rI2C[1] == 'R')){
+                        //Inicializa a string de novo
+                        this->resetI2CString();
+                        //Leitura do próprio sensor
+                        y[n] = this->Gety(N);
+                        Serial.println(y[n],4);
+                        n++;
+                    }
+                    if((this->rI2C[0] == 'M')&&(this->rI2C[1] == 'S')){
+                        //Inicializa a string de novo
+                        this->resetI2CString();
+                        //Determinar k_j, theta_j
+                        ms = this->MinSquare(dimU, u, y);
+                        this->k[j-10] = ms[0];
+                        theta_[j-10] = ms[1];
+                        delete ms;
+                        slaveEnd = true;
+                    }
+>>>>>>> origin/master
                 }
-            }
-        break;
-        //-----------------------------
+            break;
+            //-----------------------------
         }
     }
     //-----------------------------------STATE MACHINE END-----------------------------------------
-    //Valor final do offset
-    for(j=0; j < this->Narduino; j++){
-        this->theta = this->theta + theta_[j];
-    }
-    this->theta = this->theta/this->Narduino;
-
+    //Valor final do offset, theta do modelo
+    this->theta = this->calcVectorAverage(theta_, this->Narduino);
     //Meter os valores dentro da classe do controlador (LightController)
     this->_lightcontroller->setK(k);
     this->_lightcontroller->setTheta(theta);
 }
 
-
+//Imprime matriz [K] e [Theta] do modelo
 void Meta::printModel(){
   int i;
   Serial.print("[");
@@ -194,13 +251,11 @@ void Meta::setu_vec(){
       case TALK:
                 //Espera antes de falar
                 delay(20);
-        //Global call para enviar U
-        TWI::send_msg(0,"U",strlen("U"));
-        //Esperar mensagem enviada
-        while(!this->sendflag){};
-        this->sendflag = false;
-                //Valor de entrada no LED
-        Serial.println("Sent U");
+                //Global call para enviar U
+                TWI::send_msg(0,"U",strlen("U"));
+                //Esperar mensagem enviada
+                while(!this->sendflag){};
+                this->sendflag = false;
                 //Get dutycycle
                 dc = _lightcontroller->getOwnDutyCycle();
                 //Envia valor
@@ -210,12 +265,12 @@ void Meta::setu_vec(){
                 //Global call para enviar valor de U
                 TWI::send_msg(0,send,strlen(send));
                 //Esperar mensagem enviada
-        while(!this->sendflag){};
-        this->sendflag = false;
+                while(!this->sendflag){};
+                this->sendflag = false;
       break;
             //-----------------------------
       case SHUT:
-        while(!this->recvflag){};
+                while(!this->recvflag){};
                 this->recvflag = false;
                 //Esperar por U para receber valor
                 if(this->rI2C[0] == 'U'){
@@ -244,27 +299,58 @@ void Meta::setOccupancy(int o){
   this->o = o;
   //Coloca referencia em função do estado de ocupação
   if (this->o){
-    this->_lightcontroller->setRef(50.0);
+    this->_lightcontroller->setRef(OCCUPIEDLUM);
   } else {
-    this->_lightcontroller->setRef(0.0);
+    this->_lightcontroller->setRef(NOTOCCUPIEDLUM);
   }
 }
 
 Meta::~Meta(){
+    //Frees do programa no final
+    delete this->k;
     delete this->_lightcontroller;
 }
 
+//Inicializa Controlador com endereço correcto
 void Meta::initEnderecos(){
   double valor;
   valor = EEPROM.read(0);
   this->_lightcontroller->SetIndex(valor-10);
 }
 
-char *strAlloc(int len){
+char *Meta::strAlloc(int len){
   return new char[len+1];
 }
 
+<<<<<<< HEAD
 double *Meta::LeastSquare(const int N, double *u, double *y){
+=======
+void Meta::initAllVector(double *v, int dim){
+    int i;
+    for(i=0; i < dim; i++){
+        v[i] = 0;
+    }
+}
+
+//Calcula a media de um vector v de dimensão dim de doubles
+double Meta::calcVectorAverage(double *v, int dim){
+    int i;
+    double av;
+
+    for(i=0, av=0; i < dim; i++){
+        av = av + v[i];
+    }
+    av = av/dim;
+    return av;
+}
+
+//Inicializa string I2C com string vazia
+void Meta::resetI2CString(){
+    this->rI2C[0] = '\0';
+}
+
+double *Meta::MinSquare(const int N, double *u, double *y){
+>>>>>>> origin/master
     double sum = 0;
     double usquare[N];
     double sumsquare = 0;
@@ -285,16 +371,16 @@ double *Meta::LeastSquare(const int N, double *u, double *y){
     det = 1/(N*sumsquare - sum*sum);
     m = det*(N*sumyu - sum*sumy);
     b = det*(-sum*sumyu + sumsquare*sumy);
-
+    //Cria variável de retorno
     ans = new double[2];
     ans[0] = m;
     ans[1] = b;
     return ans;
 }
 
-void Meta::Setu(double u){
+void Meta::setLedU(double u){
   this->_lightcontroller->setLedU(u);
-  delay(50);
+  delay(20);
 }
 
 

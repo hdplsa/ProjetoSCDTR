@@ -79,8 +79,6 @@ public:
     //Deconstructor
     ~LightController();
 
-
-    double calcSumOtherKus();
     
 private:
     //GetFunctions
@@ -92,7 +90,8 @@ private:
     double calcPController();
     double calcPIController();
     double calcPDController();
-    //double calcSumOtherKus();
+    double calcSumOtherKus();
+    double applySaturation(double u);
     //Other
     void LEDInputControlVariable();
 };

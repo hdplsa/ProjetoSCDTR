@@ -2,25 +2,14 @@
 
 MainController::MainController(int Narduino, vector<string> ports) : arduino(Narduino,NULL) {
 	this->Narduino = Narduino;
-	/*this->t = 0;
-	this->k = 0;
-	//Inicialização dos arduinos
-	for(int i = 0; i < Narduino; i++){
-		arduino[i] = new Arduino(this->N, ports[i]);
-		//inicialização da callback periodica
-		realtimecallbacks[std::make_pair(i,'l')] = NULL;
-		realtimecallbacks[std::make_pair(i,'d')] = NULL;
-		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
-	}*/
-	this->Init();
-}
-
-void MainController::Init(){
 	this->t = 0;
 	this->k = 0;
+
+	mutex = shared_mutex(new boost::mutex());
+
 	//Inicialização dos arduinos
 	for(int i = 0; i < Narduino; i++){
-		arduino[i] = new Arduino(this->N, ports[i]);
+		arduino[i] = new Arduino(this->N, ports[i], mutex);
 		//inicialização da callback periodica
 		realtimecallbacks[std::make_pair(i,'l')] = NULL;
 		realtimecallbacks[std::make_pair(i,'d')] = NULL;
@@ -52,17 +41,21 @@ void MainController::printMetrics(int i){
 
 			str += *it; str += ' '; str += to_string(i); str += ' ';
 			str += to_string(value); str += ' '; 
-			str += arduino.at(i)->getTime(); str += '\n';
+			str += to_string(arduino.at(i)->getTime()); str += '\n';
 
 			send(str);
 		}
 	}
 }
 
+// Esta função processa o input que o cliente manda para o server e responde
+// com a informação que o cliente pediu. A resposta é feita para o callback
+// que esta função recebe.
 void MainController::get_clientRequest(string str, std::function<void(string)> callback){
 
 	int i;
 
+	// Verifica o primeiro caracter
 	switch(str.c_str()[0]){
 		case 'g': // Get de valores
 
@@ -158,11 +151,10 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 								break;
 						}
 					}
+					// Compõe a string final a ser enviada
+					string send = compose_string(string(1,str.c_str()[2]), "T", value);
 
-					string param1(1,str.c_str()[2]);
-
-					string send = compose_string(param1, "T", value);
-
+					// Envia a string
 					callback(send);
 				} catch(std::exception &e){
 					callback("Arduino not available\n");
@@ -182,7 +174,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 				cout << "Set occupancy " << value << endl;
 
-				callback("ack");
+				callback("ack\n");
 			} catch (std::exception &e){
 				callback("Invalid id\n");
 				return;
@@ -196,10 +188,8 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		try{
 			for(int i = 0; i < Narduino; i++){
-				delete arduino.at(i);
+				arduino.at(i)->reset();
 			}
-
-			this->Init();
 
 			callback("ack\n");
 		} catch (std::exception &e) {
@@ -233,12 +223,14 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 				}
 
 				string value_str = "b ";
-				value_str += str[2];
+				value_str += str[2]; value_str += " ";
+				value_str += str[4]; value_str += " ";
 
-				for(vector<double>::iterator it = value.begin(); it != value.end(); it++){
-					value_str += to_string(*it);
+				for(unsigned int i = 0; i < value.size() - 1; i++){
+					value_str += to_string(value.at(i));
 					value_str += ",";
 				}
+				value_str += to_string(value.at(i+1));
 
 				value_str += "\n";
 
@@ -289,9 +281,16 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 		break;
 
+		case 'm':
+				cout << "Print CSV" << endl;
+				for(i=0; i < this->Narduino; i++){
+					this->arduino[i]->saveVectorsCSV(i);
+				}
+		break;
+
 		default:
 
-			// Enviar invalid command
+			callback("Invalid command\n");
 
 		break;
 
@@ -321,6 +320,15 @@ string MainController::compose_string(string param1, string param2, double val){
 
 	return str;
 
+}
+
+bool MainController::isCalibrated(){
+	int i;
+	double ret;
+	for(i=0,ret=0; i < this->Narduino; i++){
+		ret = ret*this->arduino->isCalibration();
+	}
+	return ret;
 }
 
 MainController::~MainController(){

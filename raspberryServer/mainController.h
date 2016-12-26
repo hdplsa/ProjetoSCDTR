@@ -5,7 +5,14 @@
 #include <iostream>
 #include "Arduino.h"
 
+#if defined __unix__
+	//https://www.mathworks.com/help/matlab/mex-library.html
+	#define MATLAB true
+#endif
+
 using namespace std;
+
+typedef boost::shared_ptr<boost::mutex> shared_mutex;
 
 class MainController{
 	//Variável que guarda o instante actual
@@ -13,22 +20,28 @@ class MainController{
 	//Variável de instante actual no vector
 	int k;
 	//Numero de pontos guardados
-	int N = 100;
+	int N = 1000;
 	// Numero de arduinos
 	int Narduino;
 	//Arduinos
 	vector<Arduino*> arduino;
+	//Flag de calibração
+	bool systemCalibration;
 	
 	public:
 		MainController(int Narduino, vector<string> ports);
 		void get_clientRequest(string str, std::function<void(string)> callback);
 		void printMetrics(int Arduino);
+		bool isCalibrated();
 		~MainController();
 		
 	private:
 		int get_id(string str, std::function<void(string)> callback, int start = 4);
 		string compose_string(string param1, string param2, double val);
 		std::map<std::pair<int, char>, std::function<void(string)>> realtimecallbacks;
+		
+		//Mutex que impede os arduinos de imprimir ao mesmo tempo
+		shared_mutex mutex;
 		
 };
 

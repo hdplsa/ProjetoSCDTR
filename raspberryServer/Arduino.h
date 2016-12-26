@@ -6,11 +6,17 @@
 #include <cstdio>
 #include <chrono>
 #include <ctime>
+#include <fstream>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <boost/chrono.hpp>
 #include "Serial.h"
 using namespace std;
-//using namespace boost::posix_time;
+
+#define ARDUINOSIM	 0		// Flag que diz se estamos ou não em modo de simulação (sem arduinos)
+#define ARDUINODEBUG 1 		// Flag que exibe as mensagens de debug no terminal
+
+typedef boost::shared_ptr<boost::mutex> shared_mutex;
 
 class Arduino{
 	//Variável que guarda a posição actual nos vectores
@@ -22,8 +28,6 @@ class Arduino{
 	//Periodo do ciclo de controlo
 	double T = 0.02;
 	//Valores de t do sistema fisico
-	//vector<long> t;
-	//vector<std::chrono::time_point<std::chrono::system_clock>> time;
 	vector<double> t;
 	//Valores de referencia do sistema fisico
 	vector<double> ref;
@@ -47,9 +51,12 @@ class Arduino{
 	double theta;
 	//Lower bound
 	double LowBound;
+	//Flag de calibração
+	bool calibration = false;
 	
 	public:
-		Arduino(int N_, string port);
+		Arduino(int N_, string port, shared_mutex mutex_);
+		void ArduinoSim();
 		int getkNext(int k);
 		int getkPrevious(int k);
 		double getReference();
@@ -61,7 +68,6 @@ class Arduino{
 		double getComfortVariance(int k);
 		double getIlluminance();
 		double getIlluminance(int k);
-		double getExternalIlluminance();
 		vector<double> getLastMinuteIlluminance();
 		double getDuty();
 		double getDuty(int k);
@@ -72,6 +78,7 @@ class Arduino{
 		double getRef();
 		double getPower(); // Nâo implementada
 		double getTime();
+		double getExternalIlluminance();
 		void send(string str);
 		void ledON(int pwm = 255);
 		void ledON(double V);
@@ -80,6 +87,8 @@ class Arduino{
 		void setNewInformationCallback(std::function<void(void)> fcn);
 		vector<double> get_minute(vector<double> vec);
 		void reset();
+		bool saveVectorsCSV(int i);
+		bool isCalibration();
 		~Arduino();
 	
 	private:
@@ -89,11 +98,19 @@ class Arduino{
 		void calcEnergy();
 		void calcComfortError();
 		void calcComfortVariance();
+		bool savetoCSV(vector<double> vec, string filename);
+
+		// Objeto de serial que vai receber e enviar informações para os arduinos
 		Serial *serial;
 
+		// Thread onde corre o serial read e serial write
 		boost::thread th;
 
+		// Callback que torna possivel aqueles envios de informação em real time
 		std::function<void(void)> newInformationCallback = NULL;
+
+		// Objeto de mutex que nos diz se podemos ou não usar o buffer de saída
+		shared_mutex mutex;
 
 		enum sendcodes { Ref = 0 };
 };

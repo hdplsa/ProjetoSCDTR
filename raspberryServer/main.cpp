@@ -18,20 +18,6 @@ void print_received(string str)
     cout << str << endl;
 }
 
-void test_serial(){
-
-    Arduino *arduino = new Arduino(1000, "/dev/ttyUSB1");
-
-    arduino->ledON();
-
-    usleep(5000*1000);
-
-    arduino->ledOFF();
-
-    usleep(1000*1000);
-
-}
-
 int main(){
 
         // Inicia o mailController

@@ -11,10 +11,6 @@ double LedPWM::getTPWM(){
   return this->TPWM;
 }
 
-double LedPWM::getLedPower(){
-  return this->PLed;
-}
-
 void LedPWM::setLedPWM(int dutCycle){
   //dutCycle representa o duty cycle do PWM (0-255)
   this->setPWMOutput(this->LedPin,dutCycle);
