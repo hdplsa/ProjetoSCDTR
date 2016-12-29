@@ -74,7 +74,7 @@ void Arduino::ArduinoSim(){
 		if(newInformationCallback != NULL) newInformationCallback();
 
 		// Faz esta threda dormir X milisegundos, assim simula o comportamento do arduino
-		boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
 	}
 
@@ -373,11 +373,11 @@ vector<double> Arduino::get_minute(vector<double> vec){
 	vector<double> new_vec(N);	
 	double millis = t[n];
 
-	do{
+	do {
 		new_vec[ciclos] = vec.at(n);
 		ciclos++;
 		n = getkPrevious(n);
-	}while(millis <= t[n] + 1000 && ciclos <= N);
+	} while(millis <= t[n] + 1000 && ciclos <= N);
 
 	new_vec.resize(ciclos+1);
 

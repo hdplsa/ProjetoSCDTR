@@ -40,8 +40,10 @@ void tcpServer::handle_accept(const boost::system::error_code &ec, session* _ses
     cout << "Conexão aceite." << endl;
 
     std::function<void(string, session*)> fcn = std::bind(&tcpServer::handle_read, this, std::placeholders::_1, _session);
+    std::function<void(void)> fcn2 = std::bind(&tcpServer::handle_write, this);
 
     _session->set_Readcallback(fcn);
+    _session->set_Writecallback(fcn2);
     _session->start_read();
   
     sessions.push_front(_session);
@@ -76,25 +78,22 @@ void tcpServer::handle_read(string line, session* _session)
 void tcpServer::Write(string send, session* _session)
 {
 
+  boost::unique_lock<boost::mutex> lock(mut);
+  while(sending) cv.wait(lock);
+  sending = true;
+
   // Envia o send para o cliente tcp
   boost::asio::async_write(_session->get_socket(), boost::asio::buffer(send, send.length()),
                            boost::bind(&session::handle_write, _session, 
                            boost::asio::placeholders::error));
 }
 
-void tcpServer::handle_write(const boost::system::error_code &ec)
+void tcpServer::handle_write()
 {
-
-  if (!ec)
-  {
-    
-    if(onWrite != NULL) onWrite();
-
-  } else {
-    cout << "Erro no envio" << endl;
-
-    if(onWriteError != NULL) onWriteError();
-  }
+  // Abre o mutex, dizendo à thread seguinte que pode avançar
+  boost::lock_guard<boost::mutex> lock(mut);
+  sending = false;
+  cv.notify_one();
 }
 
 void tcpServer::check_deadline()

@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <boost/chrono.hpp>
 #include "session.h"
 using namespace std;
 using namespace boost::asio;
@@ -30,7 +31,7 @@ class tcpServer {
         void set_WriteErrorcallback(std::function<void(void)> fcn);
 
         void handle_read(string line, session* _session);
-        void handle_write(const boost::system::error_code &ec);
+        void handle_write();
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
@@ -63,6 +64,13 @@ class tcpServer {
 
         // Valor boleano que nos diz se o server está a ser usado ou não      
         bool working = false;
+
+        // VAlor que diz se temos ou não informação a ser enviada
+        bool sending = false;
+
+        // Mutex e conditin variable para impedir escritas simultaneas
+        boost::mutex mut;
+        boost::condition_variable cv;
 
         // Lista de sessions para depois ser facil terminar todas
         list<session*> sessions;

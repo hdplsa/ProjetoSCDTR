@@ -40,8 +40,6 @@ int main(){
     // Diz o que deve acontecer quandp se carraga no CTRL+C
     //signal(SIGINT, close_all); 
 
-    server->accept();
-
     while(server->isWorking()){}
 
     delete server;
