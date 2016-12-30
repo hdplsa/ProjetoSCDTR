@@ -293,6 +293,7 @@ void Arduino::receiveInformation(char *info){
 		if(newInformationCallback != NULL) newInformationCallback();
 	} else {
 		int Narduinos;
+		//Numero de Arduinos obtido
 		if(sscanf(info, "Narduinos: %d", &Narduinos) == 1){
 			cout << "Narduinos: " << Narduinos << endl;
 		}
@@ -300,11 +301,10 @@ void Arduino::receiveInformation(char *info){
 		if(strcmp(info, "Ready") == 0){
 			calibration = true;
 			cout << "Arduino[] Ready!" << endl;
-		} else {
-			if (ARDUINODEBUG){
-				if(dataN > 0){
-					cout << "Erro de comunicação, menos dados" << endl;
-				}
+		}
+		if (ARDUINODEBUG){
+			if(dataN > 0){
+				cout << "Erro de comunicação, menos dados" << endl;
 			}
 		}
 	}

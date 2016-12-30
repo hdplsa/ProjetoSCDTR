@@ -16,6 +16,9 @@ constexpr int sensorPin = 1;
 
 constexpr uint8_t deviceID = 2;
 volatile int Narduinos = 0;
+int MasterIndex = 10;
+int ArduinoIndex[120];
+int *NArduinoIndex;
 
 void initTimer1(){
   cli();
@@ -66,14 +69,19 @@ void count_I2Creceive(){
   receive_success = true;
 }
 
+void receiveI2CIndex(char *str){
+  int index;
+  receive_success = true;
+  sscanf(str, "A %d", &index);
+}
+
 int count_TWI(){
-
   char msg[] = "\n";
-
+  //Conta o próprio Arduino
   int count = 1;
 
   // Itera sobre todos os endereços
-  for(int i = 11; i <= 120; i++){
+  for(int i = 10; i <= 120; i++){
 
     Serial.print(i);
     Serial.print('\n');
@@ -85,13 +93,20 @@ int count_TWI(){
 
     // Se conseguirmos mandar, então existe esse endereço
     if(send_success){
+      //Guarda o indice do Arduino detectado
+      ArduinoIndex[i-10] = i;
+      //Conta o Arduino
       count++;
       send_success = false;
     }
     // Se não onseguirmos mandar, então não há esse endereço
     if(send_error){
+      //Guarda o indice do Arduino detectado
+      ArduinoIndex[i-10] = 0;
       send_error = false;
-    } 
+    }
+
+    
   }
   return count;
 }
@@ -103,7 +118,7 @@ void get_Narduinos(char* str){
 }
 
 void countArduinos(){
-  int n = 0;
+  int n;
   int endereco = EEPROM.read(0);
 
   //Espera que todos estejam prontos para a comunicação
@@ -118,8 +133,7 @@ void countArduinos(){
   
   // O arduino com o valor mais baixo não vai receber nada dos outros
   if(!receive_success){
-      //O MASTER deve esperar pelos restantes
-      //delay(2000);
+      MasterIndex = EEPROM.read(0);
       //Funções callback durante a contagem
       TWI::onSend(count_I2Csend);
       TWI::onSendError(count_I2CsendError);
@@ -134,13 +148,48 @@ void countArduinos(){
 
       // Remove o onSendError que não é mais usado
       TWI::onSendError(NULL);
+
+      // Master envia indices dos Arduinos aos restantes
+      //sendArduinoIndexes();
       
   } else { // Os restantes arduinos têm que receber o Narduinos por TWI
 
     TWI::onReceive(get_Narduinos);
     // Espera para receber o Narduino
     while(!Narduinos){}
+    //Espera receber vector com indices dos Arduinos
+    receive_success = false;
+    TWI::onReceive(receiveI2CIndex);
+    while(!receive_success){}
+    
+    
   }
+}
+
+void sendArduinoIndexes(){
+  int i, n;
+  char str[100];
+  //Aloca vector de indices de Arduinos
+  NArduinoIndex = new int[Narduinos];
+  //Percorre todos os indices do vector
+  for(i=0,n=0; i < 120; i++){
+    //Os indices a 0, são Arduinos não detectados
+    if(ArduinoIndex[i] != 0){
+      //Cria mensagem de envio
+      sprintf(str,"A %d",i);
+      //Envia todos os indices aos restantes Arduinos
+      TWI::send_msg(0,str,strlen(str));
+      //Guarda valores de indices de Arduinos
+      NArduinoIndex[n] = i;
+      n++;
+    }
+  }
+}
+
+void receiveArduinoIndexes(){
+  int n;
+  
+
 }
 
 void setup() {
@@ -150,9 +199,8 @@ void setup() {
 
   Serial.println("Inicio do programa!");
 
-    //Inicialização do I2C
+  //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
-  //EEPROM.write(0,11);
   Serial.println(EEPROM.read(0));
 
   //Conta o numero de arduinos
@@ -165,7 +213,7 @@ void setup() {
   TWI::onSend(sendI2CState);
 
   //Inicializações do controlador
-  meta = new Meta(Narduinos,ledPin, sensorPin);
+  meta = new Meta(Narduinos,NArduinoIndex,ledPin,sensorPin);
   controller = meta->getController();
 
   //Calibração do modelo
