@@ -105,10 +105,14 @@ void get_Narduinos(char* str){
 void countArduinos(){
   int n = 0;
   int endereco = EEPROM.read(0);
+
+  //Espera que todos estejam prontos para a comunicação
+  delay(2000);
+
   TWI::onReceive(count_I2Creceive);
 
   // Vai esperar um tempo que depende do seu endereço 
-  while(n < (endereco-10)*100 && !receive_success){
+  for(n=100; (n > (endereco-10)) && (!receive_success); n--){
     delay(1);
   }
   
@@ -166,7 +170,7 @@ void setup() {
 
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
-  meta->printModel();
+  //meta->printModel();
   
   //Coloca ocupação inicial
   meta->setOccupancy(1);

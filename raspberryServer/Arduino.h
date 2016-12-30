@@ -13,7 +13,7 @@
 #include "Serial.h"
 using namespace std;
 
-#define ARDUINOSIM	 1		// Flag que diz se estamos ou não em modo de simulação (sem arduinos)
+#define ARDUINOSIM	 0		// Flag que diz se estamos ou não em modo de simulação (sem arduinos)
 #define ARDUINODEBUG 1 		// Flag que exibe as mensagens de debug no terminal
 
 typedef boost::shared_ptr<boost::mutex> shared_mutex;

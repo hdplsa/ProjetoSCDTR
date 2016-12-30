@@ -292,9 +292,14 @@ void Arduino::receiveInformation(char *info){
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
 	} else {
+		int Narduinos;
+		if(sscanf(info, "Narduinos: %d", &Narduinos) == 1){
+			cout << "Narduinos: " << Narduinos << endl;
+		}
 		//Calibração terminou
 		if(strcmp(info, "Ready") == 0){
 			calibration = true;
+			cout << "Arduino[] Ready!" << endl;
 		} else {
 			if (ARDUINODEBUG){
 				if(dataN > 0){
