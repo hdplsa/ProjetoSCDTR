@@ -43,16 +43,11 @@ public:
 private:
     void initEnderecos();
     char *strAlloc(int len);
-<<<<<<< HEAD
-    double *LeastSquare(const int N, double *u, double *y);
-    void Setu(double u);
-=======
     void initAllVector(double *v, int dim);
     double calcVectorAverage(double *v, int dim);
     void resetI2CString();
-    double *MinSquare(const int N, double *u, double *y);
+    double *LeastSquare(const int N, double *u, double *y);
     void setLedU(double u);
->>>>>>> origin/master
     double Gety(const int N);    
 };
 
