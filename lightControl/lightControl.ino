@@ -52,6 +52,7 @@ void sendI2CState(){
 
 volatile bool send_success = false;
 volatile bool send_error   = false;
+volatile bool receive_success = false;
 
 void count_I2Csend(){
   send_success = true;
@@ -59,6 +60,10 @@ void count_I2Csend(){
 
 void count_I2CsendError(){
   send_error = true;
+}
+
+void count_I2Creceive(){
+  receive_success = true;
 }
 
 int count_TWI(){
@@ -98,14 +103,25 @@ void get_Narduinos(char* str){
 }
 
 void countArduinos(){
-  // O arduino 10 faz a contagem do numero de arduinos
-  if(EEPROM.read(0) == 10){
+  int n = 0;
+  int endereco = EEPROM.read(0);
+  TWI::onReceive(count_I2Creceive);
+
+  // Vai esperar um tempo que depende do seu endereço 
+  while(n < (endereco-10)*100 && !receive_success){
+    delay(1);
+  }
+  
+  // O arduino com o valor mais baixo não vai receber nada dos outros
+  if(!receive_success){
       //O MASTER deve esperar pelos restantes
-      delay(2000);
+      //delay(2000);
       //Funções callback durante a contagem
       TWI::onSend(count_I2Csend);
       TWI::onSendError(count_I2CsendError);
       Narduinos = count_TWI();
+      // Permite que todos os arduinos cheguem ao else
+      delay(100);
       //Envio de numero de arduinos para os restantes
       char msg[4] = {'C', ' ', (char)Narduinos, '\0'};
       TWI::send_msg(0,msg,3);
