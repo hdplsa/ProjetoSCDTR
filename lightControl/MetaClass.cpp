@@ -78,7 +78,7 @@ void Meta::calibrateLumVoltageModel(){
         switch(STATE){
         //-----------------------------
         case MASTER:
-            delay(1000);
+            delay(500);
             for(n = 0; n < dimU; n++){
                  delay(20);
                 //Valor de entrada no LED
@@ -102,14 +102,13 @@ void Meta::calibrateLumVoltageModel(){
             this->sendflag = false;
             //Determinar k_j, theta_j
             ms = this->LeastSquare(dimU, u, y);
-            this->k[this->arduinoIndex[i]] = ms[0];
-            theta_[this->arduinoIndex[i]] = ms[1];
+            this->k[i] = ms[0];
+            theta_[i] = ms[1];
             delete ms;
             //Esperar pelos calculos
         break;
         //-----------------------------
         case SLAVE:
-        //Serial.println("AM SLAVE");
             //Caso de ser SLAVE
             n = 0; bool slaveEnd = false;
             while(!slaveEnd){
@@ -129,8 +128,8 @@ void Meta::calibrateLumVoltageModel(){
                     this->resetI2CString();;
                     //Determinar k_j, theta_j
                     ms = this->LeastSquare(dimU, u, y);
-                    this->k[this->arduinoIndex[i]] = ms[0];
-                    theta_[this->arduinoIndex[i]] = ms[1];
+                    this->k[i] = ms[0];
+                    theta_[i] = ms[1];
                     delete ms;
                     slaveEnd = true;
                 }
