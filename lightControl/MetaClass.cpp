@@ -254,7 +254,7 @@ void Meta::initEnderecos(){
       //Verifica se é o Arduino na posição actual
       if(arduinoIndex[i] == EEPROM.read(0)){
           //Coloca valor do indice no controlador
-          this->_lightcontroller->SetIndex(i+1);
+          this->_lightcontroller->SetIndex(i);
       }
   }
 }
