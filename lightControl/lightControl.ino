@@ -16,9 +16,9 @@ constexpr int sensorPin = 1;
 
 constexpr uint8_t deviceID = 2;
 volatile int Narduinos = 0;
-int MasterIndex = 10;
 int ArduinoIndex[120];
 int *NArduinoIndex;
+volatile int index;
 
 void initTimer1(){
   cli();
@@ -70,9 +70,11 @@ void count_I2Creceive(){
 }
 
 void receiveI2CIndex(char *str){
-  int index;
-  receive_success = true;
-  sscanf(str, "A %d", &index);
+  if(sscanf(str, "A %d", &index) == 1){
+    receive_success = true;
+  } else {
+    //MENSAGEM DE ERRO
+  }
 }
 
 int count_TWI(){
@@ -133,7 +135,6 @@ void countArduinos(){
   
   // O arduino com o valor mais baixo não vai receber nada dos outros
   if(!receive_success){
-      MasterIndex = EEPROM.read(0);
       //Funções callback durante a contagem
       TWI::onSend(count_I2Csend);
       TWI::onSendError(count_I2CsendError);
@@ -150,7 +151,7 @@ void countArduinos(){
       TWI::onSendError(NULL);
 
       // Master envia indices dos Arduinos aos restantes
-      //sendArduinoIndexes();
+      sendArduinoIndexes();
       
   } else { // Os restantes arduinos têm que receber o Narduinos por TWI
 
@@ -160,9 +161,7 @@ void countArduinos(){
     //Espera receber vector com indices dos Arduinos
     receive_success = false;
     TWI::onReceive(receiveI2CIndex);
-    while(!receive_success){}
-    
-    
+    receiveArduinoIndexes();    
   }
 }
 
@@ -188,8 +187,13 @@ void sendArduinoIndexes(){
 
 void receiveArduinoIndexes(){
   int n;
-  
-
+  //Avança no vector
+  for(n=0; n < Narduinos; n++){
+    //Espera recepção de mais um indice
+    while(!receive_success){}
+    //Coloca indice no vector
+    NArduinoIndex[n] = index;
+  }
 }
 
 void setup() {
