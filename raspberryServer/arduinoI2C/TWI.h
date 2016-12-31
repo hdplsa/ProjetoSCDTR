@@ -8,9 +8,9 @@
 /// Variáveis do TWI adicionadas
 
 #define TWI_BUFFER_SIZE 32
-#define TWI_BIT_RATE    152
+#define TWI_BIT_RATE    72
 
-#define TWI_DEBUG       0
+#define TWI_DEBUG       1
 
 /// Classe de TWI
 
