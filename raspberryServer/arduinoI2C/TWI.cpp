@@ -119,9 +119,9 @@ int TWI::send_msg(uint8_t SLA, char *msg, unsigned int msg_length){
     
     // Espera que acabem as transações talvez seja melhor
     // Não bloquear o programa, simplesmente dizer -1
-    //while(twi_busy()){
-    //  Serial.print("Busy\n");
-    //}
+    while(twi_status != 0){
+      Serial.print("Busy "); Serial.print(twi_status); Serial.print('\n');
+    }
     
     // Este primeiro caracter corresponde ao SLA+W, por isso é que
     // fazemos OR 0, o +W é o bit menos significativo
@@ -196,7 +196,7 @@ void TWI::Interrupt_ISR(){
     switch(TWSR){
         
         // Foi enviado o start e tem que ser enviado o SLA+R/W
-        case TWI_START:
+        case TWI_START: //Não deveria ser o mesmo  que o REP_start????
         case TWI_REP_START:
             if(TWI_DEBUG){ 
               Serial.print("START\n");
@@ -223,7 +223,7 @@ void TWI::Interrupt_ISR(){
             break;
             
             // Foi recebido um acknowledge do slave depois dum SLA+W
-        case TWI_MTX_ADR_ACK:
+        case TWI_MTX_ADR_ACK: //Não é necessário tomar acção no TWCR??? TWCR = (1 << TWINT);
             
             if(TWI_DEBUG){ 
               Serial.print("ACK\n");
@@ -254,18 +254,18 @@ void TWI::Interrupt_ISR(){
                      | (1 << TWEN)  // Enable ao TWI
                      | (1 << TWIE); // Enable interrupção
                 // Após uma escrita bem sucedida, ficamos em modo de espera
-                twi_status = 0;
                 if(TWI_DEBUG){
                   Serial.print("STOP\n");
                 }
 
                 set_slaveR(); // Retorna o arduino ao modo slave receiver
                 data_sent(); // chama o callback que avisa que os dados foram enviados
+                twi_status = 0;
             }
             break;
             
             // O slave lançou um NACK (ou não existe este slave)
-        case TWI_MTX_ADR_NACK:
+        case TWI_MTX_ADR_NACK: //não se mete em slave reciever quando não recebe ACK? 
             if(TWI_DEBUG){
               Serial.print("ADR NACK MTX\n");
             }
@@ -275,10 +275,11 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEN)  // Enable TWI
                  | (1 << TWIE); // Enable interrupção
 
+            twi_status = 0;
             data_errorSend();
             break;
             // Recebemos o General call address
-        case TWI_SRX_GEN_ACK:
+        case TWI_SRX_GEN_ACK:  //MESMA coisa não devia ser so TWCR = (1 << TWINT);
             // Recebemos o SLA+W e enviámos o ACK
         case TWI_SRX_ADR_ACK:
             twi_status = 3; // Estado de a receber
@@ -301,8 +302,8 @@ void TWI::Interrupt_ISR(){
                 twi_buf[twi_ptr] = TWDR;
                 
                 // Avança uma posição na string
-                twi_ptr++;
-            }
+                twi_ptr++;                
+             }
 
             // Avisa que os dados foram processados
             TWCR = (1<<TWINT)
@@ -333,8 +334,9 @@ void TWI::Interrupt_ISR(){
                  | (1 << TWEA)  // Enable aknowledge
                  | (1 << TWEN)  // TWI enable
                  | (1 << TWIE); // Enable interrupção
-            
+
             data_received();
+            twi_status = 0;
             break;
 
         // Caso recebamos um comando não préprogramado
@@ -344,7 +346,7 @@ void TWI::Interrupt_ISR(){
               Serial.print(TWSR, HEX);
               Serial.print('\n');
             }
-            TWCR = (1 << TWINT) //
+            TWCR = (1 << TWINT)
                  | (1 << TWSTO)
                  | (1 << TWEN)
                  | (1 << TWIE);

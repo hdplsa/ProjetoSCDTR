@@ -58,6 +58,9 @@ void session::handle_read(const boost::system::error_code &ec)
 void session::Write(string send)
 {
 
+    // Set a deadline for the read operation.
+  deadline.expires_from_now(boost::posix_time::seconds(30));
+
   // Envia o send para o cliente tcp
   boost::asio::async_write(socket_, boost::asio::buffer(send, send.length()),
                            boost::bind(&session::handle_write, this, 

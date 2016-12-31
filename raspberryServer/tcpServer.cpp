@@ -82,10 +82,8 @@ void tcpServer::Write(string send, session* _session)
   while(sending) cv.wait(lock);
   sending = true;
 
-  // Envia o send para o cliente tcp
-  boost::asio::async_write(_session->get_socket(), boost::asio::buffer(send, send.length()),
-                           boost::bind(&session::handle_write, _session, 
-                           boost::asio::placeholders::error));
+  _session->Write(send);
+
 }
 
 void tcpServer::handle_write()
