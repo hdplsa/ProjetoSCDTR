@@ -212,7 +212,7 @@ void Meta::setu_vec(){
             //Obter duty cycle da mensagem
             sscanf(this->rI2C,"%d",&dc);
             //Set dutycycle
-            _lightcontroller->setUnFromdc(dc, this->arduinoIndex[i]);
+            _lightcontroller->setUnFromdc(dc, i);
         }
       break;
       //-----------------------------
