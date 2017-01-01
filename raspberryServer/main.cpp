@@ -35,7 +35,8 @@ int main(){
     tcpServer *server = new tcpServer(host, port);
     server->accept();
 
-    server->set_Readcallback(std::bind(&MainController::get_clientRequest, &controller, std::placeholders::_1, std::placeholders::_2));
+    server->set_Readcallback(std::bind(&MainController::get_clientRequest, &controller, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    server->set_SessionDeletecallback(std::bind(&MainController::delete_realtime, &controller, std::placeholders::_1));
 
     // Diz o que deve acontecer quandp se carraga no CTRL+C
     //signal(SIGINT, close_all); 

@@ -58,6 +58,10 @@ void session::handle_read(const boost::system::error_code &ec)
 void session::Write(string send)
 {
 
+  boost::unique_lock<boost::mutex> lock(mut);
+  while(sending) cv.wait(lock);
+  sending = true;
+
     // Set a deadline for the read operation.
   deadline.expires_from_now(boost::posix_time::seconds(30));
 
@@ -69,6 +73,11 @@ void session::Write(string send)
 
 void session::handle_write(const boost::system::error_code &ec)
 {
+
+  // Abre o mutex, dizendo à thread seguinte que pode avançar
+  boost::lock_guard<boost::mutex> lock(mut);
+  sending = false;
+  cv.notify_one();
 
   if (!ec)
   {

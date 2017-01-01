@@ -25,13 +25,15 @@ class tcpServer {
         void stop();
         ~tcpServer();
 
-        void set_Readcallback(std::function<void(string,std::function<void(string)>)> fcn);
+        void set_Readcallback(std::function<void(string,std::function<void(string)>,void*)> fcn);
         void set_Writecallback(std::function<void(void)> fcn);
         void set_ReadErrorcallback(std::function<void(void)> fcn);
         void set_WriteErrorcallback(std::function<void(void)> fcn);
+        void set_SessionDeletecallback(std::function<void(void*)> fcn);
 
         void handle_read(string line, session* _session);
         void handle_write();
+        void delete_session(session* _session);
         
     private:
         // Funções chamadas quando os processos assincronos finalizam
@@ -40,12 +42,13 @@ class tcpServer {
         void check_deadline();
     
         // Callbacks
-        std::function<void(string,std::function<void(string)>)> onRead = NULL;
+        std::function<void(string,std::function<void(string)>,void*)> onRead = NULL;
         std::function<void(void)> onWrite = NULL;
 
         // Callbacks para o erro
         std::function<void(void)> onReadError = NULL;
         std::function<void(void)> onWriteError = NULL;
+        std::function<void(void*)> onSessionDelete = NULL;
 
         // Serviço que realiza as transações do servidor
         boost::asio::io_service io;
@@ -64,13 +67,6 @@ class tcpServer {
 
         // Valor boleano que nos diz se o server está a ser usado ou não      
         bool working = false;
-
-        // VAlor que diz se temos ou não informação a ser enviada
-        bool sending = false;
-
-        // Mutex e conditin variable para impedir escritas simultaneas
-        boost::mutex mut;
-        boost::condition_variable cv;
 
         // Lista de sessions para depois ser facil terminar todas
         list<session*> sessions;

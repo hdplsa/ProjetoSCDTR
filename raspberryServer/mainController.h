@@ -30,8 +30,8 @@ class MainController{
 	
 	public:
 		MainController(int Narduino, vector<string> ports);
-		void get_clientRequest(string str, std::function<void(string)> callback);
-		void delete_realtime(std::function<void(string)> fcn);
+		void get_clientRequest(string str, std::function<void(string)> callback, void* object_ptr);
+		void delete_realtime(void* object_ptr);
 		void printMetrics(int Arduino);
 		bool isCalibrated();
 		~MainController();
@@ -39,8 +39,9 @@ class MainController{
 	private:
 		int get_id(string str, std::function<void(string)> callback, int start = 4);
 		string compose_string(string param1, string param2, double val);
-		std::map<std::pair<int, char>, std::list<std::function<void(string)>>> realtimecallbacks;
-		void compare_funcs(std::list<std::function<void(string)>> *lista, std::function<void(string)> fcn);
+
+		std::map<std::pair<int, char>, std::list< std::pair< std::function<void(string)>, void* > >> realtimecallbacks;
+		void compare_funcs(std::list< std::pair< std::function<void(string)>, void* > > *lista, void* object_ptr);
 		
 		//Mutex que impede os arduinos de imprimir ao mesmo tempo
 		shared_mutex mutex;

@@ -50,6 +50,13 @@ private:
     // buffer para enviar e receber dados
     boost::asio::streambuf buf;
 
+    // VAlor que diz se temos ou não informação a ser enviada
+    bool sending = false;
+    
+    // Mutex e conditin variable para impedir escritas simultaneas
+    boost::mutex mut;
+    boost::condition_variable cv;
+
 };
 
 #endif

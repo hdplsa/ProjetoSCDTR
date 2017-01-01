@@ -41,9 +41,12 @@ void tcpServer::handle_accept(const boost::system::error_code &ec, session* _ses
 
     std::function<void(string, session*)> fcn = std::bind(&tcpServer::handle_read, this, std::placeholders::_1, _session);
     std::function<void(void)> fcn2 = std::bind(&tcpServer::handle_write, this);
+    std::function<void(void)> fcn3 = std::bind(&tcpServer::delete_session, this, _session);
 
     _session->set_Readcallback(fcn);
     _session->set_Writecallback(fcn2);
+    _session->set_ReadErrorcallback(fcn3);
+    _session->set_WriteErrorcallback(fcn3);
     _session->start_read();
   
     sessions.push_front(_session);
@@ -67,20 +70,13 @@ void tcpServer::handle_read(string line, session* _session)
   // Ignora mensagens vazias
   if (!line.empty())
   {
-    std::cout << "Received: " << line << "\n";
-    //Write(line, _session);
+    if(onRead != NULL) onRead(line, std::bind(&tcpServer::Write, this, std::placeholders::_1, _session), (void*) _session);
   }
-
-  if(onRead != NULL) onRead(line, std::bind(&tcpServer::Write, this, std::placeholders::_1, _session));
 
 }
 
 void tcpServer::Write(string send, session* _session)
 {
-
-  boost::unique_lock<boost::mutex> lock(mut);
-  while(sending) cv.wait(lock);
-  sending = true;
 
   _session->Write(send);
 
@@ -88,10 +84,15 @@ void tcpServer::Write(string send, session* _session)
 
 void tcpServer::handle_write()
 {
-  // Abre o mutex, dizendo à thread seguinte que pode avançar
-  boost::lock_guard<boost::mutex> lock(mut);
-  sending = false;
-  cv.notify_one();
+
+}
+
+void tcpServer::delete_session(session* _session){
+
+  onSessionDelete(_session);
+
+  delete _session;
+
 }
 
 void tcpServer::check_deadline()
@@ -116,7 +117,7 @@ void tcpServer::check_deadline()
   deadline.async_wait(boost::bind(&tcpServer::check_deadline, this));
 }
 
-void tcpServer::set_Readcallback(std::function<void(string, std::function<void(string)>)> fcn){
+void tcpServer::set_Readcallback(std::function<void(string, std::function<void(string)>, void*)> fcn){
 
   onRead = fcn;
 
@@ -138,6 +139,10 @@ void tcpServer::set_WriteErrorcallback(std::function<void(void)> fcn){
 
   onWriteError = fcn;
 
+}
+
+void tcpServer::set_SessionDeletecallback(std::function<void(void*)> fcn){
+  onSessionDelete = fcn;
 }
 
 bool tcpServer::isWorking(){

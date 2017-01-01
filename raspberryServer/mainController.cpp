@@ -11,8 +11,8 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 	for(int i = 0; i < Narduino; i++){
 		arduino[i] = new Arduino(this->N, ports[i], mutex);
 		//inicialização da callback periodica
-		realtimecallbacks[std::make_pair(i,'l')] = std::list<std::function<void(string)>>();
-		realtimecallbacks[std::make_pair(i,'d')] = std::list<std::function<void(string)>>();
+		realtimecallbacks[std::make_pair(i,'l')] = std::list<std::pair<std::function<void(string)>, void*>>();
+		realtimecallbacks[std::make_pair(i,'d')] = std::list<std::pair<std::function<void(string)>, void*>>();
 		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
 	}
 }
@@ -22,15 +22,21 @@ void MainController::printMetrics(int i){
 	vector<char> comandos = {'l', 'd'};
 	std::function<void(string)> send = NULL;
 	double value = -100;
-	string str = "c ";
+	string str;
 
 	// Itera pelos comandos
 	for (std::vector<char>::iterator it = comandos.begin(); it != comandos.end(); ++it){
-		// Obtém o callback
-		std::list<std::function<void(string)>> lista = realtimecallbacks[std::make_pair(i,*it)];
-		for(std::list<std::function<void(string)>>::iterator send = lista.begin(); send != lista.end(); ++send){
+
+		// Obtém a lista com os callbacks e os ponteiros para a session
+		std::list< std::pair< std::function<void(string)>, void* > > lista = realtimecallbacks[std::make_pair(i,*it)];
+
+		// Itera na lista de callbacks
+		for(std::list< std::pair< std::function<void(string)>, void*>>::iterator it2 = lista.begin(); it2 != lista.end(); ++it2){
 			cout << "Lista com: " << lista.size() << endl;
-			if(*send != NULL){
+
+			// Obtem o callback da lista
+			std::function<void(string)> send = std::get<0>(*it2);
+			if(send != NULL){
 				//Obtém o valor que temos que mandar
 				switch(*it){
 					case 'l':
@@ -40,12 +46,13 @@ void MainController::printMetrics(int i){
 						value = arduino.at(i)->getDuty();
 						break;
 				}
-
+				
+				str = "c ";
 				str += *it; str += ' '; str += to_string(i); str += ' ';
 				str += to_string(value); str += ' '; 
 				str += to_string(arduino.at(i)->getTime()); str += '\n';
 
-				(*send)(str);
+				send(str);
 			}
 		}
 	}
@@ -54,7 +61,7 @@ void MainController::printMetrics(int i){
 // Esta função processa o input que o cliente manda para o server e responde
 // com a informação que o cliente pediu. A resposta é feita para o callback
 // que esta função recebe.
-void MainController::get_clientRequest(string str, std::function<void(string)> callback){
+void MainController::get_clientRequest(string str, std::function<void(string)> callback, void* object_ptr){
 
 	int i;
 
@@ -254,12 +261,9 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 			switch(str.c_str()[2]){
 					case 'l':
-						compare_funcs(&realtimecallbacks[std::make_pair(i,str.c_str()[2])], callback);
-						realtimecallbacks[std::make_pair(i,str.c_str()[2])].push_front(callback);
-						break;
 					case 'd':
-						compare_funcs(&realtimecallbacks[std::make_pair(i,str.c_str()[2])], callback);
-						realtimecallbacks[std::make_pair(i,str.c_str()[2])].push_front(callback);
+						compare_funcs(&realtimecallbacks[std::make_pair(i,str.c_str()[2])], object_ptr);
+						realtimecallbacks[std::make_pair(i,str.c_str()[2])].push_front(std::make_pair(callback,object_ptr));
 						break;
 					default:
 						callback("Invalid command\n");
@@ -274,10 +278,8 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 
 			switch(str.c_str()[2]){
 					case 'l':
-						compare_funcs(&realtimecallbacks[std::make_pair(i,str.c_str()[2])], callback);
-						break;
 					case 'd':
-						compare_funcs(&realtimecallbacks[std::make_pair(i,str.c_str()[2])], callback);
+						compare_funcs(&realtimecallbacks[std::make_pair(i,str.c_str()[2])], object_ptr);
 						break;
 					default:
 						callback("Invalid command\n");
@@ -302,20 +304,30 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 	}
 }
 
-void MainController::compare_funcs(std::list<std::function<void(string)>> *lista, std::function<void(string)> fcn){
+void MainController::compare_funcs(std::list< std::pair< std::function<void(string)>, void* > > *lista, void* object_ptr){
 	cout << lista->size() << endl;
 
-	for(std::list<std::function<void(string)>>::iterator it = lista->begin(); it != lista->end(); ++it){
+	std::list<std::pair<std::function<void(string)>, void*>>::iterator it = lista->begin();
+
+	while(it != lista->end()){
+
 		if(lista->empty()) break;
-		if((*it).target_type() == fcn.target_type() && (*it).target<void(string)>() == fcn.target<void(string)>()){
+
+		void* object_list = std::get<1>(*it);
+		if(object_ptr == object_list){
+			auto it_aux = ++it;
+			--it;
 			lista->erase(it);
 			cout << "Apaguei 1" << endl;
-		}
+			it = it_aux;
+		} else ++it;
+
 	}
+
 	cout << "Lista com: " << lista->size() << endl;
 }
 
-void MainController::delete_realtime(std::function<void(string)> fcn){
+void MainController::delete_realtime(void* object_ptr){
 
 	// Temos que iterar pelos comandos, pelo numero de arduinos e pelo vetor de callbacks
 	// e identificar se há callbacks desse client ou não	
@@ -325,7 +337,7 @@ void MainController::delete_realtime(std::function<void(string)> fcn){
 	for (int i = 0; i < Narduino; i++){ //Itera no numero de arduinos
 		for (std::vector<char>::iterator it = comandos.begin(); it != comandos.end(); ++it){ //Itera nos comandos
 
-			compare_funcs(&realtimecallbacks[std::make_pair(i,*it)], fcn);
+			compare_funcs(&realtimecallbacks[std::make_pair(i,*it)], object_ptr);
 			
 		}
 	}
