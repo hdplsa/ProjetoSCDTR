@@ -292,15 +292,22 @@ void Arduino::receiveInformation(char *info){
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
 	} else {
-		int Narduinos;
-		if(sscanf(info, "Narduinos: %d", &Narduinos) == 1){
-			cout << "Narduinos: " << Narduinos << endl;
-		}
-		//Calibração terminou
-		if(strcmp(info, "Ready") == 0){
-			calibration = true;
-			cout << "Arduino[] Ready!" << endl;
+		//Recepção de mensagens de erro
+		char errorString[100];
+		if(sscanf(info, "error: %s", errorString) == 1){
+			//Processamento da string de erro
+			cout << "ERRO: " << errorString << endl;
 		} else {
+			int Narduinos;
+			//Numero de Arduinos obtido
+			if(sscanf(info, "Narduinos: %d", &Narduinos) == 1){
+				cout << "Narduinos: " << Narduinos << endl;
+			}
+			//Calibração terminou
+			if(strcmp(info, "Ready") == 0){
+				calibration = true;
+				cout << "Arduino[] Ready!" << endl;
+			}
 			if (ARDUINODEBUG){
 				if(dataN > 0){
 					cout << "Erro de comunicação, menos dados" << endl;

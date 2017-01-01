@@ -13,23 +13,23 @@
 const double Umax = 5.0;
 
 //PUBLIC FUNTIONS
-Meta::Meta(int Narduino,int ledPin,int sensorPin){
+Meta::Meta(int Narduino,int *ArduinoIndex,int ledPin,int sensorPin){
     int i;
+
+    //Vector com indices dos Arduinos
+    this->arduinoIndex = ArduinoIndex;
+    this->Narduino = Narduino;
     //Inicializacao do controlador PID
     this->_lightcontroller = new LightController(Narduino,ledPin,sensorPin);
-    this->_lightcontroller->setRef(50.0);
+    this->_lightcontroller->setRef(OCCUPIEDLUM);
     this->_lightcontroller->setSaturation(5,0);
     //Init da string
     for(i = 0; i < 32; i++){
       this->rI2C[i] = '\0';
     }
     //Init do modelo feedforward
-    this->Narduino = Narduino;
     this->k = new double[this->Narduino];
     this->initAllVector(this->k, this->Narduino);
-    for(i = 0; i < this->Narduino; i++){
-      this->k[i] = 0;
-    }
     this->theta = 0;
     //Init vector de us
     this->initEnderecos();
@@ -55,7 +55,7 @@ void Meta::calibrateLumVoltageModel(){
     double theta_[this->Narduino]; //numero de thetas intermedios (Num. de Arduinos)
     double u[dimU], y[dimU]; //vector de entrada (tensao) e de saida (luminancia)
     double *ms; //vector de resposta de minimos quadrados
-    int j,n;
+    int i,n;
     
     //STATE AND VARIABLE INIT
     this->setLedU(0);
@@ -65,9 +65,9 @@ void Meta::calibrateLumVoltageModel(){
     }
 
     Serial.println("START STATE MACHINE");
-    for(j=10; j < 10+this->Narduino; j++){
+    for(i=0; i < this->Narduino; i++){
         //choice of whos MASTER or SLAVE        
-        if(j == EEPROM.read(0)){
+        if(this->arduinoIndex[i] == EEPROM.read(0)){
             Serial.println("MASTER");
             STATE = MASTER;
         }else{
@@ -78,8 +78,7 @@ void Meta::calibrateLumVoltageModel(){
         switch(STATE){
         //-----------------------------
         case MASTER:
-        //Serial.println("AM MASTER");
-            delay(1000);
+            delay(500);
             for(n = 0; n < dimU; n++){
                  delay(20);
                 //Valor de entrada no LED
@@ -103,14 +102,13 @@ void Meta::calibrateLumVoltageModel(){
             this->sendflag = false;
             //Determinar k_j, theta_j
             ms = this->LeastSquare(dimU, u, y);
-            this->k[j-10] = ms[0];
-            theta_[j-10] = ms[1];
+            this->k[i] = ms[0];
+            theta_[i] = ms[1];
             delete ms;
             //Esperar pelos calculos
         break;
         //-----------------------------
         case SLAVE:
-        //Serial.println("AM SLAVE");
             //Caso de ser SLAVE
             n = 0; bool slaveEnd = false;
             while(!slaveEnd){
@@ -130,8 +128,8 @@ void Meta::calibrateLumVoltageModel(){
                     this->resetI2CString();;
                     //Determinar k_j, theta_j
                     ms = this->LeastSquare(dimU, u, y);
-                    this->k[j-10] = ms[0];
-                    theta_[j-10] = ms[1];
+                    this->k[i] = ms[0];
+                    theta_[i] = ms[1];
                     delete ms;
                     slaveEnd = true;
                 }
@@ -141,9 +139,8 @@ void Meta::calibrateLumVoltageModel(){
         }
     }
     //-----------------------------------STATE MACHINE END-----------------------------------------
-        //Valor final do offset, theta do modelo
+    //Valor final do offset, theta do modelo
     this->theta = this->calcVectorAverage(theta_, this->Narduino);
-
     //Meter os valores dentro da classe do controlador (LightController)
     this->_lightcontroller->setK(k);
     this->_lightcontroller->setTheta(theta);
@@ -170,19 +167,18 @@ bool Meta::getSendFlag(){
 }
 
 void Meta::setu_vec(){
-  int STATE, j, dc;
+  int STATE, i, dc;
   char send[32];
   
-  for(j=10; j < 10+this->Narduino; j++){
-        //choice of whos MASTER or SLAVE        
-        if(j == EEPROM.read(0)){
-            this->_lightcontroller->SetIndex(j-10);
-            Serial.println("MASTER");
-            STATE = TALK;
-        }else{
-            Serial.println("SLAVE");
-            STATE = SHUT;
-        }
+  for(i=0; i < this->Narduino; i++){
+    //choice of whos MASTER or SLAVE        
+    if(this->arduinoIndex[i] == EEPROM.read(0)){
+        Serial.println("MASTER");
+        STATE = TALK;
+    }else{
+        Serial.println("SLAVE");
+        STATE = SHUT;
+    }
     switch(STATE){
       //-----------------------------
       case TALK:
@@ -216,7 +212,7 @@ void Meta::setu_vec(){
             //Obter duty cycle da mensagem
             sscanf(this->rI2C,"%d",&dc);
             //Set dutycycle
-            _lightcontroller->setUnFromdc(dc, j-10);
+            _lightcontroller->setUnFromdc(dc, i);
         }
       break;
       //-----------------------------
@@ -248,11 +244,19 @@ Meta::~Meta(){
     delete this->_lightcontroller;
 }
 
-//Inicializa Controlador com endereço correcto
+/* Associa o valor que está na EEPROM do Arduino
+ * e consequente ordem na comunicação ao indice
+ * no vector do controlador */
 void Meta::initEnderecos(){
-  double valor;
-  valor = EEPROM.read(0);
-  this->_lightcontroller->SetIndex(valor-10);
+  int i;
+  //Percorre o vector até encontrar o indice com o valor da EEPROM
+  for(i=0; i < this->Narduino; i++){
+      //Verifica se é o Arduino na posição actual
+      if(arduinoIndex[i] == EEPROM.read(0)){
+          //Coloca valor do indice no controlador
+          this->_lightcontroller->SetIndex(i);
+      }
+  }
 }
 
 char *Meta::strAlloc(int len){
@@ -305,7 +309,6 @@ double *Meta::LeastSquare(const int N, double *u, double *y){
     m = det*(N*sumyu - sum*sumy);
     b = det*(-sum*sumyu + sumsquare*sumy);
     //cria variável de retorno
-
     ans = new double[2];
     ans[0] = m;
     ans[1] = b;

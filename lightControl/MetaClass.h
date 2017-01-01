@@ -12,7 +12,9 @@
 // Meta class que encapsula os modulos (classes) necessarios que cada arduino
 
 class Meta{
-    
+
+    //Valor do Arduino MASTER
+    int *arduinoIndex;
     //Parâmetros de calibração
     int Narduino;
     double *k;
@@ -27,7 +29,7 @@ class Meta{
     int o = 1;
     
 public:
-    Meta(int Narduino,int ledPin,int sensorPin);
+    Meta(int Narduino,int *ArduinoIndex,int ledPin,int sensorPin);
     LightController *getController();
     void receivedI2C(char *str);
     void calibrateLumVoltageModel();
