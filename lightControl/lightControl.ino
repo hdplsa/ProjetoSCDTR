@@ -9,6 +9,7 @@
 // Objetos a serem utilizados
 Meta *meta;
 LightController * controller;
+Error *error;
 
 // Numeros das portas usadas
 constexpr int ledPin = 11;
@@ -73,7 +74,7 @@ void receiveI2CIndex(char *str){
   if(sscanf(str, "A %d", &index) == 1){
     receive_success = true;
   } else {
-    //MENSAGEM DE ERRO
+    error->setSerialString("Rececao de valores de Arduinos!");
   }
 }
 
@@ -203,6 +204,7 @@ void setup() {
 
   Serial.println("Inicio do programa!");
 
+  error = new Error();
   //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   Serial.println(EEPROM.read(0));
@@ -265,6 +267,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   
   if(flag){
+    //Send control cycle data
     sendPI();
     
     //Actualiza vector para feedforward
