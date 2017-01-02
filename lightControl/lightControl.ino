@@ -10,7 +10,6 @@
 // Objetos a serem utilizados
 Meta *meta;
 LightController * controller;
-Error *error;
 
 // Numeros das portas usadas
 constexpr int ledPin = 11;
@@ -75,7 +74,7 @@ void receiveI2CIndex(char *str){
   if(sscanf(str, "A %d", &index) == 1){
     receive_success = true;
   } else {
-    error->setSerialString("Rececao de valores de Arduinos!");
+    Error::setSerialString("Rececao de valores de Arduinos!");
   }
 }
 
@@ -164,7 +163,7 @@ void countArduinos(){
     TWI::onReceive(get_Narduinos);
     // Espera para receber o Narduino
     while(!Narduinos){}
-    error->setSerialString("Nard");
+    Error::setSerialString("Nard");
     //Espera receber vector com indices dos Arduinos
     receive_success = false;
     TWI::onReceive(receiveI2CIndex);
@@ -185,19 +184,19 @@ void sendArduinoIndexes(){
       sprintf(str,"A %d",i);
       //Envia todos os indices aos restantes Arduinos
       TWI::send_msg(0,str,strlen(str));
-      //error->setSerialString(i);
+      //Error::setSerialString(i);
       //Guarda valores de indices de Arduinos
       NArduinoIndex[n] = i;
       n++;
-      error->setSerialString("Mandei um");
+      Error::setSerialString("Mandei um");
     }
   }
-  error->setSerialString("Enviei o vetor");
+  Error::setSerialString("Enviei o vetor");
 }
 
 void receiveArduinoIndexes(){
   int n;
-  error->setSerialString("reci");
+  Error::setSerialString("reci");
   //Avança no vector
   for(n=0; n < Narduinos; n++){
     //Espera recepção de mais um indice
@@ -205,9 +204,9 @@ void receiveArduinoIndexes(){
     receive_success = false;
     //Coloca indice no vector
     NArduinoIndex[n] = index;
-    error->setSerialString(index);
+    Error::setSerialString(index);
   }
-  error->setSerialString("Rec");
+  Error::setSerialString("Rec");
 }
 
 void setup() {
@@ -217,7 +216,6 @@ void setup() {
 
   Serial.println("Inicio do programa!");
 
-  error = new Error();
   //Inicialização do I2C
   TWI::begin(EEPROM.read(0));
   Serial.println(EEPROM.read(0));

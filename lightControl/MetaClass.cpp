@@ -69,9 +69,11 @@ void Meta::calibrateLumVoltageModel(){
         //choice of whos MASTER or SLAVE        
         if(this->arduinoIndex[i] == EEPROM.read(0)){
             Serial.println("MASTER");
+            Error::setSerialString("MASTER");
             STATE = MASTER;
         }else{
             Serial.println("SLAVE");
+            Error::setSerialString("SLAVE");
             STATE = SLAVE;
         }
         //-----------------------------------STATE MACHINE START---------------------------------------

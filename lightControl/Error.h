@@ -6,15 +6,15 @@
 #include "SerialCom.h"
 
 class Error{
-    //Informações sobre o erro
-    int errorcode;
-    char errorstr[100];
 
     public:
-        Error();
-        void setSerialString(char *str);
-        void setSerialString(int d);
-        ~Error();
+        static void setSerialString(char *str);
+        static void setSerialString(int d);
+
+    private:
+        //Informações sobre o erro
+        static int errorcode;
+        static char errorstr[100];
 };
 
 #endif

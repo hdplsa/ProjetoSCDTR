@@ -6,6 +6,7 @@
 #include "EEPROM.h"
 #include "LightController.h"
 #include "TWI.h"
+#include "Error.h"
 
 #define METADEBUG 0
 
