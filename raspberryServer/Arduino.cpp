@@ -303,6 +303,11 @@ void Arduino::receiveInformation(char *info){
 			if(sscanf(info, "Narduinos: %d", &Narduinos) == 1){
 				cout << "Narduinos: " << Narduinos << endl;
 			}
+			double d;
+			//vec value
+			if(sscanf(info, "vec: %g", &d) == 1){
+				cout << "vec: " << d << endl;
+			}
 			//Calibração terminou
 			if(strcmp(info, "Ready") == 0){
 				calibration = true;
