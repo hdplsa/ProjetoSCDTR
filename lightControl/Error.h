@@ -13,7 +13,7 @@ class Error{
     public:
         Error();
         void setSerialString(char *str);
-        void setSerialString(double d);
+        void setSerialString(int d);
         ~Error();
 };
 

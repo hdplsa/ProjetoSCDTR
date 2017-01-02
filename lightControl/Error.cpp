@@ -10,8 +10,8 @@ void Error::setSerialString(char *str){
     Serial.println(this->errorstr);
 }
 
-void Error::setSerialString(double d){
-    sprintf(this->errorstr,"vec: %g", d);
+void Error::setSerialString(int d){
+    sprintf(this->errorstr,"vec: %d", d);
     Serial.println(this->errorstr);
 }
 

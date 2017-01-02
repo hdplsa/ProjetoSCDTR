@@ -185,7 +185,7 @@ void sendArduinoIndexes(){
       sprintf(str,"A %d",i);
       //Envia todos os indices aos restantes Arduinos
       TWI::send_msg(0,str,strlen(str));
-      error->setSerialString(str);
+      //error->setSerialString(i);
       //Guarda valores de indices de Arduinos
       NArduinoIndex[n] = i;
       n++;
@@ -205,7 +205,7 @@ void receiveArduinoIndexes(){
     receive_success = false;
     //Coloca indice no vector
     NArduinoIndex[n] = index;
-    error->setSerialString("Rec1");
+    error->setSerialString(index);
   }
   error->setSerialString("Rec");
 }
