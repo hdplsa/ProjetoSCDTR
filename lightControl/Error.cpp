@@ -5,7 +5,8 @@ Error::Error(){
 }
 
 void Error::setSerialString(char *str){
-    sprintf(this->errorstr,"error: %s",str);
+    sprintf(this->errorstr,"error: ");
+    strcat(this->errorstr,str);
     Serial.println(this->errorstr);
 }
 

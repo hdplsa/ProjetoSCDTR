@@ -2,6 +2,7 @@
 #define ERROR_H_INCLUDED
 
 #include <stdio.h>
+#include <string.h>
 #include "SerialCom.h"
 
 class Error{

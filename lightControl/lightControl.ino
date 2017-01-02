@@ -5,6 +5,7 @@
 #include "MetaClass.h"
 #include "EEPROM.h"
 #include "TWI.h"
+#include "Error.h"
 
 // Objetos a serem utilizados
 Meta *meta;
@@ -111,6 +112,9 @@ int count_TWI(){
 
     
   }
+  
+  ArduinoIndex[EEPROM.read(0)-10] = EEPROM.read(0);
+
   return count;
 }
 
@@ -130,8 +134,8 @@ void countArduinos(){
   TWI::onReceive(count_I2Creceive);
 
   // Vai esperar um tempo que depende do seu endereço 
-  for(n=100; (n > (endereco-10)) && (!receive_success); n--){
-    delay(1);
+  for(n=10; (n > (endereco-10)) && (!receive_success); n--){
+    delay(100);
   }
   
   // O arduino com o valor mais baixo não vai receber nada dos outros
@@ -151,6 +155,7 @@ void countArduinos(){
       // Remove o onSendError que não é mais usado
       TWI::onSendError(NULL);
 
+      delay(100);
       // Master envia indices dos Arduinos aos restantes
       sendArduinoIndexes();
       
@@ -159,6 +164,7 @@ void countArduinos(){
     TWI::onReceive(get_Narduinos);
     // Espera para receber o Narduino
     while(!Narduinos){}
+    error->setSerialString("Nard");
     //Espera receber vector com indices dos Arduinos
     receive_success = false;
     TWI::onReceive(receiveI2CIndex);
@@ -179,22 +185,29 @@ void sendArduinoIndexes(){
       sprintf(str,"A %d",i);
       //Envia todos os indices aos restantes Arduinos
       TWI::send_msg(0,str,strlen(str));
+      error->setSerialString(str);
       //Guarda valores de indices de Arduinos
       NArduinoIndex[n] = i;
       n++;
+      error->setSerialString("Mandei um");
     }
   }
+  error->setSerialString("Enviei o vetor");
 }
 
 void receiveArduinoIndexes(){
   int n;
+  error->setSerialString("reci");
   //Avança no vector
   for(n=0; n < Narduinos; n++){
     //Espera recepção de mais um indice
     while(!receive_success){}
+    receive_success = false;
     //Coloca indice no vector
     NArduinoIndex[n] = index;
+    error->setSerialString("Rec1");
   }
+  error->setSerialString("Rec");
 }
 
 void setup() {
