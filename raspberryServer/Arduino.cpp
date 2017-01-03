@@ -306,9 +306,6 @@ void Arduino::receiveInformation(char *info){
 		this->calcEnergy();
 		this->calcComfortError();
 		this->calcComfortVariance();
-		//Avança da o instante seguinte
-		this->K = this->getkNext(this->K);
-		this->cycle = this->cycle + 1;
 
 		if (ARDUINODEBUG){
 			mutex->lock();
@@ -320,6 +317,11 @@ void Arduino::receiveInformation(char *info){
 			cout << endl;
 			mutex->unlock();
 		}
+
+		//Avança da o instante seguinte
+		this->K = this->getkNext(this->K);
+		this->cycle = this->cycle + 1;
+
 		//Chama função callback
 		if(newInformationCallback != NULL) newInformationCallback();
 	} else {
