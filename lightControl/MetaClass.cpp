@@ -34,6 +34,10 @@ Meta::Meta(int Narduino,int *ArduinoIndex,int ledPin,int sensorPin){
     //Init vector de us
     this->initEnderecos();
     this->_lightcontroller->setZeroUvec();
+
+    for(i=0; i < this->Narduino; i++){
+      Error::setSerialString(this->arduinoIndex[i]);
+    }
 }
 
 LightController *Meta::getController(){

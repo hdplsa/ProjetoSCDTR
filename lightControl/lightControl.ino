@@ -186,7 +186,7 @@ void sendArduinoIndexes(){
       TWI::send_msg(0,str,strlen(str));
       //Error::setSerialString(i);
       //Guarda valores de indices de Arduinos
-      NArduinoIndex[n] = i;
+      NArduinoIndex[n] = ArduinoIndex[i];
       n++;
       Error::setSerialString("Mandei um");
     }
