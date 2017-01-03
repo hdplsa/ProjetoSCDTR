@@ -1,5 +1,5 @@
 %% Open all data
-open;
+open(' ');
 
 %% Process vectors
 time0 = deleteLastZeros(time0);
