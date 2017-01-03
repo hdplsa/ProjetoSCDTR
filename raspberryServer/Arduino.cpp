@@ -16,15 +16,25 @@ void Arduino::InitArduino(){
 	this->o = true;
 	this->LowBound = 10; // <------------------------- Verficar
 
-	t.erase(t.begin(),t.end());
-	ref.erase(ref.begin(),ref.end());
-	e.erase(e.begin(),e.end());
-	u.erase(u.begin(),u.end());
-	y.erase(y.begin(),y.end());
-	d.erase(d.begin(),d.end());
-	E.erase(E.begin(),E.end());
-	Cerror.erase(Cerror.begin(),Cerror.end());
-	Verror.erase(Verror.begin(),Verror.end());
+//	t.erase(t.begin(),t.end());
+//	ref.erase(ref.begin(),ref.end());
+//	e.erase(e.begin(),e.end());
+//	u.erase(u.begin(),u.end());
+//	y.erase(y.begin(),y.end());
+//	d.erase(d.begin(),d.end());
+//	E.erase(E.begin(),E.end());
+//	Cerror.erase(Cerror.begin(),Cerror.end());
+//	Verror.erase(Verror.begin(),Verror.end());
+
+	std::fill(t.begin(), t.end(), 0);
+	std::fill(ref.begin(), ref.end(), 0);
+	std::fill(e.begin(), e.end(), 0);
+	std::fill(u.begin(), u.end(), 0);
+	std::fill(y.begin(), y.end(), 0);
+	std::fill(d.begin(), d.end(), 0);
+	std::fill(E.begin(), E.end(), 0);
+	std::fill(Cerror.begin(), Cerror.end(), 0);
+	std::fill(Verror.begin(), Verror.end(), 0);
 
 	if(ARDUINOSIM){
 
