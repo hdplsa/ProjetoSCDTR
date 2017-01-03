@@ -53,9 +53,12 @@ class Arduino{
 	double LowBound;
 	//Flag de calibração
 	bool calibration = false;
+	//Porta do arduino
+	string port_;
 	
 	public:
 		Arduino(int N_, string port, shared_mutex mutex_);
+		void InitArduino();
 		void ArduinoSim();
 		int getkNext(int k);
 		int getkPrevious(int k);

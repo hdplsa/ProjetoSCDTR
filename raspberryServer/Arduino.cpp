@@ -2,10 +2,29 @@
 
 Arduino::Arduino(int N_, string port, shared_mutex mutex_) : N(N_), t(N_,0), ref(N_,0), e(N_,0), u(N_,0), y(N_,0), d(N_,0), E(N_,0), Cerror(N_,0), Verror(N_,0), mutex(mutex_) {
 
+	port_ = port;
+
+	InitArduino();
+
+}
+
+void Arduino::InitArduino(){
+
 	//Valores iniciais
 	this->K = 0;
+	this->cycle = 1;
 	this->o = true;
 	this->LowBound = 10; // <------------------------- Verficar
+
+	t.erase(t.begin(),t.end());
+	ref.erase(ref.begin(),ref.end());
+	e.erase(e.begin(),e.end());
+	u.erase(u.begin(),u.end());
+	y.erase(y.begin(),y.end());
+	d.erase(d.begin(),d.end());
+	E.erase(E.begin(),E.end());
+	Cerror.erase(Cerror.begin(),Cerror.end());
+	Verror.erase(Verror.begin(),Verror.end());
 
 	if(ARDUINOSIM){
 
@@ -15,7 +34,7 @@ Arduino::Arduino(int N_, string port, shared_mutex mutex_) : N(N_), t(N_,0), ref
 
 		// Abre a porta serial
 		serial = new Serial();
-		serial->Begin(115200, port.c_str());
+		serial->Begin(115200, port_.c_str());
 
 		// Atribui os callbacks
 		serial->set_Readcallback(std::bind(&Arduino::receiveInformation, this, std::placeholders::_1));
@@ -24,7 +43,7 @@ Arduino::Arduino(int N_, string port, shared_mutex mutex_) : N(N_), t(N_,0), ref
 		th = boost::thread(boost::bind(&Serial::read_ln,serial));
 
 	}
-	
+
 }
 
 void Arduino::ArduinoSim(){
@@ -269,8 +288,10 @@ void Arduino::receiveInformation(char *info){
 		// Obtem o tempo do boost::chrono
 		auto time_epoch = boost::chrono::steady_clock::now().time_since_epoch();
 		double time_millis = boost::chrono::duration_cast<boost::chrono::milliseconds>(time_epoch).count();
+		double time_sec = boost::chrono::duration_cast<boost::chrono::seconds>(time_epoch).count();
+		this->t[K] = time_millis;
 		//Calculo o vector de tempo
-		this->t[K] = this->t[this->getkPrevious(K)] + this->T;
+		//this->t[K] = this->t[this->getkPrevious(K)] + this->T;
 		//Cálculo de novas métricas
 		this->calcEnergy();
 		this->calcComfortError();
@@ -403,8 +424,10 @@ vector<double> Arduino::get_minute(vector<double> vec){
 }
 
 void Arduino::reset(){
+	cout << "Função de reset" << endl;
 	th.interrupt();
 	serial->Close();
+	delete serial;
 }
 
 //Cria ficheiros csv que podem ser lidos no MATLAB para fazer gráficos do relatório

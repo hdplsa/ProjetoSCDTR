@@ -76,6 +76,8 @@ void Serial::read_ln(){
         } while(buffer != '\n' && n > 0 && n < 10);
         str[i] = '\0';   
 
+        boost::this_thread::interruption_point();
+
         if(onRead != NULL) onRead(str);
     }
 

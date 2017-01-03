@@ -10,10 +10,10 @@ MainController::MainController(int Narduino, vector<string> ports) : arduino(Nar
 	//Inicialização dos arduinos
 	for(int i = 0; i < Narduino; i++){
 		arduino[i] = new Arduino(this->N, ports[i], mutex);
+		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
 		//inicialização da callback periodica
 		realtimecallbacks[std::make_pair(i,'l')] = std::list<std::pair<std::function<void(string)>, void*>>();
 		realtimecallbacks[std::make_pair(i,'d')] = std::list<std::pair<std::function<void(string)>, void*>>();
-		arduino[i]->setNewInformationCallback(std::bind(&MainController::printMetrics, this, i));
 	}
 }
 
@@ -200,6 +200,10 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 			for(int i = 0; i < Narduino; i++){
 				arduino.at(i)->reset();
 			}
+			for(int i = 0; i < Narduino; i++){
+				arduino.at(i)->InitArduino();
+			}
+
 
 			callback("ack\n");
 		} catch (std::exception &e) {
