@@ -73,6 +73,7 @@ void count_I2Creceive(){
 void receiveI2CIndex(char *str){
   if(sscanf(str, "A %d", &index) == 1){
     receive_success = true;
+    Error::setSerialString(str);
   } else {
     Error::setSerialString("Rececao de valores de Arduinos!");
   }
@@ -107,9 +108,7 @@ int count_TWI(){
       //Guarda o indice do Arduino detectado
       ArduinoIndex[i-10] = 0;
       send_error = false;
-    }
-
-    
+    }  
   }
   
   ArduinoIndex[EEPROM.read(0)-10] = EEPROM.read(0);
@@ -181,10 +180,9 @@ void sendArduinoIndexes(){
     //Os indices a 0, são Arduinos não detectados
     if(ArduinoIndex[i] != 0){
       //Cria mensagem de envio
-      sprintf(str,"A %d",i);
+      sprintf(str,"A %d",ArduinoIndex[i]);
       //Envia todos os indices aos restantes Arduinos
       TWI::send_msg(0,str,strlen(str));
-      //Error::setSerialString(i);
       //Guarda valores de indices de Arduinos
       NArduinoIndex[n] = ArduinoIndex[i];
       n++;
@@ -196,7 +194,8 @@ void sendArduinoIndexes(){
 
 void receiveArduinoIndexes(){
   int n;
-  Error::setSerialString("reci");
+  //Aloca vector de indices de Arduinos
+  NArduinoIndex = new int[Narduinos];
   //Avança no vector
   for(n=0; n < Narduinos; n++){
     //Espera recepção de mais um indice
@@ -204,9 +203,7 @@ void receiveArduinoIndexes(){
     receive_success = false;
     //Coloca indice no vector
     NArduinoIndex[n] = index;
-    Error::setSerialString(index);
-  }
-  Error::setSerialString("Rec");
+  } 
 }
 
 void setup() {
