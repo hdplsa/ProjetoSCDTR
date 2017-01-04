@@ -27,6 +27,8 @@ class MainController{
 	vector<Arduino*> arduino;
 	//Flag de calibração
 	bool systemCalibration;
+
+
 	
 	public:
 		MainController(int Narduino, vector<string> ports);
@@ -45,6 +47,9 @@ class MainController{
 		
 		//Mutex que impede os arduinos de imprimir ao mesmo tempo
 		shared_mutex mutex;
+
+		vector<double> sumVectors(vector<double> d1, vector<double> d2);
+		bool savetoCSV(vector<double> vec, string filename);
 		
 };
 

@@ -463,6 +463,18 @@ bool Arduino::isCalibration(){
 	return this->calibration;
 }
 
+vector<double> getEnergyVector(){
+	return this->E;
+}
+
+vector<double> getCerrorVector(){
+	return this->Cerror;
+}
+
+vector<double> getVerrorVector(){
+	return this->Verror;
+}
+
 
 Arduino::~Arduino(){
 	//Free dos vectores alocados

@@ -94,6 +94,9 @@ class Arduino{
 		void reset();
 		bool saveVectorsCSV(int i);
 		bool isCalibration();
+		vector<double> getEnergyVector();
+		vector<double> getCerrorVector();
+		vector<double> getVerrorVector();
 		~Arduino();
 	
 	private:

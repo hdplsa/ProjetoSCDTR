@@ -293,10 +293,28 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 		break;
 
 		case 'm':
-				cout << "Print CSV" << endl;
+				cout << "Save to CSV" << endl;
 				for(i=0; i < this->Narduino; i++){
+					cout << "Arduino " << i << endl;
 					this->arduino[i]->saveVectorsCSV(i);
 				}
+				cout << "Save global Metrics" << endl;
+				vector<double> vec;
+
+				for(i=0; i < this->Narduino; i++){
+					vec = this->sumVectors(vec, this->arduino[i]->getEnergyVector());
+				}
+				this->savetoCSV(vec, "Energy.csv");
+
+				for(i=0; i < this->Narduino; i++){
+					vec = this->sumVectors(vec, this->arduino[i]->getCerrorVector());
+				}
+				this->savetoCSV(vec, "Cerror.csv");
+
+				for(i=0; i < this->Narduino; i++){
+					vec = this->sumVectors(vec, this->arduino[i]->getVerrorVector());
+				}
+				this->savetoCSV(vec, "Verror.csv");
 		break;
 
 		default:
@@ -387,4 +405,33 @@ MainController::~MainController(){
 	for(int i = 0; i < Narduino; i ++){
 		delete arduino.at(i);
 	}
+}
+
+vector<double> MainController::sumVectors(vector<double> d1, vector<double> d2){
+	int i;
+
+	std::vector<double> vec;
+	for(i=0; i < d1.size(); i++){
+		vec.at(i) = d1.at(i) + d2.at(i);
+	}
+	
+	return vec;
+}
+
+bool MainController::savetoCSV(vector<double> vec, string filename){
+	ofstream file;
+	string filepath;
+	unsigned int i;
+	//Open file
+	filepath = "./data/" + filename;
+	cout << filepath << endl;
+	file.open(filepath);
+	if(file.is_open()){
+		for(i=0; i < vec.size(); i++){
+			file << to_string(vec.at(i)) << endl;
+		}
+		file.close();
+		return true;
+	}
+	return false;
 }
