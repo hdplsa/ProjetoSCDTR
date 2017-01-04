@@ -84,7 +84,7 @@ void Meta::calibrateLumVoltageModel(){
         switch(STATE){
         //-----------------------------
         case MASTER:
-            delay(500);
+            delay(200);
             for(n = 0; n < dimU; n++){
                  delay(20);
                 //Valor de entrada no LED
@@ -323,7 +323,7 @@ double *Meta::LeastSquare(const int N, double *u, double *y){
 
 void Meta::setLedU(double u){
   this->_lightcontroller->setLedU(u);
-  delay(20);
+  delay(200);
 }
 
 
