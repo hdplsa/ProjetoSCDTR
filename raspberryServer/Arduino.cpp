@@ -402,8 +402,8 @@ void Arduino::calcComfortVariance(){
 		    - 2*this->y[this->getkPrevious(this->K)] 
 			+ this->y[this->getkPrevious(this->getkPrevious(this->K))]);
 		// O erro da variância acumulada é (N-1)/N*V(k-1) + 1/N*V(k)
-		this->Verror[this->K] = ((cycle-1)/cycle)*this->Verror[getkPrevious(this->K)] 
-							  + 1/cycle*sum/(this->T*this->T);
+		this->Verror[this->K] = (((double)cycle-1)/(double)cycle)*this->Verror[getkPrevious(this->K)] 
+							  + 1/(double)cycle*sum/(this->T*this->T);
 	}	
 }
 
