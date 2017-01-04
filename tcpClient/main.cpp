@@ -25,6 +25,14 @@ int main(){
     c.start_send(string("s 1 0\n"));
     boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
     c.start_send(string("s 0 1\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+    c.start_send(string("s 1 1\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+    c.start_send(string("s 0 0\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+    c.start_send(string("s 1 0\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+    c.start_send(string("s 0 1\n"));
     boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
     c.start_send(string("s 1 1\n"));
     boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));

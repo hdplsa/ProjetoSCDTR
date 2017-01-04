@@ -20,7 +20,7 @@ class MainController{
 	//Variável de instante actual no vector
 	int k;
 	//Numero de pontos guardados
-	int N = 1000;
+	int N = 2000;
 	// Numero de arduinos
 	int Narduino;
 	//Arduinos
