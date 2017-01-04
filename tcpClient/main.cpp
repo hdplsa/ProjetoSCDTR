@@ -18,17 +18,17 @@ int main(){
 
     boost::thread th = boost::thread(boost::bind(&boost::asio::io_service::run, &io_service));
 
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
-    c.start_send(string("s 0 0"));
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
-    c.start_send(string("s 1 0"));
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
-    c.start_send(string("s 0 1"));
+    c.start_send(string("s 0 0\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+    c.start_send(string("s 1 0\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+    c.start_send(string("s 0 1\n"));
     boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
-    c.start_send(string("s 1 1"));
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
-    c.start_send(string("m"));
+    c.start_send(string("s 1 1\n"));
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+    c.start_send(string("m\n"));
 
     return 0;
 
