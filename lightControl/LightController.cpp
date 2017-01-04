@@ -187,6 +187,7 @@ double LightController::calcFeedForward(){
     double feedforward;
     
     feedforward = (this->ref - this->calcSumOtherKus() - this->theta)/this->k[this->index];
+    //feedforward = (this->ref - this->theta)/this->k[this->index];
     
     return feedforward;
 }
