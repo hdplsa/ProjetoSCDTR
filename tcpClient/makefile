@@ -1,17 +1,17 @@
 CC=g++
 CFLAGS=-std=c++11 -c -g -Wall
-LFLAGS=-lboost_system -lboost_thread -lpthread
+LFLAGS=-lboost_system -lboost_thread -lboost_chrono -lpthread
 
-all: main.o tcpClient.o app
+all: main.o client.o app
 
-app: main.o tcpClient.o
-	$(CC) main.o tcpClient.o -o app $(LFLAGS)
+app: main.o client.o
+	$(CC) main.o client.o -o app $(LFLAGS)
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
 
-tcpClient.o: tcpClient.cpp
-	$(CC) $(CFLAGS) tcpClient.cpp
+client.o: client.cpp
+	$(CC) $(CFLAGS) client.cpp
 
 clean:
 	rm *o app

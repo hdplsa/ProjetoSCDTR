@@ -1,102 +1,24 @@
-//
-// async_tcp_client.cpp
-// ~~~~~~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
+#include "client.h"
 
-#include <boost/asio/deadline_timer.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/read_until.hpp>
-#include <boost/asio/streambuf.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/bind.hpp>
-#include <iostream>
-
-using boost::asio::deadline_timer;
-using boost::asio::ip::tcp;
-
-//
-// This class manages socket timeouts by applying the concept of a deadline.
-// Some asynchronous operations are given deadlines by which they must complete.
-// Deadlines are enforced by an "actor" that persists for the lifetime of the
-// client object:
-//
-//  +----------------+
-//  |                |
-//  | check_deadline |<---+
-//  |                |    |
-//  +----------------+    | async_wait()
-//              |         |
-//              +---------+
-//
-// If the deadline actor determines that the deadline has expired, the socket
-// is closed and any outstanding operations are consequently cancelled.
-//
-// Connection establishment involves trying each endpoint in turn until a
-// connection is successful, or the available endpoints are exhausted. If the
-// deadline actor closes the socket, the connect actor is woken up and moves to
-// the next endpoint.
-//
-//  +---------------+
-//  |               |
-//  | start_connect |<---+
-//  |               |    |
-//  +---------------+    |
-//           |           |
-//  async_-  |    +----------------+
-// connect() |    |                |
-//           +--->| handle_connect |
-//                |                |
-//                +----------------+
-//                          :
-// Once a connection is     :
-// made, the connect        :
-// actor forks in two -     :
-//                          :
-// an actor for reading     :       and an actor for
-// inbound messages:        :       sending heartbeats:
-//                          :
-//  +------------+          :          +-------------+
-//  |            |<- - - - -+- - - - ->|             |
-//  | start_read |                     | start_write |<---+
-//  |            |<---+                |             |    |
-//  +------------+    |                +-------------+    | async_wait()
-//          |         |                        |          |
-//  async_- |    +-------------+       async_- |    +--------------+
-//   read_- |    |             |       write() |    |              |
-//  until() +--->| handle_read |               +--->| handle_write |
-//               |             |                    |              |
-//               +-------------+                    +--------------+
-//
-// The input actor reads messages from the socket, where messages are delimited
-// by the newline character. The deadline for a complete message is 30 seconds.
-//
-// The heartbeat actor sends a heartbeat (a message that consists of a single
-// newline character) every 10 seconds. In this example, no deadline is applied
-// message sending.
-//
-class client
-{
-public:
-  client(boost::asio::io_service& io_service)
+  client::client(boost::asio::io_service& io_service)
     : stopped_(false),
       socket_(io_service),
       deadline_(io_service),
-      heartbeat_timer_(io_service)
+      heartbeat_timer_(io_service),
+      input_(io_service, ::dup(STDIN_FILENO)),
+      console_buffer_(100000)
   {
   }
 
   // Called by the user of the client class to initiate the connection process.
   // The endpoint iterator will have been obtained using a tcp::resolver.
-  void start(tcp::resolver::iterator endpoint_iter)
+  void client::start(tcp::resolver::iterator endpoint_iter)
   {
     // Start the connect actor.
     start_connect(endpoint_iter);
+
+    // Start the read console actor
+    //start_read_console();
 
     // Start the deadline actor. You will note that we're not setting any
     // particular deadline here. Instead, the connect and input actors will
@@ -107,16 +29,16 @@ public:
   // This function terminates all the actors to shut down the connection. It
   // may be called by the user of the client class, or by the class itself in
   // response to graceful termination or an unrecoverable error.
-  void stop()
+  void client::stop()
   {
     stopped_ = true;
-    socket_.close();
+    boost::system::error_code ignored_ec;
+    socket_.close(ignored_ec);
     deadline_.cancel();
     heartbeat_timer_.cancel();
   }
 
-private:
-  void start_connect(tcp::resolver::iterator endpoint_iter)
+  void client::start_connect(tcp::resolver::iterator endpoint_iter)
   {
     if (endpoint_iter != tcp::resolver::iterator())
     {
@@ -137,7 +59,7 @@ private:
     }
   }
 
-  void handle_connect(const boost::system::error_code& ec,
+  void client::handle_connect(const boost::system::error_code& ec,
       tcp::resolver::iterator endpoint_iter)
   {
     if (stopped_)
@@ -180,7 +102,7 @@ private:
     }
   }
 
-  void start_read()
+  void client::start_read()
   {
     // Set a deadline for the read operation.
     deadline_.expires_from_now(boost::posix_time::seconds(30));
@@ -190,7 +112,7 @@ private:
         boost::bind(&client::handle_read, this, _1));
   }
 
-  void handle_read(const boost::system::error_code& ec)
+  void client::handle_read(const boost::system::error_code& ec)
   {
     if (stopped_)
       return;
@@ -218,7 +140,7 @@ private:
     }
   }
 
-  void start_write()
+  void client::start_write()
   {
     if (stopped_)
       return;
@@ -228,7 +150,7 @@ private:
         boost::bind(&client::handle_write, this, _1));
   }
 
-  void handle_write(const boost::system::error_code& ec)
+  void client::handle_write(const boost::system::error_code& ec)
   {
     if (stopped_)
       return;
@@ -247,7 +169,7 @@ private:
     }
   }
 
-  void check_deadline()
+  void client::check_deadline()
   {
     if (stopped_)
       return;
@@ -269,37 +191,64 @@ private:
     // Put the actor back to sleep.
     deadline_.async_wait(boost::bind(&client::check_deadline, this));
   }
-
-private:
-  bool stopped_;
-  tcp::socket socket_;
-  boost::asio::streambuf input_buffer_;
-  deadline_timer deadline_;
-  deadline_timer heartbeat_timer_;
-};
-
-int main(int argc, char* argv[])
-{
-  try
+  
+  void client::start_send(std::string send)
   {
-    if (argc != 3)
+    boost::asio::async_write(socket_, boost::asio::buffer(send.c_str(),send.size()), 
+           boost::bind(&client::handle_send, this, _1, _2));
+  }
+  
+  void client::handle_read_console(const boost::system::error_code& ec, std::size_t length)
+  { 
+    if (stopped_)
+      return;
+    
+    if (!ec)
     {
-      std::cerr << "Usage: client <host> <port>\n";
-      return 1;
+      // Extract the newline-delimited message from the buffer.
+      std::string line, terminated_line;
+      std::istream is(&console_buffer_);
+      std::getline(is, line);
+
+      // Empty messages are heartbeats and so ignored.
+      if (!line.empty())
+      {
+        std::cout << "Sending: " << line << "\n";
+        terminated_line = line + std::string("\n");
+        std::size_t n = terminated_line.size();
+        terminated_line.copy(send_buffer_, n);
+        boost::asio::async_write(socket_, boost::asio::buffer(send_buffer_,n), 
+           boost::bind(&client::handle_send, this, _1, _2));
+        
+      }
+      /*if (length != 0)
+      {
+        boost::asio::async_write(socket_, console_buffer_, 
+           boost::bind(&client::handle_send, this, _1, _2));
+      }*/
+
+      //start_read_console();
     }
+    else
+    {
+      std::cout << "Error on handle_read_console: " << ec.message() << "\n";
 
-    boost::asio::io_service io_service;
-    tcp::resolver r(io_service);
-    client c(io_service);
-
-    c.start(r.resolve(tcp::resolver::query(argv[1], argv[2])));
-
-    io_service.run();
+      stop();
+    }
   }
-  catch (std::exception& e)
+  void client::handle_send(const boost::system::error_code& ec, std::size_t length)
   {
-    std::cerr << "Exception: " << e.what() << "\n";
-  }
+    if (stopped_)
+      return;
+    
+    if (!ec)
+    {
+      std::cout << "Sent " << length << " bytes" << std::endl;
+    }
+    else
+    {
+      std::cout << "Error on handle_send: " << ec.message() << "\n";
 
-  return 0;
-}
+      stop();
+    }
+  }

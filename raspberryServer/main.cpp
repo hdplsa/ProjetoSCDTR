@@ -20,8 +20,8 @@ void print_received(string str)
 
 int main(){
 
-        // Inicia o mailController
-    	// Portas dos arduinos
+    // Inicia o mailController
+    // Portas dos arduinos
 	const string port1 = "/dev/ttyACM0";
 	const string port2 = "/dev/ttyACM1";
 

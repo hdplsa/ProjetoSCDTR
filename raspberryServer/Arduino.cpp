@@ -16,16 +16,7 @@ void Arduino::InitArduino(){
 	this->o = true;
 	this->LowBound = 10; // <------------------------- Verficar
 
-//	t.erase(t.begin(),t.end());
-//	ref.erase(ref.begin(),ref.end());
-//	e.erase(e.begin(),e.end());
-//	u.erase(u.begin(),u.end());
-//	y.erase(y.begin(),y.end());
-//	d.erase(d.begin(),d.end());
-//	E.erase(E.begin(),E.end());
-//	Cerror.erase(Cerror.begin(),Cerror.end());
-//	Verror.erase(Verror.begin(),Verror.end());
-
+	// Limpa os vetores (importante no reset)
 	std::fill(t.begin(), t.end(), 0);
 	std::fill(ref.begin(), ref.end(), 0);
 	std::fill(e.begin(), e.end(), 0);
@@ -288,7 +279,7 @@ void Arduino::receiveInformation(char *info){
 	int dataN;
 
 	// Extrai os dados da string
-	if(dataN = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta) == 5){
+	if((dataN = sscanf(info, "data %d %d %f %f %f", &ref, &dc, &y, &e, &theta)) == 5){
 		// Guarda os dados no objeto
 		this->ref[K] = ref;
 		this->d[K] = dc;
@@ -298,7 +289,6 @@ void Arduino::receiveInformation(char *info){
 		// Obtem o tempo do boost::chrono
 		auto time_epoch = boost::chrono::steady_clock::now().time_since_epoch();
 		double time_millis = boost::chrono::duration_cast<boost::chrono::milliseconds>(time_epoch).count();
-		double time_sec = boost::chrono::duration_cast<boost::chrono::seconds>(time_epoch).count();
 		this->t[K] = time_millis;
 		//Calculo o vector de tempo
 		//this->t[K] = this->t[this->getkPrevious(K)] + this->T;
