@@ -388,8 +388,8 @@ void Arduino::calcEnergy(){
 void Arduino::calcComfortError(){
 	if ((K >= 0) && (K < this->N)){
 		// O comfort error acumulado é (N-1)/N*C(k-1) + 1/N*C(k)
-		this->Cerror[this->K] = ((this->cycle-1)/this->cycle)*this->Cerror[getkPrevious(this->K)]
-							  + 1/(double)cycle*getMax(this->e[this->K],0);
+		this->Cerror[this->K] = ((double)(this->cycle-1)/(double)this->cycle)*this->Cerror[getkPrevious(this->K)]
+							  + 1/((double)cycle)*getMax(this->e[this->K],0);
 		
 	}
 }
