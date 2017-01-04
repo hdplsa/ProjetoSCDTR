@@ -79,6 +79,8 @@ double LightController::calcController(){
  * é utilizado para calcular o anti-windup.
  */
     double up, ui, ud, u_antes_sat, ff;
+
+    //this->ffflag = 0;
     
     if(this->ffflag == 1){
         // Primeiro ciclo só com feedforward
@@ -102,6 +104,7 @@ double LightController::calcController(){
         
         // Cálcula o feedforward
         ff = this->calcFeedForward();
+        //ff = 0;
         
         // Cálculo dos sinais de controlo
         up = this->calcPController();
