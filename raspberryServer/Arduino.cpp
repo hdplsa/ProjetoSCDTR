@@ -463,15 +463,15 @@ bool Arduino::isCalibration(){
 	return this->calibration;
 }
 
-vector<double> getEnergyVector(){
+vector<double> Arduino::getEnergyVector(){
 	return this->E;
 }
 
-vector<double> getCerrorVector(){
+vector<double> Arduino::getCerrorVector(){
 	return this->Cerror;
 }
 
-vector<double> getVerrorVector(){
+vector<double> Arduino::getVerrorVector(){
 	return this->Verror;
 }
 

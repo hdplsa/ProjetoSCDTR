@@ -293,28 +293,32 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 		break;
 
 		case 'm':
-				cout << "Save to CSV" << endl;
-				for(i=0; i < this->Narduino; i++){
-					cout << "Arduino " << i << endl;
-					this->arduino[i]->saveVectorsCSV(i);
-				}
-				cout << "Save global Metrics" << endl;
-				vector<double> vec;
+		{ // É necessário isto para limitar a existência das variáveis aqui declaradas no exterior
+			cout << "Save to CSV" << endl;
 
-				for(i=0; i < this->Narduino; i++){
-					vec = this->sumVectors(vec, this->arduino[i]->getEnergyVector());
-				}
-				this->savetoCSV(vec, "Energy.csv");
+			for(i=0; i < this->Narduino; i++){
+				cout << "Arduino " << i << endl;
+				this->arduino[i]->saveVectorsCSV(i);
+			}
 
-				for(i=0; i < this->Narduino; i++){
-					vec = this->sumVectors(vec, this->arduino[i]->getCerrorVector());
-				}
-				this->savetoCSV(vec, "Cerror.csv");
+			cout << "Save global Metrics" << endl;
+			vector<double> vec;
+			
+			for(i=0; i < this->Narduino; i++){
+				vec = this->sumVectors(vec, this->arduino[i]->getEnergyVector());
+			}
+			this->savetoCSV(vec, "Energy.csv");
 
-				for(i=0; i < this->Narduino; i++){
-					vec = this->sumVectors(vec, this->arduino[i]->getVerrorVector());
-				}
-				this->savetoCSV(vec, "Verror.csv");
+			for(i=0; i < this->Narduino; i++){
+				vec = this->sumVectors(vec, this->arduino[i]->getCerrorVector());
+			}
+			this->savetoCSV(vec, "Cerror.csv");
+
+			for(i=0; i < this->Narduino; i++){
+				vec = this->sumVectors(vec, this->arduino[i]->getVerrorVector());
+			}
+			this->savetoCSV(vec, "Verror.csv");
+		}
 		break;
 
 		default:
@@ -408,7 +412,7 @@ MainController::~MainController(){
 }
 
 vector<double> MainController::sumVectors(vector<double> d1, vector<double> d2){
-	int i;
+	unsigned int i;
 
 	std::vector<double> vec;
 	for(i=0; i < d1.size(); i++){
