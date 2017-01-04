@@ -302,7 +302,7 @@ void MainController::get_clientRequest(string str, std::function<void(string)> c
 			}
 
 			cout << "Save global Metrics" << endl;
-			vector<double> vec;
+			vector<double> vec(N,0);
 			
 			for(i=0; i < this->Narduino; i++){
 				vec = this->sumVectors(vec, this->arduino[i]->getEnergyVector());
@@ -414,9 +414,9 @@ MainController::~MainController(){
 vector<double> MainController::sumVectors(vector<double> d1, vector<double> d2){
 	unsigned int i;
 
-	std::vector<double> vec;
+	std::vector<double> vec(N,0);
 	for(i=0; i < d1.size(); i++){
-		vec.at(i) = d1.at(i) + d2.at(i);
+		vec[i] = d1.at(i) + d2.at(i);
 	}
 	
 	return vec;
