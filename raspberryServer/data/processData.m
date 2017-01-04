@@ -18,5 +18,9 @@ Energy1 = Energy1(1:length(time1));
 Cerror1 = Cerror1(1:length(time1));
 Verror1 = Verror1(1:length(time1));
 
+Energy = Energy0(1:length(time0));
+Cerror = Cerror0(1:length(time0));
+Verror = Verror0(1:length(time0));
+
 %% Graphs from files
 graphs;
