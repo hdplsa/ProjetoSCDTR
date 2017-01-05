@@ -6,7 +6,7 @@ plot(time0,ref0,time0,y0,time1,ref1,time1,y1);
 title('Luminosidade');
 legend('Ref 1','Ilum 1','Ref 2','Ilum 2');
 xlabel('t[s]');
-ylabel('Iluminância [lx]');
+ylabel('Iluminancia [lx]');
 
 subplot(2,1,2);
 plot(time0,duty0,time1,duty1);
@@ -26,7 +26,7 @@ title('Cerror');
 xlabel('t[s]');
 
 subplot(3,1,3);
-plot(time0,Verror);
+plot(time0,Vflicker);
 title('Vflicker');
 xlabel('t[s]');
 

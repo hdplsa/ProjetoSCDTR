@@ -22,7 +22,7 @@ Energy = Energy0(1:length(time0));
 Cerror = Cerror0(1:length(time0));
 Verror = Verror0(1:length(time0));
 
-%% Calculo de métricas
+%% Calculo de m?tricas
 time0 = time0/1000;
 time1 = time1/1000;
 
@@ -36,15 +36,16 @@ end
 
 %Cerror
 Cerror = zeros(1,length(time0));
-for n=1:length(time0)
-   Cerror(n) = (1/n)*(sum(max(ref0(1:n)-y0(1:n),0))+sum(max(ref1(1:n)-y1(1:n),0))); 
+Cerror(1) = (1/length(time0))*(max(ref0(1)-y0(1),0)+max(ref1(1)-y1(1),0)); 
+for n=2:length(time0)
+   Cerror(n) = Cerror(n-1)+(1/length(time0))*(max(ref0(n)-y0(n),0)+max(ref1(n)-y1(n),0)); 
 end
 
 
 %Vflicker
 Vflicker = zeros(1,length(time0));
 for n=3:length(time0)
-   Vflicker(n) = (1/(n*0.02^2))*(abs(ref0(n)-2*ref0(n-1)+ref0(n-2))+abs(ref1(n)-2*ref1(n-1)+ref1(n-2)));
+   Vflicker(n) = (1/(n*0.02^2))*(abs(y0(n)-2*y0(n-1)+y0(n-2))+abs(y1(n)-2*y1(n-1)+y1(n-2)));
 end
 
 %% Graphs from files
