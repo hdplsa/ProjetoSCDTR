@@ -333,7 +333,7 @@ void Arduino::receiveInformation(char *info){
 			}
 			//calibration model
 			float k1, k2, theta;
-			if(sscanf(info, "model: [%f %f] %f", &k1, &k2, &theta) == 3){
+			if(sscanf(info, "model: [%f %f ] %f", &k1, &k2, &theta) == 3){
 				cout << "model: [" << k1 << " " << k2 << "] " << theta << endl;
 			}
 			//Calibração terminou
