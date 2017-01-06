@@ -331,6 +331,11 @@ void Arduino::receiveInformation(char *info){
 			if(sscanf(info, "vec: %d", &d) == 1){
 				cout << "vec: " << d << endl;
 			}
+			//calibration model
+			float k1, k2, theta;
+			if(sscanf(info, "model: [%f %f] %f", &k1, &k2, &theta) == 3){
+				cout << "model: [" << k1 << " " << k2 << "] " << theta << endl;
+			}
 			//Calibração terminou
 			if(strcmp(info, "Ready") == 0){
 				calibration = true;

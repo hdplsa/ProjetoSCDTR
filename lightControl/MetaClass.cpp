@@ -155,7 +155,7 @@ void Meta::calibrateLumVoltageModel(){
 //Imprime matriz [K] e [Theta] do modelo
 void Meta::printModel(){
   int i;
-  Serial.print("[");
+  Serial.print("model: [");
   for(i=0; i < this->Narduino; i++){
     Serial.print(this->k[i],4);
     Serial.print(" ");
