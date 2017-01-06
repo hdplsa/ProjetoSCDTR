@@ -44,8 +44,14 @@ end
 
 %Vflicker
 Vflicker = zeros(1,length(time0));
-for n=3:length(time0)
-   Vflicker(n) = (1/(n*0.02^2))*(abs(y0(n)-2*y0(n-1)+y0(n-2))+abs(y1(n)-2*y1(n-1)+y1(n-2)));
+for n=10:length(time0)
+    Vflicker(n) = (1/(n*0.02^2))*(abs(y0(n)-2*y0(n-1)+y0(n-2))+abs(y1(n)-2*y1(n-1)+y1(n-2)));
+    if(sum(ref0(n-9:n)) ~= 50*10 && sum(ref0(n-9:n)) ~= 10*10)
+       Vflicker(n)=0; 
+    end
+    if(sum(ref1(n-9:n)) ~= 50*10 && sum(ref1(n-9:n)) ~= 10*10)
+       Vflicker(n)=0; 
+    end
 end
 
 %% Graphs from files
