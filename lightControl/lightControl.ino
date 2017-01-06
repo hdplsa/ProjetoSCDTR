@@ -232,7 +232,7 @@ void setup() {
 
   //Calibração do modelo
   meta->calibrateLumVoltageModel();
-  //meta->printModel();
+  meta->printModel();
   
   //Coloca ocupação inicial
   meta->setOccupancy(1);
