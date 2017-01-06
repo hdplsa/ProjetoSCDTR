@@ -25,6 +25,8 @@ Verror = Verror0(1:length(time0));
 %% Calculo de m?tricas
 time0 = time0/1000;
 time1 = time1/1000;
+duty0 = duty0/255;
+duty1 = duty1/255;
 
 %Energia
 Energy = zeros(1,length(time0));
