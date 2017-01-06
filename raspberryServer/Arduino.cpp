@@ -380,7 +380,7 @@ void Arduino::calcError(){
 void Arduino::calcEnergy(){
 	if ((K >= 0) && (K < this->N)){
 		this->E[this->K] = this->E[this->getkPrevious(this->K)] 
-						 + this->d[this->getkPrevious(this->K)]*(this->t[this->K]-this->t[getkPrevious(this->K)]);
+						 + (this->d[this->getkPrevious(this->K)]/255.0)*(this->t[this->K]-this->t[getkPrevious(this->K)]);
 	}
 }
 
